@@ -32,6 +32,8 @@ export default async function devServer({
       ],
       output: {
         filename: 'bundle.js',
+        publicPath: '/',
+        assetModuleFilename: 'static/media/[name].[hash][ext]',
       },
       module: {
         rules: [
@@ -55,7 +57,7 @@ export default async function devServer({
           },
           {
             test: /\.css$/i,
-            loader: 'css-loader',
+            use: ['style-loader', 'css-loader'],
           },
           {
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
@@ -165,7 +167,7 @@ export default async function devServer({
         App,
         Skeleton,
       },
-      { url: req.url, entrypoints: ['build.js'] }
+      { url: req.url, entrypoints: ['bundle.js'] }
     )
     res.send(html)
   })

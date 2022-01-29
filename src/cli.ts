@@ -13,7 +13,7 @@ async function getUserPkg() {
   )
 }
 
-program.command('start').action(async () => {
+program.command('dev').action(async () => {
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'development'
   await devServer(userPkg.snext)

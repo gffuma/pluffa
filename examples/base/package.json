@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "dev": "node ./node_modules/snext/dist/cli.js dev",
     "build": "node ./node_modules/snext/dist/cli.js build",
     "staticize": "node ./node_modules/snext/dist/cli.js staticize"
   },

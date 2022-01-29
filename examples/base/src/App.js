@@ -6,8 +6,8 @@ export default function App() {
   const [count, setCount] = useState(0)
   return (
     <div>
-      <img src={image} />
-      <div>hello</div>
+      <img className="banner" src={image} />
+      <div>G A N G !</div>
       <button onClick={() => setCount(count + 1)}>{count}</button>
     </div>
   )
