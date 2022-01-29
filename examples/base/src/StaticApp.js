@@ -2,10 +2,10 @@ import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
 
-export default function StaticApp({ queryClient }) {
+export default function StaticApp({ queryClient, url }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <StaticRouter>
+      <StaticRouter location={url}>
         <App />
       </StaticRouter>
     </QueryClientProvider>
