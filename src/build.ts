@@ -75,7 +75,39 @@ export default function build({
           filename: 'static/css/[name].[contenthash:8].css',
           chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
         }),
+        new webpack.DefinePlugin({
+          'process.env.IS_SNEXT_SERVER': false,
+        }),
       ],
+      resolve: {
+        // Node modules should only be used server side
+        fallback: {
+          fs: false,
+          assert: false,
+          buffer: false,
+          console: false,
+          constants: false,
+          crypto: false,
+          domain: false,
+          events: false,
+          http: false,
+          https: false,
+          os: false,
+          path: false,
+          punycode: false,
+          process: false,
+          querystring: false,
+          stream: false,
+          string_decoder: false,
+          sys: false,
+          timers: false,
+          tty: false,
+          url: false,
+          util: false,
+          vm: false,
+          zlib: false,
+        },
+      },
     },
     {
       name: 'server',
@@ -137,6 +169,11 @@ export default function build({
           },
         ],
       },
+      plugins: [
+        new webpack.DefinePlugin({
+          'process.env.IS_SNEXT_SERVER': true,
+        }),
+      ],
     },
   ])
 

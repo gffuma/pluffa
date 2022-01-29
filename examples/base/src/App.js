@@ -1,14 +1,14 @@
-import { useState } from 'react'
 import './App.css'
-import image from './j.jpg'
+import { Routes, Route } from 'react-router-dom'
+import Home from './Home'
+import { Suspense } from 'react'
 
 export default function App() {
-  const [count, setCount] = useState(0)
   return (
-    <div>
-      <img className="banner" src={image} />
-      <div>G A N G !</div>
-      <button onClick={() => setCount(count + 1)}>{count}</button>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </Suspense>
   )
 }

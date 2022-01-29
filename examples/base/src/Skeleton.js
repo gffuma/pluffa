@@ -19,16 +19,16 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
           }}
         />
       </body>
-      <script
+      {/* <script
         dangerouslySetInnerHTML={{
           __html: `window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};`,
         }}
-      />
-      {entrypoints
+      /> */}
+      {/* {entrypoints
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
           <script key={e} src={`/${e}`} />
-        ))}
+        ))} */}
     </html>
   )
 }
