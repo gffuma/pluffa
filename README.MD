@@ -7,8 +7,8 @@
 # TODO:
 
 - [V] SVG
-- [ ] Improve css minify prod
+- [V] Improve css minify prod
 - [ ] More css loaders modules sass? Ecc
-- [ ] Skip crawl abslute url
+- [V] Skip crawl abslute url
 - [ ] Polish cli
 - [ ] Examples blog pokedex base

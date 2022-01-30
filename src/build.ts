@@ -4,6 +4,7 @@ import webpack from 'webpack'
 import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import nodeExternals from 'webpack-node-externals'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 
 export interface BuildOptions {
   clientEntry: string
@@ -104,6 +105,9 @@ export default function build({
           'process.env.IS_SNEXT_SERVER': false,
         }),
       ],
+      optimization: {
+        minimizer: [new CssMinimizerPlugin()],
+      },
       resolve: {
         // Node modules should only be used server side
         fallback: {
