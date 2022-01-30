@@ -38,11 +38,10 @@ export default function Home() {
 
   return (
     <div>
-      <h2>Posts</h2>
-      <a href='http://github.com/gffuma'>Da King</a>
-      <a href='/?xd=23'>Da King</a>
-      <img className="banner" src={jolteon} />
+      <h1>An ugly Blog</h1>
       <Rocket height={50} />
+      <a href="http://github.com/gffuma">It's me!</a>
+      <img className="banner" src={jolteon} />
       {posts.map((post) => (
         <Post {...post} key={post.slug} />
       ))}

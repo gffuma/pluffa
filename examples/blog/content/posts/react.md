@@ -4,3 +4,5 @@ slug: react
 ---
 
 # Learn React
+
+React is cool [learn them](https://reactjs.org)!
