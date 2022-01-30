@@ -1,10 +1,21 @@
 {
   "private": true,
+  "scripts": {
+    "dev": "snext dev",
+    "build": "snext build",
+    "staticize": "snext staticize"
+  },
   "dependencies": {
     "react": "^18.0.0-rc.0",
     "react-dom": "^18.0.0-rc.0",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "superagent": "^7.1.1"
+    "superagent": "^7.1.1",
+    "snext": "latest"
+  },
+  "snext": {
+    "clientEntry": "./src/index.js",
+    "serverComponent": "./src/StaticApp.js",
+    "skeletonComponent": "./src/Skeleton.js"
   }
 }

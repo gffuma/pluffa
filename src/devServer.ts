@@ -31,7 +31,7 @@ export default async function devServer({
         'webpack-hot-middleware/client?reload=true&name=client',
         clientEntry,
       ],
-      devtool: 'eval-cheap-source-map',
+      devtool: 'eval-cheap-module-source-map',
       output: {
         filename: 'bundle.js',
         publicPath: '/',

@@ -61,6 +61,10 @@
     "@types/webpack-node-externals": "^2.5.3",
     "typescript": "^4.5.5"
   },
+  "peerDependencies": {
+    "react": "^18.0.0-rc.0",
+    "react-dom": "^18.0.0-rc.0"
+  },
   "engines": {
     "node": ">=14.0.0"
   }

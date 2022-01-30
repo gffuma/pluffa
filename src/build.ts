@@ -25,6 +25,7 @@ export default function build({
       mode: 'production',
       target: 'web',
       entry: clientEntry,
+      devtool: 'source-map',
       output: {
         path: path.resolve(process.cwd(), '.snext/client'),
         filename: 'static/js/bundle.[contenthash:8].js',
