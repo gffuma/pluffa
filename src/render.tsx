@@ -56,7 +56,7 @@ export type AppComponent<Props, InitialData> = ComponentType<
    * Called before each request.
    * Get the static props to inject into the App Component.
    */
-  getStaticProps?(props: SnextProps):
+  getStaticProps?(props: AppProps):
     | Promise<{
         props: Props
       }>
@@ -67,7 +67,7 @@ export type AppComponent<Props, InitialData> = ComponentType<
    * Get the initial data to inject into <Skeleton />.
    */
   getInitialData?(
-    props: SnextProps,
+    props: AppProps,
     initialProps?: Props
   ):
     | Promise<{
