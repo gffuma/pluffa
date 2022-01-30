@@ -1049,13 +1049,6 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.9.tgz#97edc9037ea0c38585320b28964dde3b39e4660d"
   integrity sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==
 
-"@types/mkdirp@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@types/mkdirp/-/mkdirp-1.0.2.tgz#8d0bad7aa793abe551860be1f7ae7f3198c16666"
-  integrity sha512-o0K1tSO0Dx5X6xlU5F1D6625FawhC3dU3iqr25lluNv/+/QIVH8RLNEiVokgIZo+mz+87w/3Mkg/VvQS+J51fQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/node@*":
   version "17.0.13"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.13.tgz#5ed7ed7c662948335fcad6c412bb42d99ea754e3"
@@ -2801,9 +2794,31 @@ setprototypeof@1.2.0:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
-"snext@link:../..":
-  version "0.0.0"
-  uid ""
+snext@latest:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/snext/-/snext-0.0.1.tgz#ffb08a6506636b5b6088903dd30b66ab3594bbf8"
+  integrity sha512-FikXrR8lTXyvCcnIo1+7mz6bbKmuRA+Z3c8GDwtsx7k20+sR+Vx8ujHinMsgvImeKmAEq5+NveinGM6CGHQ2Sw==
+  dependencies:
+    "@babel/core" "^7.16.12"
+    "@babel/preset-react" "^7.16.7"
+    "@pmmmwh/react-refresh-webpack-plugin" "^0.5.4"
+    babel-loader "^8.2.3"
+    babel-preset-react-app "^10.0.1"
+    commander "^9.0.0"
+    css-loader "^6.5.1"
+    express "^4.17.2"
+    mini-css-extract-plugin "^2.5.3"
+    mkdirp "^1.0.4"
+    node-html-parser "^5.2.0"
+    react "^18.0.0-rc.0"
+    react-dom "^18.0.0-rc.0"
+    react-refresh "^0.11.0"
+    rimraf "^3.0.2"
+    stream-buffers "^3.0.2"
+    webpack "^5.67.0"
+    webpack-dev-middleware "^5.3.0"
+    webpack-hot-middleware "^2.25.1"
+    webpack-node-externals "^3.0.0"
 
 source-map-js@^1.0.1:
   version "1.0.2"
