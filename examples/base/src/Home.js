@@ -2,7 +2,8 @@ import fs from 'fs/promises'
 import path from 'path'
 import * as matter from 'gray-matter'
 import { useQuery } from 'react-query'
-import j from './j.jpg'
+import jolteon from './jolteon.jpg'
+import { ReactComponent as Rocket } from './rocket.svg'
 
 async function getPosts() {
   const ls = await fs.readdir(path.resolve(process.cwd(), 'content/posts'))
@@ -38,7 +39,8 @@ export default function Home() {
   return (
     <div>
       <h2>Posts</h2>
-      <img className='banner' src={j} />
+      <img className="banner" src={jolteon} />
+      <Rocket height={50} />
       {posts.map((post) => (
         <Post {...post} key={post.slug} />
       ))}
