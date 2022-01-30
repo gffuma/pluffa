@@ -32,7 +32,7 @@ program.command('dev').action(async () => {
 program.command('build').action(async () => {
   console.log(logo)
   console.log()
-  console.log('Creating an optmized build...')
+  console.log('Creating an optimized build...')
   console.log()
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'production'

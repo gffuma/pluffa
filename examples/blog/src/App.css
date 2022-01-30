@@ -1,0 +1,11 @@
+html {
+  color: blueviolet;
+  font-family: monospace;
+  font-size: 23px;
+}
+
+img.banner {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}

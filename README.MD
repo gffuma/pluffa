@@ -5,6 +5,7 @@
 
 
 ## TODO:
+- [ ] Typescript support
 - [ ] More css loaders, css modules, sass (?), post css ecc ...
 - [ ] Generic file loader
 - [ ] Improve error handling developer experience

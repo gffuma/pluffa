@@ -9,16 +9,16 @@ import render from './render'
 
 export interface DevServerOptions {
   clientEntry: string
-  serverEntry: string
-  skeletonEntry: string
+  serverComponent: string
+  skeletonComponent: string
   publicDir: string
   port: number
 }
 
 export default async function devServer({
   clientEntry,
-  serverEntry,
-  skeletonEntry,
+  serverComponent,
+  skeletonComponent,
   port = 7000,
   publicDir = 'public',
 }: DevServerOptions) {
@@ -140,8 +140,8 @@ export default async function devServer({
       mode: 'development',
       target: 'node',
       entry: {
-        App: serverEntry,
-        Skeleton: skeletonEntry,
+        App: serverComponent,
+        Skeleton: skeletonComponent,
       },
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
       externals: [nodeExternals()], // in order to ignore all modules in node_modules folder

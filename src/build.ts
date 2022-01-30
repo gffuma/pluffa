@@ -8,15 +8,15 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 
 export interface BuildOptions {
   clientEntry: string
-  serverEntry: string
-  skeletonEntry: string
+  serverComponent: string
+  skeletonComponent: string
   port: number
 }
 
 export default function build({
   clientEntry,
-  serverEntry,
-  skeletonEntry,
+  serverComponent,
+  skeletonComponent,
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
   const compiler = webpack([
@@ -143,8 +143,8 @@ export default function build({
       mode: 'production',
       target: 'node',
       entry: {
-        App: serverEntry,
-        Skeleton: skeletonEntry,
+        App: serverComponent,
+        Skeleton: skeletonComponent,
       },
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
       externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
