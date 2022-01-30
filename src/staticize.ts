@@ -14,12 +14,25 @@ interface ProcessContract {
   saveFile(url: string, html: string): Promise<void>
 }
 
+function getPathFromUrl(url: string) {
+  return url.split(/[?#]/)[0]
+}
+
+const AbsoluteURLRegex = new RegExp('^(?:[a-z]+:)?//', 'i')
+function isUrlAbsolute(url: string) {
+  return AbsoluteURLRegex.test(url)
+}
+
 async function processURL(url: string, config: ProcessContract) {
   console.log('-->', url)
   const { renderURL, saveFile } = config
   const html = await renderURL(url)
   const document = parseHTML(html)
-  const urls = document.getElementsByTagName('a').map((l) => l.attributes.href)
+  const urls = document
+    .getElementsByTagName('a')
+    .map((l) => l.attributes.href)
+    .filter((url) => !isUrlAbsolute(url))
+    .map((url) => getPathFromUrl(url))
   await saveFile(url, html)
   return urls
 }

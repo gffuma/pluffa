@@ -39,6 +39,8 @@ export default function Home() {
   return (
     <div>
       <h2>Posts</h2>
+      <a href='http://github.com/gffuma'>Da King</a>
+      <a href='/?xd=23'>Da King</a>
       <img className="banner" src={jolteon} />
       <Rocket height={50} />
       {posts.map((post) => (
