@@ -4,11 +4,12 @@
 ## Next.js + react-snap = SNext.js
 
 
-# TODO:
-
-- [V] SVG
-- [V] Improve css minify prod
-- [ ] More css loaders modules sass? Ecc
-- [V] Skip crawl abslute url
-- [ ] Polish cli
+## TODO:
+- [ ] More css loaders, css modules, sass (?), post css ecc ...
+- [ ] Generic file loader
+- [ ] Improve error handling developer experience
 - [ ] Examples blog pokedex base
+
+
+## LICENSE
+MIT

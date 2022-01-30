@@ -6,7 +6,6 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import render from './render'
-import logo from './logo'
 
 export interface DevServerOptions {
   clientEntry: string
@@ -268,7 +267,10 @@ export default async function devServer({
   })
 
   app.listen(port, () => {
-    console.log(logo)
-    console.log(`Listen on port ${port}`)
+    console.log()
+    console.log(`SNext.js Dev Server listen on port: ${port}`)
+    console.log()
+    console.log(`http://localhost:${port}`)
+    console.log()
   })
 }
