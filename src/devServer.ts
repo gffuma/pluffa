@@ -28,7 +28,7 @@ export default async function devServer({
       mode: 'development',
       target: 'web',
       entry: [
-        'webpack-hot-middleware/client?reload=true&name=client',
+        'webpack-hot-middleware/client?reload=true&name=client&quiet=true',
         clientEntry,
       ],
       devtool: 'eval-cheap-module-source-map',

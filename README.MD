@@ -9,7 +9,8 @@
 - [ ] More css loaders, css modules, sass (?), post css ecc ...
 - [ ] Generic file loader
 - [ ] Improve error handling developer experience
-- [ ] Examples blog pokedex base
+- [ ] Add Helmet example in blog example
+- [ ] ESM support for node
 
 
 ## LICENSE
