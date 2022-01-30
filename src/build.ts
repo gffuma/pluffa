@@ -141,21 +141,27 @@ export default function build({
     },
     {
       name: 'server',
-      mode: 'production',
+      mode: 'development',
       target: 'node',
       entry: {
         App: serverComponent,
         Skeleton: skeletonComponent,
       },
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-      externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+      externals: [nodeExternals({ importType: 'module' as any })], // in order to ignore all modules in node_modules folder
+      externalsType: 'module',
       output: {
+        chunkFormat: 'module',
         path: path.join(process.cwd(), '.snext/node'),
         filename: '[name].js',
-        libraryTarget: 'umd',
+        libraryTarget: 'module',
         libraryExport: 'default',
         publicPath: '/',
         assetModuleFilename: 'static/media/[name].[hash][ext]',
+        environment: { module: true },
+      },
+      experiments: {
+        outputModule: true,
       },
       module: {
         rules: [

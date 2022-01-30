@@ -11,11 +11,15 @@
     "react-dom": "^18.0.0-rc.0",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "snext": "latest"
+    "rehype-stringify": "^9.0.3",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "snext": "latest",
+    "unified": "^10.1.1"
   },
   "snext": {
     "clientEntry": "./src/index.js",
-    "serverEntry": "./src/StaticApp.js",
-    "skeletonEntry": "./src/Skeleton.js"
+    "serverComponent": "./src/StaticApp.js",
+    "skeletonComponent": "./src/Skeleton.js"
   }
 }

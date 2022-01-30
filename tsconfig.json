@@ -4,8 +4,9 @@
     "declaration": true,
     "jsx": "react",
     "lib": ["es2020"],
-    "module": "commonjs",
+    "module": "ES2020",
     "target": "es2020",
+    "moduleResolution": "node",
 
     "strict": true,
     "strictNullChecks": true,

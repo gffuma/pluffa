@@ -1,4 +1,8 @@
 import fs from 'fs/promises'
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import rehypeStringify from 'rehype-stringify'
 import path from 'path'
 import * as matter from 'gray-matter'
 import { useQuery } from 'react-query'
@@ -10,9 +14,19 @@ async function getPost(slug) {
     'utf-8'
   )
   const parsed = matter(md)
+
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkRehype)
+    .use(rehypeSanitize)
+    .use(rehypeStringify)
+    .process(parsed.content)
+
+  const html = String(file)
+
   return {
     ...parsed.data,
-    content: parsed.content,
+    html,
   }
 }
 
@@ -29,7 +43,7 @@ export default function Post() {
     <div>
       POST
       <h2>{post.title}</h2>
-      <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
+      <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import nodeExternals from 'webpack-node-externals'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
-import render from './render'
+import render from './render.js'
 
 export interface DevServerOptions {
   clientEntry: string
@@ -28,7 +28,7 @@ export default async function devServer({
       mode: 'development',
       target: 'web',
       entry: [
-        'webpack-hot-middleware/client?reload=true&name=client',
+        'webpack-hot-middleware/client?reload=true&name=client&quiet=true',
         clientEntry,
       ],
       devtool: 'eval-cheap-module-source-map',

@@ -3,10 +3,10 @@ import { Command } from 'commander'
 import fs from 'fs/promises'
 import fsSync from 'fs'
 import path from 'path'
-import build from './build'
-import devServer from './devServer'
-import staticize from './staticize'
-import logo from './logo'
+import build from './build.js'
+import devServer from './devServer.js'
+import staticize from './staticize.js'
+import logo from './logo.js'
 
 const pkg = JSON.parse(
   fsSync.readFileSync(path.resolve(__dirname, '../package.json'), 'utf-8')
@@ -46,6 +46,10 @@ program.command('staticize').action(async () => {
   console.log()
   const userPkg = await getUserPkg()
   await staticize(userPkg)
+})
+
+program.command('hello').action(async () => {
+  console.log('Hello asshole')
 })
 
 program.parse()

@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import render from './render'
+import render from './render.js'
 import ncpCB from 'ncp'
 import util from 'util'
 import { parse as parseHTML } from 'node-html-parser'
