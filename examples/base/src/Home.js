@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <div>
       <h2>Posts</h2>
-      <img src={j} />
+      <img className='banner' src={j} />
       {posts.map((post) => (
         <Post {...post} key={post.slug} />
       ))}

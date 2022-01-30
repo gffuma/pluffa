@@ -1,8 +1,13 @@
 import fs from 'fs/promises'
 import path from 'path'
 import render from './render'
+import ncpCB from 'ncp'
+import util from 'util'
 import { parse as parseHTML } from 'node-html-parser'
 import mkdirp from 'mkdirp'
+import rimraf from 'rimraf'
+
+const ncp = util.promisify(ncpCB)
 
 interface ProcessContract {
   renderURL(url: string): Promise<string>
@@ -50,9 +55,20 @@ async function processURLs(
 
 export default async function staticize({
   outputDir = 'build',
+  publicDir = 'public',
 }: {
   outputDir: string
+  publicDir: string
 }) {
+  rimraf.sync(path.resolve(process.cwd(), outputDir))
+  await ncp(
+    path.resolve(process.cwd(), publicDir),
+    path.resolve(process.cwd(), outputDir)
+  )
+  await ncp(
+    path.resolve(process.cwd(), '.snext/client'),
+    path.resolve(process.cwd(), outputDir)
+  )
   const manifest = JSON.parse(
     await fs.readFile(
       path.join(process.cwd(), 'build', 'manifest.json'),
@@ -60,10 +76,10 @@ export default async function staticize({
     )
   )
 
-  const appPath = path.join(process.cwd(), '.snext', 'App.js')
+  const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
   const App = require(appPath)
 
-  const skeletonPath = path.join(process.cwd(), '.snext', 'Skeleton.js')
+  const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.js')
   const Skeleton = require(skeletonPath)
 
   await processURLs(['/'], {

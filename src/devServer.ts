@@ -12,6 +12,7 @@ export interface DevServerOptions {
   clientEntry: string
   serverEntry: string
   skeletonEntry: string
+  publicDir: string
   port: number
 }
 
@@ -20,6 +21,7 @@ export default async function devServer({
   serverEntry,
   skeletonEntry,
   port = 7000,
+  publicDir = 'public',
 }: DevServerOptions) {
   const compiler = webpack([
     {
@@ -30,6 +32,7 @@ export default async function devServer({
         'webpack-hot-middleware/client?reload=true&name=client',
         clientEntry,
       ],
+      devtool: 'eval-cheap-source-map',
       output: {
         filename: 'bundle.js',
         publicPath: '/',
@@ -118,7 +121,7 @@ export default async function devServer({
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
       externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
       output: {
-        path: path.join(process.cwd(), '.snext'),
+        path: path.join(process.cwd(), '.snext/node'),
         filename: '[name].js',
         libraryTarget: 'umd',
         libraryExport: 'default',
@@ -177,6 +180,8 @@ export default async function devServer({
 
   const app = express()
 
+  app.use(express.static(path.resolve(process.cwd(), publicDir)))
+
   const instance = webpackDevMiddleware(compiler, {
     writeToDisk: (target) => {
       if (path.relative(process.cwd(), target).startsWith('.snext')) {
@@ -191,11 +196,11 @@ export default async function devServer({
   app.use(instance)
 
   app.use(async (req, res) => {
-    const appPath = path.join(process.cwd(), '.snext', 'App.js')
+    const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
     delete require.cache[require.resolve(appPath)]
     const App = require(appPath)
 
-    const skeletonPath = path.join(process.cwd(), '.snext', 'Skeleton.js')
+    const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.js')
     delete require.cache[require.resolve(skeletonPath)]
     const Skeleton = require(skeletonPath)
 

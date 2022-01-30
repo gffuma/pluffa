@@ -17,7 +17,6 @@ export default function build({
   serverEntry,
   skeletonEntry,
 }: BuildOptions) {
-  rimraf.sync(path.resolve(process.cwd(), 'build'))
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
   const compiler = webpack([
     {
@@ -26,7 +25,7 @@ export default function build({
       target: 'web',
       entry: clientEntry,
       output: {
-        path: path.resolve(process.cwd(), 'build'),
+        path: path.resolve(process.cwd(), '.snext/client'),
         filename: 'static/js/bundle.[contenthash:8].js',
         publicPath: '/',
         assetModuleFilename: 'static/media/[name].[hash][ext]',
@@ -120,7 +119,7 @@ export default function build({
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
       externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
       output: {
-        path: path.join(process.cwd(), '.snext'),
+        path: path.join(process.cwd(), '.snext/node'),
         filename: '[name].js',
         libraryTarget: 'umd',
         libraryExport: 'default',
@@ -195,7 +194,7 @@ export default function build({
       const entrypoints =
         info.children![0]!.entrypoints!['main'].assets?.map((a) => a.name) ?? []
       await fs.writeFile(
-        path.join(process.cwd(), 'build', 'manifest.json'),
+        path.join(process.cwd(), '.snext/client', 'manifest.json'),
         JSON.stringify({ entrypoints }, null, 2)
       )
     }
