@@ -5,8 +5,12 @@ import nodeExternals from 'webpack-node-externals'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
-import render from './render.js'
+import { createRequire } from 'module'
+import { Worker } from 'worker_threads'
+import { fileURLToPath } from 'url'
+// import render from './render.js'
 
+const require = createRequire(import.meta.url)
 export interface DevServerOptions {
   clientEntry: string
   serverComponent: string
@@ -144,14 +148,23 @@ export default async function devServer({
         Skeleton: skeletonComponent,
       },
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-      externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+      externals: [
+        nodeExternals({
+          importType: 'module' as any,
+        }),
+      ], // in order to ignore all modules in node_modules folder
+      externalsType: 'module',
       output: {
+        chunkFormat: 'module',
         path: path.join(process.cwd(), '.snext/node'),
-        filename: '[name].js',
-        libraryTarget: 'umd',
-        libraryExport: 'default',
+        filename: '[name].mjs',
+        libraryTarget: 'module',
         publicPath: '/',
         assetModuleFilename: 'static/media/[name].[hash][ext]',
+        environment: { module: true },
+      },
+      experiments: {
+        outputModule: true,
       },
       module: {
         rules: [
@@ -247,23 +260,53 @@ export default async function devServer({
 
   app.use(instance)
 
+  // app.use(async (req, res) => {
+  //   const appPath = path.join(process.cwd(), '.snext/node', 'App.mjs')
+  //   // // delete require.cache[require.resolve(appPath)]
+  //   // // const App = require(appPath)
+  //   const { default: App } = await import(appPath)
+
+  //   const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.mjs')
+  //   // // delete require.cache[require.resolve(skeletonPath)]
+  //   // // const Skeleton = require(skeletonPath)
+  //   const { default: Skeleton } = await import(skeletonPath)
+
+  //   const html = await render(
+  //     {
+  //       App,
+  //       Skeleton,
+  //     },
+  //     { url: req.url, entrypoints: ['bundle.js'] }
+  //   )
+  //   res.send(html)
+  // })
+
   app.use(async (req, res) => {
-    const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
-    delete require.cache[require.resolve(appPath)]
-    const App = require(appPath)
+    const appPath = path.join(process.cwd(), '.snext/node', 'App.mjs')
+    const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.mjs')
 
-    const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.js')
-    delete require.cache[require.resolve(skeletonPath)]
-    const Skeleton = require(skeletonPath)
-
-    const html = await render(
+    const worker = new Worker(
+      path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './renderWorker.js'
+      ),
       {
-        App,
-        Skeleton,
-      },
-      { url: req.url, entrypoints: ['bundle.js'] }
+        workerData: {
+          appPath,
+          skeletonPath,
+          url: req.url,
+          entrypoints: ['bundle.js'],
+        },
+      }
     )
-    res.send(html)
+
+    worker.once('message', (html) => {
+      res.send(html)
+    })
+
+    worker.once('error', (error) => {
+      console.error(error)
+    })
   })
 
   app.listen(port, () => {

@@ -1,3 +1,4 @@
+import { createRequire } from 'module'
 import path from 'path'
 import fs from 'fs/promises'
 import webpack from 'webpack'
@@ -5,6 +6,8 @@ import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import nodeExternals from 'webpack-node-externals'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+
+const require = createRequire(import.meta.url)
 
 export interface BuildOptions {
   clientEntry: string
@@ -141,7 +144,7 @@ export default function build({
     },
     {
       name: 'server',
-      mode: 'development',
+      mode: 'production',
       target: 'node',
       entry: {
         App: serverComponent,

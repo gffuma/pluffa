@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'url'
 import { Command } from 'commander'
+import { readFileSync } from 'fs'
 import fs from 'fs/promises'
-import fsSync from 'fs'
 import path from 'path'
 import build from './build.js'
 import devServer from './devServer.js'
@@ -9,7 +10,13 @@ import staticize from './staticize.js'
 import logo from './logo.js'
 
 const pkg = JSON.parse(
-  fsSync.readFileSync(path.resolve(__dirname, '../package.json'), 'utf-8')
+  readFileSync(
+    path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../package.json'
+    ),
+    'utf-8'
+  )
 )
 const program = new Command()
   .name(pkg.name)

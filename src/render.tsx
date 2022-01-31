@@ -56,7 +56,7 @@ export type AppComponent<Props, InitialData> = ComponentType<
    * Called before each request.
    * Get the static props to inject into the App Component.
    */
-  getStaticProps?(props: SnextProps):
+  getStaticProps?(props: AppProps):
     | Promise<{
         props: Props
       }>
@@ -67,7 +67,7 @@ export type AppComponent<Props, InitialData> = ComponentType<
    * Get the initial data to inject into <Skeleton />.
    */
   getInitialData?(
-    props: SnextProps,
+    props: AppProps,
     initialProps?: Props
   ):
     | Promise<{
@@ -87,12 +87,14 @@ export default async function render<Props, InitialData>(
   props: SnextProps
 ): Promise<string> {
   const out = new streamBuffers.WritableStreamBuffer()
+  const { entrypoints, url } = props
+  const appProps = { url }
 
   return new Promise(async (resolve, reject) => {
     let didError = false
     let initialProps: Props | undefined
     if (App.getStaticProps) {
-      const result = await App.getStaticProps(props)
+      const result = await App.getStaticProps(appProps)
       initialProps = result.props
     }
     const { pipe } = renderToPipeableStream(
@@ -106,13 +108,13 @@ export default async function render<Props, InitialData>(
             const appHtml = out.getContentsAsString() as string
             let initialData: InitialData | undefined
             if (typeof App.getInitialData === 'function') {
-              const result = await App.getInitialData(props, initialProps)
+              const result = await App.getInitialData(appProps, initialProps)
               initialData = result.initialData
             }
             resolve(
               renderToString(
                 <Skeleton
-                  entrypoints={props.entrypoints}
+                  entrypoints={entrypoints}
                   appHtml={appHtml}
                   initialData={initialData}
                 />
