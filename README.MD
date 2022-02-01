@@ -8,28 +8,33 @@
 
 This is an experimental library based on [new React 18 server capabilities](https://github.com/reactwg/react-18/discussions/37) that combine the spirit of [Next.js](https://github.com/vercel/next.js) with the idea behinded [react-snap](https://github.com/stereobooster/react-snap) of creating a static site by crawling all links.
 
-To do this instead of using [puppeter](https://github.com/puppeteer/puppeteer) and wait to all request to finsh we use the output of your server side rendered application to crawl the links. Thanks to React 18 we can execute all side effects of React tree using Suspense.
+To do this instead of using [puppeter](https://github.com/puppeteer/puppeteer) and wait to all request to finsh we use the output of your server side rendered application to crawl all the links. Thanks to React 18 we can execute all side effects of React tree using Suspense.
 
 This project is an experimental stage and is based on ogoing React 18 RC apis but by tests seems working like a charm.
 
 ## Getting started
 
-First of all install `snext`
+Install:
 
 ```sh
 yarn add --dev snext
 ```
 
-Then add theese scripts to `package.json`
+Change your `package.json`:
 
 ```json
-// ..
-"scripts": {
-  "dev": "snext dev",
-  "build": "snext build",
-  "staticize": "snext staticize"
+{
+  "scripts": {
+    "dev": "snext dev",
+    "build": "snext build",
+    "staticize": "snext staticize"
+  },
+  "snext": {
+    "clientEntry": "./src/index.js",
+    "serverComponent": "./src/StaticApp.js",
+    "skeletonComponent": "./src/Skeleton.js"
+  }
 }
-// ..
 ```
 
 The `dev` command wil start a dev server on port 7000 with fast refresh and hot module reload so you can try
@@ -37,40 +42,22 @@ both your client and server code.
 
 The `build` command generate a intermediate folder with a production build of your client and server code.
 
-The `staticize` command use the production code of `build` to render your app using node and crawl your links to generate a static site with all of your routes.
-
-Finally your have to configure `snext` options, for now only in `package.json`, add:
-
-```json
-// ..
-"snext": {
-  // Required
-  "clientEntry": "./src/index.js",
-  "serverComponent": "./src/StaticApp.js",
-  "skeletonComponent": "./src/Skeleton.js",
-  // Optional
-  // the directory to serve public
-  "publicDir": "public",
-  // the port of dev server
-  "port": 7000,
-  // the staticize output directory
-  "outputDir": "build"
-}
-// ..
-```
+The `staticize` command use the production code of `build` command to render your app using node and crawl your links to generate a static site with all of your routes.
 
 The `serverComponent` is the path of your component rendered on the server.
 In the `snext` mental model here you should be able to collect the result of your side effects that happends during render.
 
 The Server Component receive the `url` prop from the server.
 
-The Server Component has tow optional special method `getStaticProps` used to inject extra props into the component before render and `getInitialData` use to "dump" the data collected into a serializable format.
+The Server Component file can export two special functions:
+- `getStaticProps`: Used to inject extra props into the component before render
+- `getSkeletonProps`: Used to inject props into the Skeleton component.
 
 The `snext` library try to be more unopinated possible but for clarity we use the [react-query](https://github.com/tannerlinsley/react-query) library to handle suspense data fetching and the [react-router](https://github.com/remix-run/react-router) library to handle routing and show a real world example.
 
 ```jsx
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { StaticRouter } from 'react-router-dom/server'
+import { StaticRouter } from 'react-router-dom/server.js'
 import App from './App'
 
 // This the app render on the server tipically the inner app performs
@@ -93,7 +80,7 @@ export default function StaticApp({ queryClient, url }) {
 // can be used to create them.
 // you can also perform other side effects and return them as props
 // (the original Next.js getStaticProps)
-StaticApp.getStaticProps = async ({ url }) => {
+export const getStaticProps = async ({ url }) => {
   return {
     props: {
       queryClient: new QueryClient({
@@ -117,9 +104,11 @@ StaticApp.getStaticProps = async ({ url }) => {
 // Here as second argument you have the props injected before
 // you can use this hook to dump the values write in the cache
 // into a serializable format
-StaticApp.getInitialData = async ({ url }, { queryClient }) => {
+export const getSkeletonProps = async ({ url }, { queryClient }) => {
   return {
-    initialData: dehydrate(queryClient),
+    props: {
+      initialData: dehydrate(queryClient),
+    }
   }
 }
 ```
@@ -127,9 +116,12 @@ StaticApp.getInitialData = async ({ url }, { queryClient }) => {
 The `skeletonEntry` is the component used to provide a shell to your server render app.
 The skeleton component is rendered after the server component has finish all side effects and we have its output.
 
-The server component props are the `appHtml` the html string of Server Component rendered, the `entrypoints` are a list of strings of scripts or styles paths generated by the compilation step.
+The server component props are:
+- `appHtml`: The html string of Server Component rendered,
+- `entrypoints`: Strings of scripts or styles paths generated by the compilation step.
+Plus all the props injected by `getSkeletonProps`.
 
-A tipical Skeleton looks like this:
+A Skeleton component looks like this:
 
 ```jsx
 export default function Skeleton({ appHtml, initialData, entrypoints }) {
@@ -171,7 +163,7 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
 The `clientEntry` is the path for your browser entry point.
 Here we use the initial data injected by the Skeleton to hydrate the state of our app.
 
-We complete the example mimic the above Server Component:
+To complete the example above here the client entry:
 
 ```jsx
 import { hydrateRoot } from 'react-dom'
@@ -190,6 +182,57 @@ hydrateRoot(
   </QueryClientProvider>
 )
 ```
+
+## Configure
+
+Here all the available snext options with their defaults:
+
+
+```json
+{
+  "scripts": {
+    "dev": "snext dev",
+    "build": "snext build",
+    "staticize": "snext staticize"
+  },
+  "snext": {
+    "clientEntry": "./path/to/file",
+    "serverComponent": "./path/to/file",
+    "skeletonComponent": "./path/to/file",
+    "port": 7000,
+    "outputDir": "build",
+    "publicDir": "public",
+    "compileNodeCommonJS": false
+  }
+}
+```
+
+## Typescript
+
+Typescript is available out of the box, add a `tsconfig.json` in the root of your project
+and snext will use compile typescript.
+Look [here](./examples/pokedex-typescript) to see a complete typescript example.
+
+## Node ESM
+
+The snext package itself is [pure ESM module](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c),
+also your code is compiled as node ESM, however you can omit file extension in relative import cause your code will be bundled
+as a single file, on the other hand you have to write explicit extension for node_modules import for example:
+```js
+import { StaticRouter } from 'react-router-dom/server.js'
+```
+You can also compile your code as commonJS, if you want, with:
+```json
+{
+  "snext": {
+    "compileNodeCommonJS": true
+  }
+}
+```
+With commonJS the hot reload of node code is a litte bit faster (the implementation is more tricky) and you
+can omit file extension for node_modules dependency but you can't import pure ESM modules.
+
+
 
 ## [EXAMPLES](./examples)
 
