@@ -1,5 +1,6 @@
 import { createRequire } from 'module'
 import path from 'path'
+import { existsSync } from 'fs'
 import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
@@ -23,10 +24,17 @@ export default function build({
   skeletonComponent,
   compileNodeCommonJS = false,
 }: BuildOptions) {
+  rimraf.sync(path.resolve(process.cwd(), '.snext'))
+  const useTypescript = existsSync(
+    path.resolve(process.cwd(), 'tsconfig.json')
+  )
+  const resolveExtesions = [
+    ...['.js', '.mjs', '.jsx'],
+    ...(useTypescript ? ['.ts', '.tsx'] : []),
+  ]
   const nodeConfiguration = compileNodeCommonJS
     ? NodeCommonJSConfiguration
     : NodeESMConfiguration
-  rimraf.sync(path.resolve(process.cwd(), '.snext'))
   const compiler = webpack([
     {
       name: 'client',
@@ -43,7 +51,7 @@ export default function build({
       module: {
         rules: [
           {
-            test: /\.m?js$/,
+            test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
             exclude: /(node_modules)/,
             use: {
               loader: 'babel-loader',
@@ -53,6 +61,8 @@ export default function build({
                     'react-app',
                     {
                       runtime: 'automatic',
+                      flow: false,
+                      typescript: useTypescript,
                     },
                   ],
                 ],
@@ -118,6 +128,7 @@ export default function build({
         minimizer: [new CssMinimizerPlugin()],
       },
       resolve: {
+        extensions: resolveExtesions,
         // Node modules should only be used server side
         fallback: {
           fs: false,
@@ -159,19 +170,20 @@ export default function build({
       module: {
         rules: [
           {
-            test: /\.m?js$/,
+            test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
             exclude: /(node_modules)/,
             use: {
               loader: 'babel-loader',
               options: {
                 presets: [
+                  useTypescript && '@babel/preset-typescript',
                   [
                     '@babel/preset-react',
                     {
                       runtime: 'automatic',
                     },
                   ],
-                ],
+                ].filter(Boolean),
               },
             },
           },
@@ -224,6 +236,9 @@ export default function build({
             },
           },
         ],
+      },
+      resolve: {
+        extensions: resolveExtesions,
       },
       plugins: [
         new webpack.DefinePlugin({

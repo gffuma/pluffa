@@ -50,7 +50,7 @@ export type GetStaticProps<Props = any> = (
 
 export type GetSkeletonProps<StaticProps = any, Props = any> = (
   props: AppProps,
-  staticProps?: StaticProps
+  staticProps: StaticProps
 ) => { props: Props } | Promise<{ props: Props }>
 
 export type AppComponent<Props> = ComponentType<AppProps & Props>
@@ -72,12 +72,12 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
      * Called before each request.
      * Get the static props to inject into the App Component.
      */
-    getStaticProps: GetStaticProps<StaticProps>
+    getStaticProps?: GetStaticProps<StaticProps>
     /**
      * Callend after the <App /> component has fully rendered.
      * Get the initial data to inject into <Skeleton />.
      */
-    getSkeletonProps: GetSkeletonProps<StaticProps, HydrateSkeletonProps>
+    getSkeletonProps?: GetSkeletonProps<StaticProps, HydrateSkeletonProps>
     /**
      * The Skeleton Component
      */
@@ -107,7 +107,7 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
             const appHtml = out.getContentsAsString() || ''
             let skeletonProps: HydrateSkeletonProps | undefined
             if (getSkeletonProps) {
-              const result = await getSkeletonProps(appProps, staticProps)
+              const result = await getSkeletonProps(appProps, staticProps!)
               skeletonProps = result.props
             }
             resolve(

@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import express from 'express'
 import webpack from 'webpack'
@@ -28,9 +29,17 @@ export default async function devServer({
   publicDir = 'public',
   compileNodeCommonJS = false,
 }: DevServerOptions) {
+  const useTypescript = fs.existsSync(
+    path.resolve(process.cwd(), 'tsconfig.json')
+  )
   const nodeConfiguration = compileNodeCommonJS
     ? NodeCommonJSConfiguration
     : NodeESMConfiguration
+
+  const resolveExtesions = [
+    ...['.js', '.mjs', '.jsx'],
+    ...(useTypescript ? ['.ts', '.tsx'] : []),
+  ]
 
   const compiler = webpack([
     {
@@ -50,7 +59,7 @@ export default async function devServer({
       module: {
         rules: [
           {
-            test: /\.m?js$/,
+            test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
             exclude: /(node_modules)/,
             use: {
               loader: 'babel-loader',
@@ -60,6 +69,8 @@ export default async function devServer({
                     'react-app',
                     {
                       runtime: 'automatic',
+                      flow: false,
+                      typescript: useTypescript,
                     },
                   ],
                 ],
@@ -116,6 +127,7 @@ export default async function devServer({
         }),
       ],
       resolve: {
+        extensions: resolveExtesions,
         // Node modules should only be used server side
         fallback: {
           fs: false,
@@ -157,19 +169,20 @@ export default async function devServer({
       module: {
         rules: [
           {
-            test: /\.m?js$/,
+            test: /\.(js|mjs|jsx|ts|tsx)$/,
             exclude: /(node_modules)/,
             use: {
               loader: 'babel-loader',
               options: {
                 presets: [
+                  useTypescript && '@babel/preset-typescript',
                   [
                     '@babel/preset-react',
                     {
                       runtime: 'automatic',
                     },
                   ],
-                ],
+                ].filter(Boolean),
               },
             },
           },
@@ -222,6 +235,9 @@ export default async function devServer({
             },
           },
         ],
+      },
+      resolve: {
+        extensions: resolveExtesions,
       },
       plugins: [
         new webpack.DefinePlugin({
