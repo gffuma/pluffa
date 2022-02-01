@@ -11,11 +11,8 @@
     "react-dom": "^18.0.0-rc.0",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "rehype-stringify": "^9.0.3",
-    "remark-parse": "^10.0.1",
-    "remark-rehype": "^10.1.0",
-    "snext": "latest",
-    "unified": "^10.1.1"
+    "showdown": "^1.9.1",
+    "snext": "latest"
   },
   "snext": {
     "clientEntry": "./src/index.js",
