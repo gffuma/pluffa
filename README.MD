@@ -258,6 +258,7 @@ can omit file extension for node_modules dependency but you can't import pure ES
 
 If your website has no interaction except for links you can decide to ship
 it without ANY Javascript.
+
 With snext doing it's simple, hack you Skeleton Component:
 
 ```jsx
@@ -304,6 +305,7 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
 }
 ```
 
+To a more complete example check the [blog example](./example/blog).
 
 
 ## [EXAMPLES](./examples)
