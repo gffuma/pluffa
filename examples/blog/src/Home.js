@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import * as matter from 'gray-matter'
+import matter from 'gray-matter'
 import { useQuery } from 'react-query'
 import jolteon from './jolteon.jpg'
 import { ReactComponent as Rocket } from './rocket.svg'

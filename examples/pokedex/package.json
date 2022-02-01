@@ -16,7 +16,6 @@
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
-    "skeletonComponent": "./src/Skeleton.js",
-    "compileNodeCommonJS": true
+    "skeletonComponent": "./src/Skeleton.js"
   }
 }
