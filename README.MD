@@ -326,7 +326,9 @@ The default starting point of crawling is `/` you can customize the urls to star
 
 ```json
 {
-  "urls": ["/", "/blog", "/about"]
+  "snext": {
+    "urls": ["/", "/blog", "/about"]
+  }
 }
 ```
 
@@ -334,7 +336,9 @@ You can also tweak crawling concurrency with:
 
 ```json
 {
-  "crawlConcurrency": 1
+  "snext": {
+    "crawlConcurrency": 1
+  }
 }
 ```
 
