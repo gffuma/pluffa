@@ -1,8 +1,9 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import Home from './Home'
 import { Suspense } from 'react'
+import Home from './Home'
 import Post from './Post'
+import Secret from './Secret'
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/post/:slug" element={<Post />} />
+        <Route path="/secret" element={<Secret />} />
       </Routes>
     </Suspense>
   )

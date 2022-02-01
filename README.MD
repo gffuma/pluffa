@@ -316,7 +316,6 @@ To a more complete example check the [blog example](./examples/blog).
 
 - [ ] More css loaders, css modules, sass (?), post css ecc ...
 - [ ] Generic file loader
-- [ ] Improve error handling developer experience
 - [ ] Add Helmet example in blog example
 
 ## LICENSE

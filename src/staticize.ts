@@ -1,12 +1,13 @@
 import fs from 'fs/promises'
 import path from 'path'
-import render from './render.js'
 import ncpCB from 'ncp'
 import util from 'util'
 import { parse as parseHTML } from 'node-html-parser'
 import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
 import chalk from 'chalk'
+import PQueue from 'p-queue'
+import render from './render.js'
 
 const ncp = util.promisify(ncpCB)
 
@@ -40,41 +41,42 @@ async function processURL(url: string, config: ProcessContract) {
 
 async function processURLs(
   urls: string[],
+  concurrency: number,
   config: ProcessContract
 ): Promise<void> {
-  const queue: string[] = []
-
+  const queue = new PQueue({ concurrency })
   const uniqeUrls = new Set<string>()
-  function addToQueue(url: string) {
+
+  function enqueueUrl(url: string) {
     if (!uniqeUrls.has(url)) {
-      queue.push(url)
       uniqeUrls.add(url)
+      queue.add(() => processURL(url, config))
     }
   }
 
-  urls.forEach(addToQueue)
-
-  async function recursiveProcessURL(): Promise<void> {
-    if (queue.length === 0) {
-      return
-    }
-    const url = queue.pop()!
-    const collectedUrls = await processURL(url, config)
-    collectedUrls.forEach(addToQueue)
-    return recursiveProcessURL()
-  }
-
-  return recursiveProcessURL()
+  urls.forEach((url) => {
+    enqueueUrl(url)
+  })
+  queue.on('completed', (urls: string[]) => {
+    urls.forEach((url) => {
+      enqueueUrl(url)
+    })
+  })
+  return queue.onIdle()
 }
 
 export default async function staticize({
   outputDir = 'build',
   publicDir = 'public',
   compileNodeCommonJS = false,
+  urls = ['/'],
+  crawlConcurrency = 4,
 }: {
   outputDir: string
   publicDir: string
   compileNodeCommonJS: boolean
+  urls: string[]
+  crawlConcurrency: number
 }) {
   rimraf.sync(path.resolve(process.cwd(), outputDir))
   await ncp(
@@ -112,7 +114,7 @@ export default async function staticize({
   )
   const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
 
-  await processURLs(['/'], {
+  await processURLs(urls, crawlConcurrency, {
     async renderURL(url) {
       return render(
         {
