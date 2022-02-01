@@ -31,8 +31,7 @@ export const NodeCommonJSConfiguration: Configuration = {
   output: {
     path: path.join(process.cwd(), '.snext/node'),
     filename: '[name].js',
-    libraryTarget: 'umd',
-    libraryExport: 'default',
+    libraryTarget: 'commonjs',
     publicPath: '/',
     assetModuleFilename: 'static/media/[name].[hash][ext]',
   },

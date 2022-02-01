@@ -12,7 +12,7 @@ export default function StaticApp({ queryClient, url }) {
   )
 }
 
-StaticApp.getStaticProps = () => {
+export const getStaticProps = () => {
   return {
     props: {
       queryClient: new QueryClient({
@@ -33,8 +33,10 @@ StaticApp.getStaticProps = () => {
   }
 }
 
-StaticApp.getInitialData = (config, { queryClient }) => {
+export const getSkeletonProps = (staticProps, { queryClient }) => {
   return {
-    initialData: dehydrate(queryClient),
+    props: {
+      initialData: dehydrate(queryClient),
+    },
   }
 }

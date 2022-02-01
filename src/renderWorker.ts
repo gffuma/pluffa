@@ -13,12 +13,18 @@ async function renderWorker({
   appPath: string
   skeletonPath: string
 } & SnextProps) {
-  const { default: App } = await import(appPath)
+  const {
+    default: App,
+    getStaticProps,
+    getSkeletonProps,
+  } = await import(appPath)
   const { default: Skeleton } = await import(skeletonPath)
 
   const html = await render(
     {
       App,
+      getStaticProps,
+      getSkeletonProps,
       Skeleton,
     },
     { url, entrypoints }

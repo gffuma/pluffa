@@ -32,7 +32,7 @@ export interface AppProps {
   url: string
 }
 
-export interface SkeletonProps<InitialData> {
+export interface SkeletonProps {
   /**
    * List of entrypoints file names
    */
@@ -42,47 +42,46 @@ export interface SkeletonProps<InitialData> {
    * Rendered html of app
    */
   appHtml: string
-
-  /**
-   * Data to inject from <App /> static method + result of side effects XD
-   */
-  initialData?: InitialData
 }
 
-export type AppComponent<Props, InitialData> = ComponentType<
-  Props & AppProps
-> & {
-  /**
-   * Called before each request.
-   * Get the static props to inject into the App Component.
-   */
-  getStaticProps?(props: AppProps):
-    | Promise<{
-        props: Props
-      }>
-    | { props: Props }
+export type GetStaticProps<Props = any> = (
+  props: AppProps
+) => { props: Props } | Promise<{ props: Props }>
 
-  /**
-   * Callend after the <App /> component has fully rendered.
-   * Get the initial data to inject into <Skeleton />.
-   */
-  getInitialData?(
-    props: AppProps,
-    initialProps?: Props
-  ):
-    | Promise<{
-        initialData: InitialData
-      }>
-    | { initialData: InitialData }
-}
+export type GetSkeletonProps<StaticProps = any, Props = any> = (
+  props: AppProps,
+  staticProps?: StaticProps
+) => { props: Props } | Promise<{ props: Props }>
 
-export default async function render<Props, InitialData>(
+export type AppComponent<Props> = ComponentType<AppProps & Props>
+
+export type SkeletonComponent<Props> = ComponentType<SkeletonProps & Props>
+
+export default async function render<StaticProps, HydrateSkeletonProps>(
   {
     App,
+    getStaticProps,
+    getSkeletonProps,
     Skeleton,
   }: {
-    App: AppComponent<Props, InitialData>
-    Skeleton: ComponentType<SkeletonProps<InitialData>>
+    /**
+     * The static App Component
+     */
+    App: AppComponent<StaticProps>
+    /**
+     * Called before each request.
+     * Get the static props to inject into the App Component.
+     */
+    getStaticProps: GetStaticProps<StaticProps>
+    /**
+     * Callend after the <App /> component has fully rendered.
+     * Get the initial data to inject into <Skeleton />.
+     */
+    getSkeletonProps: GetSkeletonProps<StaticProps, HydrateSkeletonProps>
+    /**
+     * The Skeleton Component
+     */
+    Skeleton: SkeletonComponent<HydrateSkeletonProps>
   },
   props: SnextProps
 ): Promise<string> {
@@ -92,31 +91,31 @@ export default async function render<Props, InitialData>(
 
   return new Promise(async (resolve, reject) => {
     let didError = false
-    let initialProps: Props | undefined
-    if (App.getStaticProps) {
-      const result = await App.getStaticProps(appProps)
-      initialProps = result.props
+    let staticProps: StaticProps | undefined
+    if (getStaticProps) {
+      const result = await getStaticProps(appProps)
+      staticProps = result.props
     }
     const { pipe } = renderToPipeableStream(
-      <App url={props.url} {...initialProps!} />,
+      <App {...staticProps!} url={props.url} />,
       {
         onCompleteAll() {
           if (didError) {
             return
           }
           out.on('finish', async () => {
-            const appHtml = out.getContentsAsString() as string
-            let initialData: InitialData | undefined
-            if (typeof App.getInitialData === 'function') {
-              const result = await App.getInitialData(appProps, initialProps)
-              initialData = result.initialData
+            const appHtml = out.getContentsAsString() || ''
+            let skeletonProps: HydrateSkeletonProps | undefined
+            if (getSkeletonProps) {
+              const result = await getSkeletonProps(appProps, staticProps)
+              skeletonProps = result.props
             }
             resolve(
               renderToString(
                 <Skeleton
+                  {...skeletonProps!}
                   entrypoints={entrypoints}
                   appHtml={appHtml}
-                  initialData={initialData}
                 />
               )
             )

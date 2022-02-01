@@ -91,25 +91,33 @@ export default async function staticize({
     )
   )
 
+  const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
+
   const appPath = path.join(
     process.cwd(),
     '.snext/node',
     `App.${compileNodeCommonJS ? '' : 'm'}js`
   )
-  const { default: App } = await import(appPath)
+  const {
+    default: App,
+    getSkeletonProps,
+    getStaticProps,
+  } = await import(appPath).then(uniformExport)
 
   const skeletonPath = path.join(
     process.cwd(),
     '.snext/node',
     `Skeleton.${compileNodeCommonJS ? '' : 'm'}js`
   )
-  const { default: Skeleton } = await import(skeletonPath)
+  const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
 
   await processURLs(['/'], {
     async renderURL(url) {
       return render(
         {
           App,
+          getSkeletonProps,
+          getStaticProps,
           Skeleton,
         },
         {

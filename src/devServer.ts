@@ -252,18 +252,24 @@ export default async function devServer({
     app.use(async (req, res) => {
       const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
       delete require.cache[require.resolve(appPath)]
-      const App = require(appPath)
+      const {
+        default: App,
+        getStaticProps,
+        getSkeletonProps,
+      } = require(appPath)
 
       const skeletonPath = path.join(
         process.cwd(),
         '.snext/node',
         'Skeleton.js'
       )
-      const { default: Skeleton } = await import(skeletonPath)
-
+      delete require.cache[require.resolve(skeletonPath)]
+      const { default: Skeleton } = require(skeletonPath)
       const html = await render(
         {
           App,
+          getStaticProps,
+          getSkeletonProps,
           Skeleton,
         },
         { url: req.url, entrypoints: ['bundle.js'] }

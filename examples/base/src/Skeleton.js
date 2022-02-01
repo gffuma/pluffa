@@ -1,4 +1,4 @@
-export default function Skeleton({ appHtml, initialData, entrypoints }) {
+export default function Skeleton({ appHtml, entrypoints }) {
   return (
     <html>
       <head>
@@ -19,11 +19,6 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
           }}
         />
       </body>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};`,
-        }}
-      />
       {entrypoints
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
