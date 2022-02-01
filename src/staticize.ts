@@ -30,11 +30,17 @@ async function processURL(url: string, config: ProcessContract) {
   const { renderURL, saveFile } = config
   const html = await renderURL(url)
   const document = parseHTML(html)
-  const urls = document
+  const urls: string[] = []
+  document
     .getElementsByTagName('a')
     .map((l) => l.attributes.href)
     .filter((url) => !isUrlAbsolute(url))
-    .map((url) => getPathFromUrl(url))
+    .forEach((url) => urls.push(getPathFromUrl(url)))
+  document
+    .querySelectorAll('[data-crawl-url]')
+    .map((l) => l.attributes['data-crawl-url'])
+    .filter((url) => !isUrlAbsolute(url))
+    .forEach((url) => urls.push(getPathFromUrl(url)))
   await saveFile(url, html)
   return urls
 }
@@ -54,14 +60,11 @@ async function processURLs(
     }
   }
 
-  urls.forEach((url) => {
-    enqueueUrl(url)
-  })
   queue.on('completed', (urls: string[]) => {
-    urls.forEach((url) => {
-      enqueueUrl(url)
-    })
+    urls.forEach((url) => enqueueUrl(url))
   })
+
+  urls.forEach((url) => enqueueUrl(url))
   return queue.onIdle()
 }
 

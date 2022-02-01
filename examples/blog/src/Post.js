@@ -32,7 +32,7 @@ export default function Post() {
 
   return (
     <div>
-      <h2>{post.title}</h2>
+      <h2 data-crawl-url='/Dr4g0'>{post.title}</h2>
       <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
     </div>
   )
