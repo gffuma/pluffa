@@ -211,7 +211,7 @@ Here all the available snext options with their defaults:
 
 Typescript is available out of the box, add a `tsconfig.json` in the root of your project
 and snext will use compile typescript.
-Look [here](./examples/pokedex-typescript) to see a complete typescript example.
+Look [here](./examples/typescript-pokedex) to see a complete typescript example.
 
 ## Node ESM
 
