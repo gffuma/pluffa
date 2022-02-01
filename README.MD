@@ -183,6 +183,28 @@ hydrateRoot(
 )
 ```
 
+## Running node specific code
+You can run specefic node code wherever you want using `process.env.IS_SNEXT_SERVER`.
+This special expression in statically replaced with `true` in node environment and `false` on
+client.
+Note, all node native modules are empty modules in client javascript.
+
+```js
+// Empty module in client
+import fs from 'fs'
+
+// Removed in production client bundle by tree shaking
+function readMy() {
+  return fs.readFileSync('something.json', 'utf-8')
+}
+
+if (process.env.IS_SNEXT_SERVER) {
+  // Never shipped to client bundle
+  readMy()
+}
+```
+
+
 ## Configure
 
 Here all the available snext options with their defaults:
@@ -215,7 +237,7 @@ Look [here](./examples/typescript-pokedex) to see a complete typescript example.
 
 ## Node ESM
 
-The snext package itself is [pure ESM module](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c),
+The snext package itself is [pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c),
 also your code is compiled as node ESM, however you can omit file extension in relative import cause your code will be bundled
 as a single file, on the other hand you have to write explicit extension for node_modules import for example:
 ```js
@@ -231,6 +253,56 @@ You can also compile your code as commonJS, if you want, with:
 ```
 With commonJS the hot reload of node code is a litte bit faster (the implementation is more tricky) and you
 can omit file extension for node_modules dependency but you can't import pure ESM modules.
+
+## No Javascript
+
+If your website has no interaction except for links you can decide to ship
+it without ANY Javascript.
+With snext doing it's simple, hack you Skeleton Component:
+
+```jsx
+export default function Skeleton({ appHtml, initialData, entrypoints }) {
+  return (
+    <html>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        {entrypoints
+          .filter((e) => e.endsWith('.css'))
+          .map((e) => (
+            <link key={e} href={`/${e}`} rel="stylesheet" />
+          ))}
+      </head>
+      <body>
+        <div
+          id="root"
+          dangerouslySetInnerHTML={{
+            __html: appHtml,
+          }}
+        />
+      </body>
+      {/* In DEV we use javascript for hot reload =) */}
+      {process.env.NODE_ENV !== 'production' && (
+        <>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.__INITIAL_DATA__ = ${JSON.stringify(
+                initialData
+              )};`,
+            }}
+          />
+          {entrypoints
+            .filter((e) => e.endsWith('.js'))
+            .map((e) => (
+              <script key={e} src={`/${e}`} />
+            ))}
+        </>
+      )}
+    </html>
+  )
+}
+```
 
 
 
