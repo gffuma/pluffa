@@ -183,6 +183,8 @@ hydrateRoot(
 )
 ```
 
+You can find the complete example [here](./examples/pokedex).
+
 ## Running node specific code
 You can run specefic node code wherever you want using `process.env.IS_SNEXT_SERVER`.
 This special expression in statically replaced with `true` in node environment and `false` on
@@ -305,7 +307,7 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
 }
 ```
 
-To a more complete example check the [blog example](./example/blog).
+To a more complete example check the [blog example](./examples/blog).
 
 
 ## [EXAMPLES](./examples)
