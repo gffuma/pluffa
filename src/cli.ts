@@ -5,6 +5,7 @@ import { readFileSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
 import logo from './logo.js'
+import chalk from 'chalk'
 
 const pkg = JSON.parse(
   readFileSync(
@@ -27,7 +28,7 @@ async function getUserPkg() {
 }
 
 program.command('dev').action(async () => {
-  console.log(logo)
+  console.log(chalk.magenta(logo))
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'development'
   const { default: devServer } = await import('./devServer.js')
@@ -35,7 +36,7 @@ program.command('dev').action(async () => {
 })
 
 program.command('build').action(async () => {
-  console.log(logo)
+  console.log(chalk.magenta(logo))
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'production'
   const { default: build } = await import('./build.js')
@@ -46,7 +47,7 @@ program.command('build').action(async () => {
 })
 
 program.command('staticize').action(async () => {
-  console.log(logo)
+  console.log(chalk.magenta(logo))
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'production'
   const { default: staticize } = await import('./staticize.js')

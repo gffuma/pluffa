@@ -2,14 +2,17 @@ import fs from 'fs'
 import path from 'path'
 import express from 'express'
 import webpack from 'webpack'
+import { renderToString } from 'react-dom/server.js'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import { createRequire } from 'module'
 import { Worker } from 'worker_threads'
+import chalk from 'chalk'
 import { fileURLToPath } from 'url'
 import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
 import render from './render.js'
+import ErrorPage from './ErrorPage.js'
 
 const require = createRequire(import.meta.url)
 export interface DevServerOptions {
@@ -160,6 +163,7 @@ export default async function devServer({
     {
       name: 'server',
       mode: 'development',
+      devtool: 'eval-cheap-module-source-map',
       target: 'node',
       entry: {
         App: serverComponent,
@@ -266,31 +270,43 @@ export default async function devServer({
 
   if (compileNodeCommonJS) {
     app.use(async (req, res) => {
-      const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
-      delete require.cache[require.resolve(appPath)]
-      const {
-        default: App,
-        getStaticProps,
-        getSkeletonProps,
-      } = require(appPath)
-
-      const skeletonPath = path.join(
-        process.cwd(),
-        '.snext/node',
-        'Skeleton.js'
-      )
-      delete require.cache[require.resolve(skeletonPath)]
-      const { default: Skeleton } = require(skeletonPath)
-      const html = await render(
-        {
-          App,
+      try {
+        const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
+        delete require.cache[require.resolve(appPath)]
+        const {
+          default: App,
           getStaticProps,
           getSkeletonProps,
-          Skeleton,
-        },
-        { url: req.url, entrypoints: ['bundle.js'] }
-      )
-      res.send(html)
+        } = require(appPath)
+
+        const skeletonPath = path.join(
+          process.cwd(),
+          '.snext/node',
+          'Skeleton.js'
+        )
+        delete require.cache[require.resolve(skeletonPath)]
+        const { default: Skeleton } = require(skeletonPath)
+        const html = await render(
+          {
+            App,
+            getStaticProps,
+            getSkeletonProps,
+            Skeleton,
+          },
+          { url: req.url, entrypoints: ['bundle.js'] }
+        )
+        res.send(html)
+      } catch (error) {
+        console.error(chalk.red('Error during render'))
+        console.error(error)
+        res
+          .status(500)
+          .send(
+            renderToString(
+              <ErrorPage title="Error during render" error={error as any} />
+            )
+          )
+      }
     })
   } else {
     app.use(async (req, res) => {
@@ -307,6 +323,7 @@ export default async function devServer({
           './renderWorker.js'
         ),
         {
+          execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
           workerData: {
             appPath,
             skeletonPath,
@@ -320,15 +337,23 @@ export default async function devServer({
         res.send(html)
       })
 
-      worker.once('error', (error) => {
+      worker.on('error', (error) => {
+        console.error(chalk.red('Error during render'))
         console.error(error)
+        res
+          .status(500)
+          .send(
+            renderToString(
+              <ErrorPage title="Error during render" error={error} />
+            )
+          )
       })
     })
   }
 
   app.listen(port, () => {
     console.log()
-    console.log(`SNext.js Dev Server listen on port: ${port}`)
+    console.log(chalk.green(`SNext.js Dev Server listen on port: ${port}`))
     console.log()
     console.log(`http://localhost:${port}`)
     console.log()

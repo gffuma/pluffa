@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react'
+import { ComponentType } from 'react'
 import streamBuffers from 'stream-buffers'
 import ReacDOMServer from 'react-dom/server.js'
 const { renderToString } = ReacDOMServer

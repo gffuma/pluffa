@@ -6,6 +6,7 @@ import util from 'util'
 import { parse as parseHTML } from 'node-html-parser'
 import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
+import chalk from 'chalk'
 
 const ncp = util.promisify(ncpCB)
 
@@ -24,7 +25,7 @@ function isUrlAbsolute(url: string) {
 }
 
 async function processURL(url: string, config: ProcessContract) {
-  console.log('-->', url)
+  console.log(chalk.bold.cyan(url))
   const { renderURL, saveFile } = config
   const html = await renderURL(url)
   const document = parseHTML(html)
