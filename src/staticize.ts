@@ -69,9 +69,11 @@ async function processURLs(
 export default async function staticize({
   outputDir = 'build',
   publicDir = 'public',
+  compileNodeCommonJS = false,
 }: {
   outputDir: string
   publicDir: string
+  compileNodeCommonJS: boolean
 }) {
   rimraf.sync(path.resolve(process.cwd(), outputDir))
   await ncp(
@@ -89,11 +91,19 @@ export default async function staticize({
     )
   )
 
-  const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
-  const App = require(appPath)
+  const appPath = path.join(
+    process.cwd(),
+    '.snext/node',
+    `App.${compileNodeCommonJS ? '' : 'm'}js`
+  )
+  const { default: App } = await import(appPath)
 
-  const skeletonPath = path.join(process.cwd(), '.snext/node', 'Skeleton.js')
-  const Skeleton = require(skeletonPath)
+  const skeletonPath = path.join(
+    process.cwd(),
+    '.snext/node',
+    `Skeleton.${compileNodeCommonJS ? '' : 'm'}js`
+  )
+  const { default: Skeleton } = await import(skeletonPath)
 
   await processURLs(['/'], {
     async renderURL(url) {

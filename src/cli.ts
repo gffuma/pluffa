@@ -4,9 +4,6 @@ import { Command } from 'commander'
 import { readFileSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
-import build from './build.js'
-import devServer from './devServer.js'
-import staticize from './staticize.js'
 import logo from './logo.js'
 
 const pkg = JSON.parse(
@@ -33,30 +30,30 @@ program.command('dev').action(async () => {
   console.log(logo)
   const userPkg = await getUserPkg()
   process.env.NODE_ENV = 'development'
+  const { default: devServer } = await import('./devServer.js')
   await devServer(userPkg.snext)
 })
 
 program.command('build').action(async () => {
   console.log(logo)
+  const userPkg = await getUserPkg()
+  process.env.NODE_ENV = 'production'
+  const { default: build } = await import('./build.js')
   console.log()
   console.log('Creating an optimized build...')
   console.log()
-  const userPkg = await getUserPkg()
-  process.env.NODE_ENV = 'production'
   build(userPkg.snext)
 })
 
 program.command('staticize').action(async () => {
   console.log(logo)
-  console.log()
-  console.log('Export your build as a static website...')
-  console.log()
   const userPkg = await getUserPkg()
-  await staticize(userPkg)
-})
-
-program.command('hello').action(async () => {
-  console.log('Hello asshole')
+  process.env.NODE_ENV = 'production'
+  const { default: staticize } = await import('./staticize.js')
+  console.log()
+  console.log('Exporting your build as a static website...')
+  console.log()
+  await staticize(userPkg.snext)
 })
 
 program.parse()

@@ -4,8 +4,8 @@ import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import nodeExternals from 'webpack-node-externals'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
 
 const require = createRequire(import.meta.url)
 
@@ -14,13 +14,18 @@ export interface BuildOptions {
   serverComponent: string
   skeletonComponent: string
   port: number
+  compileNodeCommonJS: boolean
 }
 
 export default function build({
   clientEntry,
   serverComponent,
   skeletonComponent,
+  compileNodeCommonJS = false,
 }: BuildOptions) {
+  const nodeConfiguration = compileNodeCommonJS
+    ? NodeCommonJSConfiguration
+    : NodeESMConfiguration
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
   const compiler = webpack([
     {
@@ -150,22 +155,7 @@ export default function build({
         App: serverComponent,
         Skeleton: skeletonComponent,
       },
-      externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-      externals: [nodeExternals({ importType: 'module' as any })], // in order to ignore all modules in node_modules folder
-      externalsType: 'module',
-      output: {
-        chunkFormat: 'module',
-        path: path.join(process.cwd(), '.snext/node'),
-        filename: '[name].js',
-        libraryTarget: 'module',
-        libraryExport: 'default',
-        publicPath: '/',
-        assetModuleFilename: 'static/media/[name].[hash][ext]',
-        environment: { module: true },
-      },
-      experiments: {
-        outputModule: true,
-      },
+      ...nodeConfiguration,
       module: {
         rules: [
           {
