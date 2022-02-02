@@ -1,8 +1,8 @@
 # SNext.js
 
-[![npm version](https://badge.fury.io/js/snext.svg)](https://badge.fury.io/js/snext)
-
 > Build static sites with React
+
+[![npm version](https://badge.fury.io/js/snext.svg)](https://badge.fury.io/js/snext)
 
 ## Next.js + react-snap = SNext.js
 
