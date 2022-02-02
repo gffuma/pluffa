@@ -229,7 +229,8 @@ Here all the available snext options with their defaults:
     "publicDir": "public",
     "compileNodeCommonJS": false,
     "urls": ["/"],
-    "crawlConcurrency": 4
+    "crawlConcurrency": 4,
+    "proxy": null,
   }
 }
 ```
@@ -342,6 +343,27 @@ You can also tweak crawling concurrency with:
 }
 ```
 
+## Proxy
+
+To add an url to proxy:
+
+```json
+{
+  "snext": {
+    "proxy": "http://somehost"
+  }
+}
+```
+
+Note that when crawling we are not running an http server so proxy wont
+works so you can have something like this in your code:
+
+```js
+export const API_URL = process.env.IS_SNEXT_SERVER ? 'https://somehost' : ''
+```
+
+
+
 ## [EXAMPLES](./examples)
 
 ## TODO:
@@ -349,6 +371,7 @@ You can also tweak crawling concurrency with:
 - [ ] More css loaders, css modules, sass (?), post css ecc ...
 - [ ] Generic file loader
 - [ ] Add Helmet example in blog example
+- [ ] Custom env ecc
 
 ## LICENSE
 

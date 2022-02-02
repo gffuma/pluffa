@@ -22,6 +22,7 @@ export interface DevServerOptions {
   publicDir: string
   port: number
   compileNodeCommonJS: boolean
+  proxy?: string
 }
 
 export default async function devServer({
@@ -31,6 +32,7 @@ export default async function devServer({
   port = 7000,
   publicDir = 'public',
   compileNodeCommonJS = false,
+  proxy: proxyUrl,
 }: DevServerOptions) {
   const useTypescript = fs.existsSync(
     path.resolve(process.cwd(), 'tsconfig.json')
@@ -255,7 +257,7 @@ export default async function devServer({
 
   app.use(express.static(path.resolve(process.cwd(), publicDir)))
 
-  const instance = webpackDevMiddleware(compiler, {
+  const webpackDev = webpackDevMiddleware(compiler, {
     writeToDisk: (target) => {
       if (path.relative(process.cwd(), target).startsWith('.snext')) {
         return true
@@ -266,7 +268,23 @@ export default async function devServer({
 
   app.use(webpackHotMiddleware(compiler))
 
-  app.use(instance)
+  app.use(webpackDev)
+
+  if (proxyUrl) {
+    const { default: proxy } = await import('express-http-proxy')
+    app.use(
+      proxy(proxyUrl, {
+        filter: (req) => {
+          return (
+            req.method !== 'GET' ||
+            Boolean(
+              req.headers.accept && !req.headers.accept.includes('text/html')
+            )
+          )
+        },
+      })
+    )
+  }
 
   if (compileNodeCommonJS) {
     app.use(async (req, res) => {
