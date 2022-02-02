@@ -8,7 +8,7 @@
   "author": "Giovanni Fumagalli",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "build:watch": "tsc --watch"
   },
   "bin": {
