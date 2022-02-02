@@ -88,6 +88,13 @@ export default async function devServer({
             use: ['style-loader', 'css-loader'],
           },
           {
+            test: /\.module.css$/i,
+            use: ['style-loader', 'css-loader'],
+            options: {
+              modules: true
+            }
+          },
+          {
             test: /\.svg$/,
             use: [
               {
@@ -194,6 +201,15 @@ export default async function devServer({
           },
           {
             test: /\.css$/i,
+            loader: 'css-loader',
+            options: {
+              modules: {
+                exportOnlyLocals: true,
+              },
+            },
+          },
+          {
+            test: /\.module.css$/i,
             loader: 'css-loader',
             options: {
               modules: {

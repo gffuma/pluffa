@@ -25,9 +25,7 @@ export default function build({
   compileNodeCommonJS = false,
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
-  const useTypescript = existsSync(
-    path.resolve(process.cwd(), 'tsconfig.json')
-  )
+  const useTypescript = existsSync(path.resolve(process.cwd(), 'tsconfig.json'))
   const resolveExtesions = [
     ...['.js', '.mjs', '.jsx'],
     ...(useTypescript ? ['.ts', '.tsx'] : []),
@@ -77,6 +75,19 @@ export default function build({
               },
               'css-loader',
             ],
+          },
+          {
+            test: /\.module.css$/i,
+            use: [
+              'style-loader',
+              'css-loader',
+              {
+                loader: MiniCssExtractPlugin.loader,
+              },
+            ],
+            options: {
+              modules: true,
+            },
           },
           {
             test: /\.svg$/,
@@ -189,6 +200,15 @@ export default function build({
           },
           {
             test: /\.css$/i,
+            loader: 'css-loader',
+            options: {
+              modules: {
+                exportOnlyLocals: true,
+              },
+            },
+          },
+          {
+            test: /\.module.css$/i,
             loader: 'css-loader',
             options: {
               modules: {

@@ -374,6 +374,7 @@ export const API_URL = process.env.IS_SNEXT_SERVER ? 'https://somehost' : ''
 - [ ] Generic file loader
 - [ ] Add Helmet example in blog example
 - [ ] Custom env ecc
+- [ ] Configure Babel
 
 ## LICENSE
 
