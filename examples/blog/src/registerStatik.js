@@ -21,7 +21,7 @@ export default function registerStatik(router) {
     })
   })
 
-  router.put('/posts/:slug', async ({ params }) => {
+  router.get('/posts/:slug', async ({ params }) => {
     const { slug } = params
     const md = await fs.readFile(
       path.resolve(process.cwd(), 'content/posts', `${slug}.md`),

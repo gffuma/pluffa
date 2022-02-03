@@ -7,6 +7,7 @@ export default async function statik(url: string, config?: StatikReqConfig) {
   const { default: registerStatik } = await import(statikPath)
   const req = {
     method: config?.method ?? 'GET',
+    body: config?.body,
     url,
   }
   return runStatik(req, registerStatik)

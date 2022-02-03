@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import statik from 'snext/statik'
@@ -6,9 +5,7 @@ import statik from 'snext/statik'
 export default function Post() {
   const { slug } = useParams()
   const { data: post } = useQuery(['post', slug], () =>
-    statik(`/posts/${slug}`, {
-      method: 'PUT'
-    })
+    statik(`/posts/${slug}`)
   )
 
   return (

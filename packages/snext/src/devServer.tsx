@@ -286,6 +286,8 @@ export default async function devServer({
 
   const app = express()
 
+  app.use(express.json())
+
   app.use(express.static(path.resolve(process.cwd(), publicDir)))
 
   const webpackDev = webpackDevMiddleware(compiler, {
@@ -313,6 +315,7 @@ export default async function devServer({
         workerData: {
           statikPath,
           method: req.method,
+          body: req.body,
           url: req.url,
         },
       }
@@ -322,14 +325,22 @@ export default async function devServer({
       res.send(data)
     })
 
-    worker.on('error', (error) => {
+    worker.on('error', (error: any) => {
+      if (error.status === 404) {
+        res
+          .status(404)
+          .send(
+            renderToString(<ErrorPage title="404 o.O" error={error} />)
+          )
+        return
+      }
       console.error(chalk.red('Error in serving statik data'))
       console.error(error)
       res
         .status(500)
         .send(
           renderToString(
-            <ErrorPage title="Error in serving statik data" error={error} />
+            <ErrorPage title="500 Error in serving statik data" error={error} />
           )
         )
     })
