@@ -74,12 +74,14 @@ export default async function staticize({
   compileNodeCommonJS = false,
   urls = ['/'],
   crawlConcurrency = 4,
+  statikDataDir = 'snextdata',
 }: {
   outputDir: string
   publicDir: string
   compileNodeCommonJS: boolean
   urls: string[]
   crawlConcurrency: number
+  statikDataDir?: string | false
 }) {
   rimraf.sync(path.resolve(process.cwd(), outputDir))
   await ncp(
@@ -96,6 +98,13 @@ export default async function staticize({
       'utf-8'
     )
   )
+
+  if (statikDataDir !== false) {
+    process.env.SNEXT_STATIK_DATA_DIR = path.resolve(
+      path.resolve(process.cwd(), outputDir),
+      statikDataDir
+    )
+  }
 
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
 

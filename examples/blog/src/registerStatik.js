@@ -15,10 +15,11 @@ export default function registerStatik(router) {
       const content = matter(md)
       posts.push(content.data)
     }
-    return posts.concat({
-      slug: 'hot',
-      title: 'YEE',
-    })
+    return posts
+    // .concat({
+    //   slug: 'hot',
+    //   title: 'YEE',
+    // })
   })
 
   router.get('/posts/:slug', async ({ params }) => {

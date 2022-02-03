@@ -1,3 +1,6 @@
+import mkdirp from 'mkdirp'
+import fs from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
 import runStatik from '../runStatik.js'
 import { StatikReqConfig } from './statik.js'
@@ -10,5 +13,14 @@ export default async function statik(url: string, config?: StatikReqConfig) {
     body: config?.body,
     url,
   }
-  return runStatik(req, registerStatik)
+  const data = await runStatik(req, registerStatik)
+  if (process.env.SNEXT_STATIK_DATA_DIR && req.method === 'GET') {
+    const statikPath =
+      path.join(process.env.SNEXT_STATIK_DATA_DIR, url) + '.json'
+    mkdirp.sync(path.dirname(statikPath))
+    if (!existsSync(statikPath)) {
+      await fs.writeFile(statikPath, JSON.stringify(data))
+    }
+  }
+  return data
 }

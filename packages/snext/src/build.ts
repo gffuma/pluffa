@@ -2,7 +2,7 @@ import { createRequire } from 'module'
 import path from 'path'
 import { existsSync } from 'fs'
 import fs from 'fs/promises'
-import webpack from 'webpack'
+import webpack, { EntryObject } from 'webpack'
 import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
@@ -14,15 +14,19 @@ export interface BuildOptions {
   clientEntry: string
   serverComponent: string
   skeletonComponent: string
+  registerStatik?: string
   port: number
   compileNodeCommonJS: boolean
+  statikDataDir?: string | false
 }
 
 export default function build({
   clientEntry,
   serverComponent,
   skeletonComponent,
+  registerStatik,
   compileNodeCommonJS = false,
+  statikDataDir = 'snextdata',
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
   const useTypescript = existsSync(path.resolve(process.cwd(), 'tsconfig.json'))
@@ -33,6 +37,22 @@ export default function build({
   const nodeConfiguration = compileNodeCommonJS
     ? NodeCommonJSConfiguration
     : NodeESMConfiguration
+
+  const nodeEntry: EntryObject = {
+    App: serverComponent,
+    Skeleton: skeletonComponent,
+  }
+  if (registerStatik) {
+    nodeEntry.statik = registerStatik
+  }
+  let statikDataUrl = ''
+  if (statikDataDir !== false) {
+    statikDataUrl = path.normalize(statikDataDir)
+    statikDataUrl = statikDataUrl.startsWith('/')
+      ? statikDataUrl
+      : `/${statikDataUrl}`
+  }
+
   const compiler = webpack([
     {
       name: 'client',
@@ -135,6 +155,7 @@ export default function build({
         }),
         new webpack.DefinePlugin({
           'process.env.IS_SNEXT_SERVER': false,
+          'process.env.SNEXT_STATIK_BASE_URL': `'${statikDataUrl}'`,
         }),
       ],
       optimization: {
@@ -175,10 +196,7 @@ export default function build({
       name: 'server',
       mode: 'production',
       target: 'node',
-      entry: {
-        App: serverComponent,
-        Skeleton: skeletonComponent,
-      },
+      entry: nodeEntry,
       ...nodeConfiguration,
       module: {
         rules: [

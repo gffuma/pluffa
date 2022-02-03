@@ -13,7 +13,13 @@ export default async function statik(url: string, config?: StatikReqConfig) {
       }
     }
   }
-  return fetch(`/__snextstatik${url}`, init).then((r) =>
+  let fetchUrl: string
+  if (process.env.SNEXT_STATIK_BASE_URL) {
+    fetchUrl = process.env.SNEXT_STATIK_BASE_URL + url + '.json'
+  } else {
+    fetchUrl = '/__snextstatik' + url
+  }
+  return fetch(fetchUrl, init).then((r) =>
     r.ok ? r.json() : Promise.reject({ status: r.status })
   )
 }
