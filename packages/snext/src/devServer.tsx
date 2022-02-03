@@ -1,48 +1,63 @@
-import { createRequire } from 'module'
+import fs from 'fs'
 import path from 'path'
-import { existsSync } from 'fs'
-import fs from 'fs/promises'
+import express from 'express'
 import webpack from 'webpack'
-import rimraf from 'rimraf'
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import { renderToString } from 'react-dom/server.js'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
+import { createRequire } from 'module'
+import { Worker } from 'worker_threads'
+import chalk from 'chalk'
+import { fileURLToPath } from 'url'
 import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
+import render from './render.js'
+import ErrorPage from './ErrorPage.js'
 
 const require = createRequire(import.meta.url)
-
-export interface BuildOptions {
+export interface DevServerOptions {
   clientEntry: string
   serverComponent: string
   skeletonComponent: string
+  publicDir: string
   port: number
   compileNodeCommonJS: boolean
+  proxy?: string
 }
 
-export default function build({
+export default async function devServer({
   clientEntry,
   serverComponent,
   skeletonComponent,
+  port = 7000,
+  publicDir = 'public',
   compileNodeCommonJS = false,
-}: BuildOptions) {
-  rimraf.sync(path.resolve(process.cwd(), '.snext'))
-  const useTypescript = existsSync(path.resolve(process.cwd(), 'tsconfig.json'))
+  proxy: proxyUrl,
+}: DevServerOptions) {
+  const useTypescript = fs.existsSync(
+    path.resolve(process.cwd(), 'tsconfig.json')
+  )
+  const nodeConfiguration = compileNodeCommonJS
+    ? NodeCommonJSConfiguration
+    : NodeESMConfiguration
+
   const resolveExtesions = [
     ...['.js', '.mjs', '.jsx'],
     ...(useTypescript ? ['.ts', '.tsx'] : []),
   ]
-  const nodeConfiguration = compileNodeCommonJS
-    ? NodeCommonJSConfiguration
-    : NodeESMConfiguration
+
   const compiler = webpack([
     {
       name: 'client',
-      mode: 'production',
+      mode: 'development',
       target: 'web',
-      entry: clientEntry,
-      devtool: 'source-map',
+      entry: [
+        'webpack-hot-middleware/client?reload=true&name=client&quiet=true',
+        clientEntry,
+      ],
+      devtool: 'eval-cheap-module-source-map',
       output: {
-        path: path.resolve(process.cwd(), '.snext/client'),
-        filename: 'static/js/bundle.[contenthash:8].js',
+        filename: 'bundle.js',
         publicPath: '/',
         assetModuleFilename: 'static/media/[name].[hash][ext]',
       },
@@ -64,30 +79,26 @@ export default function build({
                     },
                   ],
                 ],
+                plugins: [require.resolve('react-refresh/babel')],
               },
             },
-          },
-          {
-            test: /\.css$/i,
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-              },
-              'css-loader',
-            ],
           },
           {
             test: /\.module.css$/i,
             use: [
               'style-loader',
-              'css-loader',
               {
-                loader: MiniCssExtractPlugin.loader,
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: true,
+                },
               },
             ],
-            options: {
-              modules: true,
-            },
+          },
+          {
+            test: /\.css$/i,
+            exclude: /\.module.css$/i,
+            use: ['style-loader', 'css-loader'],
           },
           {
             test: /\.svg$/,
@@ -127,17 +138,12 @@ export default function build({
         ],
       },
       plugins: [
-        new MiniCssExtractPlugin({
-          filename: 'static/css/[name].[contenthash:8].css',
-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new ReactRefreshWebpackPlugin(),
         new webpack.DefinePlugin({
           'process.env.IS_SNEXT_SERVER': false,
         }),
       ],
-      optimization: {
-        minimizer: [new CssMinimizerPlugin()],
-      },
       resolve: {
         extensions: resolveExtesions,
         // Node modules should only be used server side
@@ -171,7 +177,8 @@ export default function build({
     },
     {
       name: 'server',
-      mode: 'production',
+      mode: 'development',
+      devtool: 'eval-cheap-module-source-map',
       target: 'node',
       entry: {
         App: serverComponent,
@@ -181,7 +188,7 @@ export default function build({
       module: {
         rules: [
           {
-            test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
+            test: /\.(js|mjs|jsx|ts|tsx)$/,
             exclude: /(node_modules)/,
             use: {
               loader: 'babel-loader',
@@ -199,16 +206,18 @@ export default function build({
             },
           },
           {
-            test: /\.css$/i,
+            test: /\.module.css$/i,
             loader: 'css-loader',
             options: {
               modules: {
+                mode: 'local',
                 exportOnlyLocals: true,
               },
             },
           },
           {
-            test: /\.module.css$/i,
+            test: /\.css$/i,
+            exclude: /\.module.css$/i,
             loader: 'css-loader',
             options: {
               modules: {
@@ -268,27 +277,127 @@ export default function build({
     },
   ])
 
-  compiler.run(async (err, stats) => {
-    if (err) {
-      console.error(err.stack || err)
-      if ((err as any).details) {
-        console.error((err as any).details)
+  const app = express()
+
+  app.use(express.static(path.resolve(process.cwd(), publicDir)))
+
+  const webpackDev = webpackDevMiddleware(compiler, {
+    writeToDisk: (target) => {
+      if (path.relative(process.cwd(), target).startsWith('.snext')) {
+        return true
       }
-      process.exit(1)
-      return
-    }
-    const info = stats!.toJson()
-    if (stats!.hasErrors()) {
-      console.log('Build failed.')
-      info.errors!.forEach((e) => console.error(e))
-      process.exit(1)
-    } else {
-      const entrypoints =
-        info.children![0]!.entrypoints!['main'].assets?.map((a) => a.name) ?? []
-      await fs.writeFile(
-        path.join(process.cwd(), '.snext/client', 'manifest.json'),
-        JSON.stringify({ entrypoints }, null, 2)
+      return false
+    },
+  })
+
+  app.use(webpackHotMiddleware(compiler))
+
+  app.use(webpackDev)
+
+  if (proxyUrl) {
+    const { default: proxy } = await import('express-http-proxy')
+    app.use(
+      proxy(proxyUrl, {
+        filter: (req) => {
+          return (
+            req.method !== 'GET' ||
+            Boolean(
+              req.headers.accept && !req.headers.accept.includes('text/html')
+            )
+          )
+        },
+      })
+    )
+  }
+
+  if (compileNodeCommonJS) {
+    app.use(async (req, res) => {
+      try {
+        const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
+        delete require.cache[require.resolve(appPath)]
+        const {
+          default: App,
+          getStaticProps,
+          getSkeletonProps,
+        } = require(appPath)
+
+        const skeletonPath = path.join(
+          process.cwd(),
+          '.snext/node',
+          'Skeleton.js'
+        )
+        delete require.cache[require.resolve(skeletonPath)]
+        const { default: Skeleton } = require(skeletonPath)
+        const html = await render(
+          {
+            App,
+            getStaticProps,
+            getSkeletonProps,
+            Skeleton,
+          },
+          { url: req.url, entrypoints: ['bundle.js'] }
+        )
+        res.send(html)
+      } catch (error) {
+        console.error(chalk.red('Error during render'))
+        console.error(error)
+        res
+          .status(500)
+          .send(
+            renderToString(
+              <ErrorPage title="Error during render" error={error as any} />
+            )
+          )
+      }
+    })
+  } else {
+    app.use(async (req, res) => {
+      const appPath = path.join(process.cwd(), '.snext/node', 'App.mjs')
+      const skeletonPath = path.join(
+        process.cwd(),
+        '.snext/node',
+        'Skeleton.mjs'
       )
-    }
+
+      const worker = new Worker(
+        path.resolve(
+          path.dirname(fileURLToPath(import.meta.url)),
+          './renderWorker.js'
+        ),
+        {
+          execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
+          workerData: {
+            appPath,
+            skeletonPath,
+            url: req.url,
+            entrypoints: ['bundle.js'],
+          },
+        }
+      )
+
+      worker.once('message', (html) => {
+        res.send(html)
+      })
+
+      worker.on('error', (error) => {
+        console.error(chalk.red('Error during render'))
+        console.error(error)
+        res
+          .status(500)
+          .send(
+            renderToString(
+              <ErrorPage title="Error during render" error={error} />
+            )
+          )
+      })
+    })
+  }
+
+  app.listen(port, () => {
+    console.log()
+    console.log(chalk.green(`SNext.js Dev Server listen on port: ${port}`))
+    console.log()
+    console.log(`http://localhost:${port}`)
+    console.log()
   })
 }

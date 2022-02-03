@@ -370,11 +370,14 @@ export const API_URL = process.env.IS_SNEXT_SERVER ? 'https://somehost' : ''
 
 ## TODO:
 
-- [ ] More css loaders, css modules, sass (?), post css ecc ...
+- [ ] Post CSS
+- [ ] CSS preprocessor(s)
 - [ ] Generic file loader
 - [ ] Add Helmet example in blog example
 - [ ] Custom env ecc
 - [ ] Configure Babel
+- [ ] Emotion example (for to show set up with css in js)
+- [ ] Create command
 
 ## LICENSE
 

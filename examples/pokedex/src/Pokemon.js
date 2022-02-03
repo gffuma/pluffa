@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import request from 'superagent'
+import S from './Pokemon.module.css'
 
 export default function Pokemon() {
   const { name } = useParams()
@@ -17,7 +18,7 @@ export default function Pokemon() {
         </Link>
       </h2>
       <h1>{name}</h1>
-      <img src={pokemon.sprites.back_default} />
+      <img className={S.PokemonImage} src={pokemon.sprites.back_default} />
       <br />
       <img src={pokemon.sprites.front_default} />
     </div>

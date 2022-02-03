@@ -1,7 +1,7 @@
-/node_modules
-/dist
-/.snext
-/build
+node_modules
+dist
+.snext
+build
 
 # misc
 .DS_Store
