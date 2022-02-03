@@ -5,7 +5,7 @@ const { renderToString } = ReacDOMServer
 
 const renderToPipeableStream = (ReacDOMServer as any)
   .renderToPipeableStream as (
-  element: Element,
+  element: JSX.Element,
   options?: {
     onCompleteAll?(): void
     onError?(err: any): void

@@ -1,31 +1,16 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url'
 import { Command } from 'commander'
-import { readFileSync } from 'fs'
-import fs from 'fs/promises'
-import path from 'path'
 import logo from './logo.js'
 import chalk from 'chalk'
+import { readLibPkgSync, getUserPkg } from './utils.js'
 
-const pkg = JSON.parse(
-  readFileSync(
-    path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../package.json'
-    ),
-    'utf-8'
-  )
-)
+const pkg = readLibPkgSync()
+
 const program = new Command()
   .name(pkg.name)
   .version(pkg.version)
   .description(pkg.description)
-
-async function getUserPkg() {
-  return JSON.parse(
-    await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf-8')
-  )
-}
 
 program.command('dev').action(async () => {
   console.log(chalk.magenta(logo))

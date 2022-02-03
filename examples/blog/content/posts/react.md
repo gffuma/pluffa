@@ -1,5 +1,5 @@
 ---
-title: React is cool
+title: React is cool ~.~
 slug: react
 ---
 

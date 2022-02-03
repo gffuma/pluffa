@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import express from 'express'
-import webpack from 'webpack'
+import webpack, { EntryObject } from 'webpack'
 import { renderToString } from 'react-dom/server.js'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpackDevMiddleware from 'webpack-dev-middleware'
@@ -19,6 +19,7 @@ export interface DevServerOptions {
   clientEntry: string
   serverComponent: string
   skeletonComponent: string
+  registerStatik?: string
   publicDir: string
   port: number
   compileNodeCommonJS: boolean
@@ -29,6 +30,7 @@ export default async function devServer({
   clientEntry,
   serverComponent,
   skeletonComponent,
+  registerStatik,
   port = 7000,
   publicDir = 'public',
   compileNodeCommonJS = false,
@@ -40,6 +42,14 @@ export default async function devServer({
   const nodeConfiguration = compileNodeCommonJS
     ? NodeCommonJSConfiguration
     : NodeESMConfiguration
+
+  const nodeEntry: EntryObject = {
+    App: serverComponent,
+    Skeleton: skeletonComponent,
+  }
+  if (registerStatik) {
+    nodeEntry.statik = registerStatik
+  }
 
   const resolveExtesions = [
     ...['.js', '.mjs', '.jsx'],
@@ -180,10 +190,7 @@ export default async function devServer({
       mode: 'development',
       devtool: 'eval-cheap-module-source-map',
       target: 'node',
-      entry: {
-        App: serverComponent,
-        Skeleton: skeletonComponent,
-      },
+      entry: nodeEntry,
       ...nodeConfiguration,
       module: {
         rules: [
@@ -293,6 +300,40 @@ export default async function devServer({
   app.use(webpackHotMiddleware(compiler))
 
   app.use(webpackDev)
+
+  app.use('/__snextstatik', async (req, res) => {
+    const statikPath = path.join(process.cwd(), '.snext/node', 'statik.mjs')
+    const worker = new Worker(
+      path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './statikWorker.js'
+      ),
+      {
+        execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
+        workerData: {
+          statikPath,
+          method: req.method,
+          url: req.url,
+        },
+      }
+    )
+
+    worker.once('message', (data) => {
+      res.send(data)
+    })
+
+    worker.on('error', (error) => {
+      console.error(chalk.red('Error in serving statik data'))
+      console.error(error)
+      res
+        .status(500)
+        .send(
+          renderToString(
+            <ErrorPage title="Error in serving statik data" error={error} />
+          )
+        )
+    })
+  })
 
   if (proxyUrl) {
     const { default: proxy } = await import('express-http-proxy')

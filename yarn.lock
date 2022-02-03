@@ -2479,6 +2479,11 @@ is-core-module@^2.8.1:
   dependencies:
     has "^1.0.3"
 
+itty-router@^2.4.10:
+  version "2.4.10"
+  resolved "https://registry.yarnpkg.com/itty-router/-/itty-router-2.4.10.tgz#23c7e44e36784e106f71ae6b1ec0fd4b95c70978"
+  integrity sha512-6z8UO4MoJRCdgLRVU++L6QTHJwU2pCAYFM8+9HjjcneRM5DqYyF5g6tsgIw24xXLFJlpvVrIzVzhjn862ZQZcQ==
+
 jest-worker@^27.0.2, jest-worker@^27.4.5:
   version "27.4.6"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.4.6.tgz#5d2d93db419566cb680752ca0792780e71b3273e"

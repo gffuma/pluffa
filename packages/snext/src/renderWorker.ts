@@ -1,6 +1,3 @@
-// Is just fantasy? No this seems the more reasonable workaround to support
-// ESM hot reloading
-
 import { workerData, parentPort } from 'worker_threads'
 import render, { SnextProps } from './render.js'
 

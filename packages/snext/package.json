@@ -3,7 +3,20 @@
   "type": "module",
   "description": "Build static sites with React",
   "version": "0.0.6",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/inde.js",
+    "./statik": {
+      "browser": "./dist/lib/statik.browser.js",
+      "node": "./dist/lib/statik.node.js",
+      "default": "./dist/lib/statik.browser.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/index.d.ts"],
+      "statik": ["./dist/lib/statik.d.ts"]
+    }
+  },
   "types": "./dist/index.d.ts",
   "author": "Giovanni Fumagalli",
   "license": "MIT",
@@ -36,6 +49,7 @@
     "express": "^4.17.2",
     "express-http-proxy": "^1.6.3",
     "file-loader": "^6.2.0",
+    "itty-router": "^2.4.10",
     "mini-css-extract-plugin": "^2.5.3",
     "mkdirp": "^1.0.4",
     "ncp": "^2.0.0",

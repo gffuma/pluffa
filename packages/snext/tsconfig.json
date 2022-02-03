@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "declaration": true,
     "jsx": "react-jsx",
-    "lib": ["es2020"],
+    "lib": ["es2020", "dom"],
     "module": "ES2020",
     "target": "es2020",
     "moduleResolution": "node",
