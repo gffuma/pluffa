@@ -16,10 +16,6 @@ export default function registerStatik(router) {
       posts.push(content.data)
     }
     return posts
-    // .concat({
-    //   slug: 'hot',
-    //   title: 'YEE',
-    // })
   })
 
   router.get('/posts/:slug', async ({ params }) => {

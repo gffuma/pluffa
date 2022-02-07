@@ -19,22 +19,16 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
           }}
         />
       </body>
-      {process.env.NODE_ENV !== 'production' && (
-        <>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window.__INITIAL_DATA__ = ${JSON.stringify(
-                initialData
-              )};`,
-            }}
-          />
-          {entrypoints
-            .filter((e) => e.endsWith('.js'))
-            .map((e) => (
-              <script key={e} src={`/${e}`} />
-            ))}
-        </>
-      )}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};`,
+        }}
+      />
+      {entrypoints
+        .filter((e) => e.endsWith('.js'))
+        .map((e) => (
+          <script key={e} src={`/${e}`} />
+        ))}
     </html>
   )
 }

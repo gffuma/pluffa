@@ -6,7 +6,10 @@ import runStatik from '../runStatik.js'
 import { StatikReqConfig } from './statik.js'
 
 export default async function statik(url: string, config?: StatikReqConfig) {
-  const statikPath = path.join(process.cwd(), '.snext/node/statik.mjs')
+  const statikPath = path.join(
+    process.cwd(),
+    `.snext/node/statik.${process.env.SNEXT_COMPILE_NODE_COMMONJS ? '' : 'm'}js`
+  )
   const { default: registerStatik } = await import(statikPath)
   const req = {
     method: config?.method ?? 'GET',

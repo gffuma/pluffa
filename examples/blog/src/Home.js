@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>An ugly Blog</h1>
+      <h1>An ugly Blog!</h1>
       <Rocket height={50} />
       <a href="http://github.com/gffuma">It's me!</a>
       <img className="banner" src={jolteon} />

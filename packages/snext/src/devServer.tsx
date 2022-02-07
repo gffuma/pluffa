@@ -12,6 +12,7 @@ import chalk from 'chalk'
 import { fileURLToPath } from 'url'
 import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
 import render from './render.js'
+import runStatik from './runStatik.js'
 import ErrorPage from './ErrorPage.js'
 
 const require = createRequire(import.meta.url)
@@ -36,6 +37,7 @@ export default async function devServer({
   compileNodeCommonJS = false,
   proxy: proxyUrl,
 }: DevServerOptions) {
+  process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   const useTypescript = fs.existsSync(
     path.resolve(process.cwd(), 'tsconfig.json')
   )
@@ -152,6 +154,7 @@ export default async function devServer({
         new ReactRefreshWebpackPlugin(),
         new webpack.DefinePlugin({
           'process.env.IS_SNEXT_SERVER': false,
+          'process.env.SNEXT_STATIK_BASE_URL': false,
         }),
       ],
       resolve: {
@@ -303,48 +306,90 @@ export default async function devServer({
 
   app.use(webpackDev)
 
-  app.use('/__snextstatik', async (req, res) => {
-    const statikPath = path.join(process.cwd(), '.snext/node', 'statik.mjs')
-    const worker = new Worker(
-      path.resolve(
-        path.dirname(fileURLToPath(import.meta.url)),
-        './statikWorker.js'
-      ),
-      {
-        execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
-        workerData: {
-          statikPath,
-          method: req.method,
-          body: req.body,
-          url: req.url,
-        },
-      }
-    )
-
-    worker.once('message', (data) => {
-      res.send(data)
-    })
-
-    worker.on('error', (error: any) => {
-      if (error.status === 404) {
-        res
-          .status(404)
-          .send(
-            renderToString(<ErrorPage title="404 o.O" error={error} />)
+  if (registerStatik) {
+    if (compileNodeCommonJS) {
+      app.use('/__snextstatik', async (req, res) => {
+        try {
+          const statikPath = path.join(
+            process.cwd(),
+            '.snext/node',
+            'statik.js'
           )
-        return
-      }
-      console.error(chalk.red('Error in serving statik data'))
-      console.error(error)
-      res
-        .status(500)
-        .send(
-          renderToString(
-            <ErrorPage title="500 Error in serving statik data" error={error} />
+          const { default: registerStatik } = require(statikPath)
+          delete require.cache[require.resolve(statikPath)]
+          const data = await runStatik(
+            {
+              method: req.method,
+              body: req.body,
+              url: req.url,
+            },
+            registerStatik
           )
+          res.send(data)
+        } catch (error: any) {
+          if (error.status === 404) {
+            res
+              .status(404)
+              .send(renderToString(<ErrorPage title="404 o.O" error={error} />))
+            return
+          }
+          console.error(chalk.red('Error during render'))
+          console.error(error)
+          res
+            .status(500)
+            .send(
+              renderToString(
+                <ErrorPage title="Error during render" error={error as any} />
+              )
+            )
+        }
+      })
+    } else {
+      app.use('/__snextstatik', async (req, res) => {
+        const statikPath = path.join(process.cwd(), '.snext/node', 'statik.mjs')
+        const worker = new Worker(
+          path.resolve(
+            path.dirname(fileURLToPath(import.meta.url)),
+            './statikWorker.js'
+          ),
+          {
+            execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
+            workerData: {
+              statikPath,
+              method: req.method,
+              body: req.body,
+              url: req.url,
+            },
+          }
         )
-    })
-  })
+
+        worker.once('message', (data) => {
+          res.send(data)
+        })
+
+        worker.on('error', (error: any) => {
+          if (error.status === 404) {
+            res
+              .status(404)
+              .send(renderToString(<ErrorPage title="404 o.O" error={error} />))
+            return
+          }
+          console.error(chalk.red('Error in serving statik data'))
+          console.error(error)
+          res
+            .status(500)
+            .send(
+              renderToString(
+                <ErrorPage
+                  title="500 Error in serving statik data"
+                  error={error}
+                />
+              )
+            )
+        })
+      })
+    }
+  }
 
   if (proxyUrl) {
     const { default: proxy } = await import('express-http-proxy')
@@ -367,6 +412,15 @@ export default async function devServer({
       try {
         const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
         delete require.cache[require.resolve(appPath)]
+        // NOTE: Delete also require cachek of statik
+        if (registerStatik) {
+          const statikPath = path.join(
+            process.cwd(),
+            '.snext/node',
+            'statik.js'
+          )
+          delete require.cache[require.resolve(statikPath)]
+        }
         const {
           default: App,
           getStaticProps,

@@ -4,25 +4,38 @@
   "description": "Build static sites with React",
   "version": "0.0.6",
   "exports": {
-    ".": "./dist/inde.js",
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
     "./statik": {
-      "browser": "./dist/lib/statik.browser.js",
-      "node": "./dist/lib/statik.node.js",
+      "browser": {
+        "require": "./dist/lib/statik.browser.cjs",
+        "import": "./dist/lib/statik.browser.js"
+      },
+      "node": {
+        "require": "./dist/lib/statik.node.cjs",
+        "import": "./dist/lib/statik.node.js"
+      },
       "default": "./dist/lib/statik.browser.js"
     }
   },
   "typesVersions": {
     "*": {
-      "*": ["./dist/index.d.ts"],
-      "statik": ["./dist/lib/statik.d.ts"]
+      "*": [
+        "./dist/index.d.ts"
+      ],
+      "statik": [
+        "./dist/lib/statik.d.ts"
+      ]
     }
   },
   "types": "./dist/index.d.ts",
   "author": "Giovanni Fumagalli",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && tsc",
-    "build:watch": "tsc --watch"
+    "build": "rimraf dist && rollup -c",
+    "build:watch": "rimraf dist && rollup -c -w"
   },
   "bin": {
     "snext": "dist/cli.js"
@@ -65,6 +78,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.3.0",
     "@types/express": "^4.17.13",
     "@types/express-http-proxy": "^1.6.3",
     "@types/mkdirp": "^1.0.2",
@@ -76,6 +90,11 @@
     "@types/stream-buffers": "^3.0.4",
     "@types/webpack-hot-middleware": "^2.25.5",
     "@types/webpack-node-externals": "^2.5.3",
+    "renamer": "^4.0.0",
+    "rollup": "^2.67.1",
+    "rollup-plugin-node-externals": "^4.0.0",
+    "rollup-plugin-preserve-shebang": "^1.0.1",
+    "tslib": "^2.3.1",
     "typescript": "^4.5.5"
   },
   "peerDependencies": {

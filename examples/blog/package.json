@@ -11,15 +11,14 @@
     "react-dom": "^18.0.0-rc.0",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "showdown": "^1.9.1",
-    "snext": "latest"
+    "showdown": "^1.9.1"
   },
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
     "skeletonComponent": "./src/Skeleton.js",
     "registerStatik": "./src/registerStatik.js",
-    "statikDataDir": false,
+    "compileNodeCommonJS": true,
     "urls": [
       "/",
       "/secret"

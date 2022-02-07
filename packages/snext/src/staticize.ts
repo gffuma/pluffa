@@ -99,6 +99,7 @@ export default async function staticize({
     )
   )
 
+  process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   if (statikDataDir !== false) {
     process.env.SNEXT_STATIK_DATA_DIR = path.resolve(
       path.resolve(process.cwd(), outputDir),
