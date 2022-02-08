@@ -212,12 +212,12 @@ You can find the complete example [here](./examples/pokedex).
 
 ## Commands
 
-- The `dev` command wil start a dev server on port 7000 with fast refresh and hot module reload so you can try
+- `dev` command starts a dev server on port *7000* with fast refresh and hot module reload so you can try
 both your client and server code.
 
-- The `build` command generate a intermediate folder with a production build of your client and server code.
+- `build` command generate a intermediate folder with a production build of your client and node code.
 
-- The `staticize` command use the production code of `build` command to render your app using node and crawl your links to generate a static site with all of your routes.
+- `staticize` command use the production code of `build` command to render your app using node and crawling your links to generate a static site with all of your routes.
 
 ## Running node specific code
 
@@ -247,11 +247,6 @@ Here all the available snext options with their defaults:
 
 ```json
 {
-  "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
-  },
   "snext": {
     "clientEntry": "./path/to/file",
     "serverComponent": "./path/to/file",
@@ -267,17 +262,11 @@ Here all the available snext options with their defaults:
 }
 ```
 
-## Typescript
-
-Typescript is available out of the box, add a `tsconfig.json` in the root of your project
-and snext will use compile typescript.
-Look [here](./examples/typescript-pokedex) to see a complete typescript example.
-
 ## Node ESM
 
-The snext package itself is [pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c),
+The SNext package itself is [pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c),
 also your code is compiled as node ESM, however you can omit file extension in relative import cause your code will be bundled
-as a single file, on the other hand you have to write explicit extension for node_modules import for example:
+as a single file, on the other hand you have to write explicit extension for *node_modules* import for example:
 
 ```js
 import { StaticRouter } from 'react-router-dom/server.js'
@@ -294,14 +283,14 @@ You can also compile your code as commonJS, if you want, with:
 ```
 
 With commonJS the hot reload of node code is a litte bit faster (the implementation is more tricky) and you
-can omit file extension for node_modules dependency but you can't import pure ESM modules.
+can omit file extension for *node_modules* dependency but you can't import pure ESM modules.
 
 ## No Javascript
 
 If your website has no interaction except for links you can decide to ship
-it without ANY Javascript.
+it without **ANY** Javascript.
 
-With snext doing it's simple, hack you Skeleton Component:
+With SNext doing it's simple, hack you Skeleton Component:
 
 ```jsx
 export default function Skeleton({ appHtml, initialData, entrypoints }) {
@@ -346,8 +335,6 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
   )
 }
 ```
-
-To a more complete example check the [blog example](./examples/blog).
 
 ## Crawling
 
