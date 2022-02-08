@@ -12,25 +12,28 @@ This is an experimental library based on [new React 18 server capabilities](http
 
 To do this instead of using [puppeter](https://github.com/puppeteer/puppeteer) and wait to all request to finsh we use the output of your server side rendered application to crawl all the links. Thanks to React 18 we can execute all side effects of React tree using Suspense.
 
-This project is an experimental stage and is based on ogoing React 18 RC apis but by tests seems working like a charm.
+SNext is an experimental project and is based on ogoing React 18 RC apis but by tests seems working like a charm 🎸 🎸 🎸
 
 ## Getting started
 
-Install:
+Create a SNext App:
 
 ```sh
-yarn add --dev snext
+yarn create snext-app [app_folder]
 ```
 
-Change your `package.json`:
+or
+
+```
+npx create-snext-app [app_folder]
+```
+
+This create a bare minimum SNext project, if you want Typescript add the `--typescript` flag.
+
+If your looking into the generated `package.json`:
 
 ```json
 {
-  "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
-  },
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
@@ -39,31 +42,48 @@ Change your `package.json`:
 }
 ```
 
-The `dev` command wil start a dev server on port 7000 with fast refresh and hot module reload so you can try
-both your client and server code.
+You have **3 main configurations points**:
+- `serverComponent`: The path of your component rendered **ONLY** in node. 
+- `clientEntry`: The path of your client side entry point.
+- `skeletonComponent`: The path of your html shell component rendered **ONLY** in node **after the server component render**.
 
-The `build` command generate a intermediate folder with a production build of your client and server code.
 
-The `staticize` command use the production code of `build` command to render your app using node and crawl your links to generate a static site with all of your routes.
+SNext try to be more unopinated possibile and let you use the tools you love without the configuration boilerplate.
 
-The `serverComponent` is the path of your component rendered on the server.
-In the `snext` mental model here you should be able to collect the result of your side effects that happends during render.
+What is the idea behind Snext?
+
+First we render the `serverComponent` in node with the current *crawling / requested* `url` as prop, thanks to React 18 the tree rendered by the server component can use suspense to fetch its data dependencies.
+
+When the server component render finish we take the html string generated and we pass it as prop to the render of `skeletonComponent` (rendered with the old `renderToString`). The final render output of skeleton is usded as *content of your site / http response in dev server*.
+
+We use some special exported functions in `serverComponent` to inject props both in server and skeleton component.
+So the skeleton component can inject in the html document the initial data collected during the server component render.
+
+Finally in the `clientEntry` we use the injected data to correctly hydrate the react tree and the its data dependencies.
+
+Ok, let's see an example.
+
+> NOTE
+For show a real example we use [react-query](https://github.com/tannerlinsley/react-query) library to handle suspense data fetching and the [react-router](https://github.com/remix-run/react-router) library to handle routing. You can use your own routing and suspense data fetching libraries.
+
+### `serverComponent`
+
+The `serverComponent` is the path of your component rendered **ONLY** in node.
+Here we use a data fetching library to have a way to dump al collected rederning data.
 
 The Server Component receive the `url` prop from the server.
 
 The Server Component file can export two special functions:
 
-- `getStaticProps`: Used to inject extra props into the component before render
-- `getSkeletonProps`: Used to inject props into the Skeleton component.
-
-The `snext` library try to be more unopinated possible but for clarity we use the [react-query](https://github.com/tannerlinsley/react-query) library to handle suspense data fetching and the [react-router](https://github.com/remix-run/react-router) library to handle routing and show a real world example.
+- `getStaticProps`: Called in node **before** each server component render used to inject extra props in server component.
+- `getSkeletonProps`: Called **after** the server component render with props from `getStaticProps` used to inject collected rendering data into skeleton props.
 
 ```jsx
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { StaticRouter } from 'react-router-dom/server.js'
 import App from './App'
 
-// This the app render on the server tipically the inner app performs
+// This Component render in node tpically the inner app performs
 // side effect during render both on server and client
 // here we can inject the cache provider with a value created from
 // server.
@@ -79,7 +99,7 @@ export default function StaticApp({ queryClient, url }) {
 }
 
 // Create the query client on the server
-// Tipically you need a mutable cache to write, this is hook
+// Tipically you need a mutable cache to write, this is function
 // can be used to create them.
 // you can also perform other side effects and return them as props
 // (the original Next.js getStaticProps)
@@ -105,7 +125,7 @@ export const getStaticProps = async ({ url }) => {
 }
 
 // Here as second argument you have the props injected before
-// you can use this hook to dump the values write in the cache
+// you can use this function to dump the values write in the cache
 // into a serializable format
 export const getSkeletonProps = async ({ url }, { queryClient }) => {
   return {
@@ -116,16 +136,17 @@ export const getSkeletonProps = async ({ url }, { queryClient }) => {
 }
 ```
 
-The `skeletonEntry` is the component used to provide a shell to your server render app.
+### `skeletonComponent`
+
+The `skeletonComponent` is the component used to provide a shell to your server render app.
 The skeleton component is rendered after the server component has finish all side effects and we have its output.
 
 The server component props are:
 
 - `appHtml`: The html string of Server Component rendered,
 - `entrypoints`: Strings of scripts or styles paths generated by the compilation step.
-  Plus all the props injected by `getSkeletonProps`.
-
-A Skeleton component looks like this:
+ 
+Plus all the props injected by `getSkeletonProps`.
 
 ```jsx
 export default function Skeleton({ appHtml, initialData, entrypoints }) {
@@ -164,10 +185,10 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
 }
 ```
 
+### `clientEntry`
+
 The `clientEntry` is the path for your browser entry point.
 Here we use the initial data injected by the Skeleton to hydrate the state of our app.
-
-To complete the example above here the client entry:
 
 ```jsx
 import { hydrateRoot } from 'react-dom'
@@ -188,6 +209,15 @@ hydrateRoot(
 ```
 
 You can find the complete example [here](./examples/pokedex).
+
+## Commands
+
+- The `dev` command wil start a dev server on port 7000 with fast refresh and hot module reload so you can try
+both your client and server code.
+
+- The `build` command generate a intermediate folder with a production build of your client and server code.
+
+- The `staticize` command use the production code of `build` command to render your app using node and crawl your links to generate a static site with all of your routes.
 
 ## Running node specific code
 
@@ -377,7 +407,6 @@ export const API_URL = process.env.IS_SNEXT_SERVER ? 'https://somehost' : ''
 - [ ] Custom env ecc
 - [ ] Configure Babel
 - [ ] Emotion example (for to show set up with css in js)
-- [ ] Create command
 
 ## LICENSE
 
