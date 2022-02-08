@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { fileURLToPath } from 'url'
 import { Command } from 'commander'
 import logo from './logo.js'
 import chalk from 'chalk'

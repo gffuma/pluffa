@@ -1,0 +1,31 @@
+{
+  "name": "create-snext-app",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Create snext app",
+  "license": "MIT",
+  "author": "Giovanni Fumagalli",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "bin": {
+    "create-snext-app": "dist/index.js"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "build:watch": "rimraf dist && tsc --watch",
+    "test-create": "node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "commander": "^9.0.0",
+    "cross-spawn": "^7.0.3",
+    "ncp": "^2.0.0"
+  }
+}

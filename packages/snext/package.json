@@ -90,7 +90,6 @@
     "@types/stream-buffers": "^3.0.4",
     "@types/webpack-hot-middleware": "^2.25.5",
     "@types/webpack-node-externals": "^2.5.3",
-    "renamer": "^4.0.0",
     "rollup": "^2.67.1",
     "rollup-plugin-node-externals": "^4.0.0",
     "rollup-plugin-preserve-shebang": "^1.0.1",
