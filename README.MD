@@ -510,7 +510,6 @@ Here all the available snext options with their defaults:
 - [ ] Post CSS
 - [ ] CSS preprocessor(s)
 - [ ] Generic file loader
-- [ ] Add Helmet example in blog example
 - [ ] Custom env ecc
 - [ ] Configure Babel
 
