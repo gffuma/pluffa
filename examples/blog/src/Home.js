@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet'
 import { useQuery } from 'react-query'
 import jolteon from './jolteon.jpg'
 import { ReactComponent as Rocket } from './rocket.svg'
@@ -19,6 +20,9 @@ export default function Home() {
 
   return (
     <div>
+      <Helmet defer={false}>
+        <title>De Blog</title>
+      </Helmet>
       <h1>An ugly Blog!</h1>
       <Rocket height={50} />
       <a href="http://github.com/gffuma">It's me!</a>

@@ -1,4 +1,7 @@
+import { Helmet } from 'react-helmet'
+
 export default function Skeleton({ appHtml, initialData, entrypoints }) {
+  const helmet = Helmet.renderStatic()
   return (
     <html>
       <head>
@@ -10,6 +13,9 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
           .map((e) => (
             <link key={e} href={`/${e}`} rel="stylesheet" />
           ))}
+        {helmet.title.toComponent()}
+        {helmet.meta.toComponent()}
+        {helmet.link.toComponent()}
       </head>
       <body>
         <div
