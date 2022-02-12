@@ -513,7 +513,6 @@ Here all the available snext options with their defaults:
 - [ ] Add Helmet example in blog example
 - [ ] Custom env ecc
 - [ ] Configure Babel
-- [ ] Emotion example (for to show set up with css in js)
 
 ## LICENSE
 
