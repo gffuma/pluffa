@@ -215,6 +215,7 @@ export default function build({
                     },
                   ],
                 ].filter(Boolean),
+                plugins: ['macros'],
               },
             },
           },

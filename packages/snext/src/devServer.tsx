@@ -212,6 +212,7 @@ export default async function devServer({
                     },
                   ],
                 ].filter(Boolean),
+                plugins: ['macros'],
               },
             },
           },
