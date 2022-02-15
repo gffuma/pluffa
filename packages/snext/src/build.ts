@@ -6,7 +6,7 @@ import webpack, { EntryObject } from 'webpack'
 import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
-import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
+import { NodeCommonJSConfiguration, NodeESMConfiguration, NodeNativeModulesFallbacks } from './config.js'
 
 const require = createRequire(import.meta.url)
 
@@ -206,32 +206,7 @@ export default function build({
       resolve: {
         extensions: resolveExtesions,
         // Node modules should only be used server side
-        fallback: {
-          fs: false,
-          assert: false,
-          buffer: false,
-          console: false,
-          constants: false,
-          crypto: false,
-          domain: false,
-          events: false,
-          http: false,
-          https: false,
-          os: false,
-          path: false,
-          punycode: false,
-          process: false,
-          querystring: false,
-          stream: false,
-          string_decoder: false,
-          sys: false,
-          timers: false,
-          tty: false,
-          url: false,
-          util: false,
-          vm: false,
-          zlib: false,
-        },
+        fallback: NodeNativeModulesFallbacks,
       },
     },
     {

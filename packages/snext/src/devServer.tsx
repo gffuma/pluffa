@@ -10,7 +10,11 @@ import { createRequire } from 'module'
 import { Worker } from 'worker_threads'
 import chalk from 'chalk'
 import { fileURLToPath } from 'url'
-import { NodeCommonJSConfiguration, NodeESMConfiguration } from './config.js'
+import {
+  NodeCommonJSConfiguration,
+  NodeESMConfiguration,
+  NodeNativeModulesFallbacks,
+} from './config.js'
 import render from './render.js'
 import runStatik from './runStatik.js'
 import ErrorPage from './ErrorPage.js'
@@ -194,32 +198,7 @@ export default async function devServer({
       resolve: {
         extensions: resolveExtesions,
         // Node modules should only be used server side
-        fallback: {
-          fs: false,
-          assert: false,
-          buffer: false,
-          console: false,
-          constants: false,
-          crypto: false,
-          domain: false,
-          events: false,
-          http: false,
-          https: false,
-          os: false,
-          path: false,
-          punycode: false,
-          process: false,
-          querystring: false,
-          stream: false,
-          string_decoder: false,
-          sys: false,
-          timers: false,
-          tty: false,
-          url: false,
-          util: false,
-          vm: false,
-          zlib: false,
-        },
+        fallback: NodeNativeModulesFallbacks,
       },
     },
     {
