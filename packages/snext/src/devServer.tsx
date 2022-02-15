@@ -76,94 +76,110 @@ export default async function devServer({
       module: {
         rules: [
           {
-            test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
-            exclude: /(node_modules)/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  [
-                    'react-app',
-                    {
-                      runtime: 'automatic',
-                      flow: false,
-                      typescript: useTypescript,
-                    },
-                  ],
-                ],
-                plugins: [require.resolve('react-refresh/babel')],
-              },
-            },
-          },
-          {
-            test: /\.module.css$/i,
-            use: [
-              'style-loader',
+            oneOf: [
               {
-                loader: require.resolve('css-loader'),
-                options: {
-                  modules: true,
-                },
-              },
-            ],
-          },
-          {
-            test: /\.css$/i,
-            exclude: /\.module.css$/i,
-            use: ['style-loader', 'css-loader'],
-          },
-          {
-            test: /\.module\.s[ac]ss$/i,
-            use: [
-              'style-loader',
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  modules: true,
-                },
-              },
-              'sass-loader',
-            ],
-          },
-          {
-            test: /\.s[ac]ss$/i,
-            exclude: /\.module\.s[ac]ss$/i,
-            use: ['style-loader', 'css-loader', 'sass-loader'],
-          },
-          {
-            test: /\.svg$/,
-            use: [
-              {
-                loader: require.resolve('@svgr/webpack'),
-                options: {
-                  prettier: false,
-                  svgo: false,
-                  svgoConfig: {
-                    plugins: [{ removeViewBox: false }],
+                test: useTypescript
+                  ? /\.(js|mjs|jsx|ts|tsx)$/
+                  : /\.(js|mjs|jsx)$/,
+                exclude: /(node_modules)/,
+                use: {
+                  loader: 'babel-loader',
+                  options: {
+                    presets: [
+                      [
+                        'react-app',
+                        {
+                          runtime: 'automatic',
+                          flow: false,
+                          typescript: useTypescript,
+                        },
+                      ],
+                    ],
+                    plugins: [require.resolve('react-refresh/babel')],
                   },
-                  titleProp: true,
-                  ref: true,
                 },
               },
               {
-                loader: require.resolve('file-loader'),
-                options: {
-                  name: 'static/media/[name].[hash].[ext]',
+                test: /\.module.css$/i,
+                use: [
+                  'style-loader',
+                  {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                      modules: true,
+                    },
+                  },
+                ],
+              },
+              {
+                test: /\.css$/i,
+                exclude: /\.module.css$/i,
+                use: ['style-loader', 'css-loader'],
+              },
+              {
+                test: /\.module\.s[ac]ss$/i,
+                use: [
+                  'style-loader',
+                  {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                      modules: true,
+                    },
+                  },
+                  'sass-loader',
+                ],
+              },
+              {
+                test: /\.s[ac]ss$/i,
+                exclude: /\.module\.s[ac]ss$/i,
+                use: ['style-loader', 'css-loader', 'sass-loader'],
+              },
+              {
+                test: /\.svg$/,
+                use: [
+                  {
+                    loader: require.resolve('@svgr/webpack'),
+                    options: {
+                      prettier: false,
+                      svgo: false,
+                      svgoConfig: {
+                        plugins: [{ removeViewBox: false }],
+                      },
+                      titleProp: true,
+                      ref: true,
+                    },
+                  },
+                  {
+                    loader: require.resolve('file-loader'),
+                    options: {
+                      name: 'static/media/[name].[hash].[ext]',
+                    },
+                  },
+                ],
+                issuer: {
+                  and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
                 },
               },
-            ],
-            issuer: {
-              and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
-            },
-          },
-          {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            type: 'asset',
-            parser: {
-              dataUrlCondition: {
-                maxSize: 10000,
+              {
+                test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+                type: 'asset',
+                parser: {
+                  dataUrlCondition: {
+                    maxSize: 10000,
+                  },
+                },
               },
-            },
+              {
+                exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+                resourceQuery: { not: [/raw/] },
+                type: 'asset/resource',
+              },
+              {
+                exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+                resourceQuery: /raw/,
+                type: 'asset/source',
+              },
+            ],
           },
         ],
       },
@@ -216,49 +232,29 @@ export default async function devServer({
       module: {
         rules: [
           {
-            test: /\.(js|mjs|jsx|ts|tsx)$/,
-            exclude: /(node_modules)/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  useTypescript && '@babel/preset-typescript',
-                  [
-                    '@babel/preset-react',
-                    {
-                      runtime: 'automatic',
-                    },
-                  ],
-                ].filter(Boolean),
-                plugins: ['macros'],
-              },
-            },
-          },
-          {
-            test: /\.module.css$/i,
-            loader: 'css-loader',
-            options: {
-              modules: {
-                mode: 'local',
-                exportOnlyLocals: true,
-              },
-            },
-          },
-          {
-            test: /\.css$/i,
-            exclude: /\.module.css$/i,
-            loader: 'css-loader',
-            options: {
-              modules: {
-                exportOnlyLocals: true,
-              },
-            },
-          },
-          {
-            test: /\.module\.s[ac]ss$/i,
-            use: [
+            oneOf: [
               {
-                loader: require.resolve('css-loader'),
+                test: /\.(js|mjs|jsx|ts|tsx)$/,
+                exclude: /(node_modules)/,
+                use: {
+                  loader: 'babel-loader',
+                  options: {
+                    presets: [
+                      useTypescript && '@babel/preset-typescript',
+                      [
+                        '@babel/preset-react',
+                        {
+                          runtime: 'automatic',
+                        },
+                      ],
+                    ].filter(Boolean),
+                    plugins: ['macros'],
+                  },
+                },
+              },
+              {
+                test: /\.module.css$/i,
+                loader: 'css-loader',
                 options: {
                   modules: {
                     mode: 'local',
@@ -266,62 +262,101 @@ export default async function devServer({
                   },
                 },
               },
-              'sass-loader',
-            ],
-          },
-          {
-            test: /\.s[ac]ss$/i,
-            exclude: /\.module\.s[ac]ss$/i,
-            use: [
               {
-                loader: require.resolve('css-loader'),
+                test: /\.css$/i,
+                exclude: /\.module.css$/i,
+                loader: 'css-loader',
                 options: {
                   modules: {
                     exportOnlyLocals: true,
                   },
                 },
               },
-              'sass-loader',
-            ],
-          },
-          {
-            test: /\.svg$/,
-            use: [
               {
-                loader: require.resolve('@svgr/webpack'),
-                options: {
-                  prettier: false,
-                  svgo: false,
-                  svgoConfig: {
-                    plugins: [{ removeViewBox: false }],
+                test: /\.module\.s[ac]ss$/i,
+                use: [
+                  {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                      modules: {
+                        mode: 'local',
+                        exportOnlyLocals: true,
+                      },
+                    },
                   },
-                  titleProp: true,
-                  ref: true,
+                  'sass-loader',
+                ],
+              },
+              {
+                test: /\.s[ac]ss$/i,
+                exclude: /\.module\.s[ac]ss$/i,
+                use: [
+                  {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                      modules: {
+                        exportOnlyLocals: true,
+                      },
+                    },
+                  },
+                  'sass-loader',
+                ],
+              },
+              {
+                test: /\.svg$/,
+                use: [
+                  {
+                    loader: require.resolve('@svgr/webpack'),
+                    options: {
+                      prettier: false,
+                      svgo: false,
+                      svgoConfig: {
+                        plugins: [{ removeViewBox: false }],
+                      },
+                      titleProp: true,
+                      ref: true,
+                    },
+                  },
+                  {
+                    loader: require.resolve('file-loader'),
+                    options: {
+                      emitFile: false,
+                      name: 'static/media/[name].[hash].[ext]',
+                    },
+                  },
+                ],
+                issuer: {
+                  and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
                 },
               },
               {
-                loader: require.resolve('file-loader'),
-                options: {
-                  emitFile: false,
-                  name: 'static/media/[name].[hash].[ext]',
+                test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+                type: 'asset',
+                generator: {
+                  emit: false,
+                },
+                parser: {
+                  dataUrlCondition: {
+                    maxSize: 10000,
+                  },
                 },
               },
-            ],
-            issuer: {
-              and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
-            },
-          },
-          {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            type: 'asset',
-            generator: {
-              emit: false,
-            },
-            parser: {
-              dataUrlCondition: {
-                maxSize: 10000,
+              // NOTE: to import raw content use:
+              // import helloContent from './hello.txt?raw'
+              {
+                exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+                resourceQuery: { not: [/raw/] },
+                type: 'asset/resource',
+                generator: {
+                  emit: false,
+                },
               },
-            },
+              {
+                exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+                resourceQuery: /raw/,
+                type: 'asset/source',
+              },
+            ],
           },
         ],
       },

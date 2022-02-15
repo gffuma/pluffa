@@ -508,7 +508,6 @@ Here all the available snext options with their defaults:
 ## TODO:
 
 - [ ] Post CSS
-- [ ] Generic file loader
 - [ ] Custom env ecc
 - [ ] Configure Babel
 
