@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "snext dev",
+    "build": "snext build",
+    "staticize": "snext staticize"
+  },
+  "dependencies": {
+    "react": "^18.0.0-rc.0",
+    "react-dom": "^18.0.0-rc.0",
+    "snext": "latest"
+  },
+  "snext": {
+    "clientEntry": "./src/index.js",
+    "serverComponent": "./src/App.js",
+    "skeletonComponent": "./src/Skeleton.js"
+  }
+}

@@ -113,6 +113,24 @@ export default async function devServer({
             use: ['style-loader', 'css-loader'],
           },
           {
+            test: /\.module\.s[ac]ss$/i,
+            use: [
+              'style-loader',
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: true,
+                },
+              },
+              'sass-loader',
+            ],
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            exclude: /\.module\.s[ac]ss$/i,
+            use: ['style-loader', 'css-loader', 'sass-loader'],
+          },
+          {
             test: /\.svg$/,
             use: [
               {
@@ -235,6 +253,36 @@ export default async function devServer({
                 exportOnlyLocals: true,
               },
             },
+          },
+          {
+            test: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: {
+                    mode: 'local',
+                    exportOnlyLocals: true,
+                  },
+                },
+              },
+              'sass-loader',
+            ],
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            exclude: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: {
+                    exportOnlyLocals: true,
+                  },
+                },
+              },
+              'sass-loader',
+            ],
           },
           {
             test: /\.svg$/,

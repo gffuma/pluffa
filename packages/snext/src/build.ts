@@ -112,6 +112,32 @@ export default function build({
             ],
           },
           {
+            test: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+              },
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: true,
+                },
+              },
+              'sass-loader',
+            ],
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            exclude: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+              },
+              'css-loader',
+              'sass-loader',
+            ],
+          },
+          {
             test: /\.svg$/,
             use: [
               {
@@ -238,6 +264,36 @@ export default function build({
                 exportOnlyLocals: true,
               },
             },
+          },
+          {
+            test: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: {
+                    mode: 'local',
+                    exportOnlyLocals: true,
+                  },
+                },
+              },
+              'sass-loader',
+            ],
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            exclude: /\.module\.s[ac]ss$/i,
+            use: [
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  modules: {
+                    exportOnlyLocals: true,
+                  },
+                },
+              },
+              'sass-loader',
+            ],
           },
           {
             test: /\.svg$/,
