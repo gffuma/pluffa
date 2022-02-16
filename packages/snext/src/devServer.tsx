@@ -10,11 +10,7 @@ import { createRequire } from 'module'
 import { Worker } from 'worker_threads'
 import chalk from 'chalk'
 import { fileURLToPath } from 'url'
-import {
-  NodeCommonJSConfiguration,
-  NodeESMConfiguration,
-  NodeNativeModulesFallbacks,
-} from './config.js'
+import { getNodeConfiguration, NodeNativeModulesFallbacks } from './config.js'
 import render from './render.js'
 import runStatik from './runStatik.js'
 import ErrorPage from './ErrorPage.js'
@@ -45,10 +41,7 @@ export default async function devServer({
   const useTypescript = fs.existsSync(
     path.resolve(process.cwd(), 'tsconfig.json')
   )
-  const nodeConfiguration = compileNodeCommonJS
-    ? NodeCommonJSConfiguration
-    : NodeESMConfiguration
-
+  const nodeConfiguration = getNodeConfiguration(compileNodeCommonJS)
   const nodeEntry: EntryObject = {
     App: serverComponent,
     Skeleton: skeletonComponent,

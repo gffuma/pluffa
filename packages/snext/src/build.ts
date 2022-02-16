@@ -6,7 +6,7 @@ import webpack, { EntryObject } from 'webpack'
 import rimraf from 'rimraf'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
-import { NodeCommonJSConfiguration, NodeESMConfiguration, NodeNativeModulesFallbacks } from './config.js'
+import { getNodeConfiguration, NodeNativeModulesFallbacks } from './config.js'
 
 const require = createRequire(import.meta.url)
 
@@ -34,10 +34,7 @@ export default function build({
     ...['.js', '.mjs', '.jsx'],
     ...(useTypescript ? ['.ts', '.tsx'] : []),
   ]
-  const nodeConfiguration = compileNodeCommonJS
-    ? NodeCommonJSConfiguration
-    : NodeESMConfiguration
-
+  const nodeConfiguration = getNodeConfiguration(compileNodeCommonJS)
   const nodeEntry: EntryObject = {
     App: serverComponent,
     Skeleton: skeletonComponent,
