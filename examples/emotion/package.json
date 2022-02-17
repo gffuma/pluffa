@@ -16,8 +16,7 @@
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
-    "skeletonComponent": "./src/Skeleton.js",
-    "compileNodeCommonJS": true
+    "skeletonComponent": "./src/Skeleton.js"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.7.2"

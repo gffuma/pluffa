@@ -16,8 +16,7 @@
   "snext": {
     "clientEntry": "./src/index.tsx",
     "serverComponent": "./src/StaticApp.tsx",
-    "skeletonComponent": "./src/Skeleton.tsx",
-    "compileNodeCommonJS": true
+    "skeletonComponent": "./src/Skeleton.tsx"
   },
   "devDependencies": {
     "@types/react": "^17.0.38",

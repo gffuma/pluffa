@@ -3,8 +3,46 @@ import nodeExternals from 'webpack-node-externals'
 import { Configuration } from 'webpack'
 import path from 'path'
 import { createRequire } from 'module'
-import { existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { pathToFileURL } from 'url'
+
+interface FoundPkg {
+  content: any
+  path: string
+}
+
+function findPkgInPath(request: string, modulePath: string): FoundPkg | false {
+  let search = path.join(modulePath, request)
+  if (path.extname(search)) {
+    search = path.dirname(search)
+  }
+
+  while (search !== modulePath) {
+    const pkgPath = path.join(search, 'package.json')
+    if (existsSync(pkgPath)) {
+      return {
+        content: JSON.parse(readFileSync(pkgPath, 'utf-8')),
+        path: pkgPath,
+      }
+    }
+    search = path.dirname(search)
+  }
+
+  return false
+}
+
+function findPkgJson(
+  request: string,
+  modulesPaths: string[]
+): FoundPkg | false {
+  for (let modulePath of modulesPaths) {
+    const pkg = findPkgInPath(request, modulePath)
+    if (pkg !== false) {
+      return pkg
+    }
+  }
+  return false
+}
 
 export function getNodeConfiguration(
   compileNodeCommonJS: boolean
@@ -22,32 +60,14 @@ export function getNodeConfiguration(
       },
     }
   }
+  // ESM Configuration
+
+  // Lookup of request import and ESM preference
   const PreferModuleCache = new Map<string, boolean>()
+
   const userRequire = createRequire(
     pathToFileURL(path.join(process.cwd(), 'index.js')).href
   )
-
-  // Try to find pkg json path using resolved file path and request string
-  function findPkgJsonPath(filePath: string, request: string): string | false {
-    const startNodeModules = filePath.lastIndexOf(`node_modules${path.sep}`)
-    if (startNodeModules === -1) {
-      return false
-    }
-    const startModules =
-      filePath.substring(0, startNodeModules) + 'node_modules'
-    let search = path.join(startModules, request)
-    if (path.extname(search)) {
-      search = path.dirname(search)
-    }
-    while (search !== startModules) {
-      const pkgPath = path.join(search, 'package.json')
-      if (existsSync(pkgPath)) {
-        return pkgPath
-      }
-      search = path.dirname(search)
-    }
-    return false
-  }
 
   return {
     externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
@@ -58,35 +78,19 @@ export function getNodeConfiguration(
           if (PreferModuleCache.has(request)) {
             preferModuleImport = PreferModuleCache.get(request)!
           } else {
-            try {
-              // Grab the resolved file path from the dev prespective
-              const filePath = userRequire.resolve(request)
-              // Return if the type of file requested is explicit
-              if (filePath.endsWith('.mjs')) {
-                preferModuleImport = true
-              } else if (filePath.endsWith('.cjs')) {
+            const modulesPath = userRequire.resolve.paths(request)
+            if (modulesPath === null) {
+              preferModuleImport = true
+            } else {
+              // Prefer ESM when pkg is an ESM module only
+              const foundPkg = findPkgJson(request, modulesPath)
+              if (foundPkg === false) {
                 preferModuleImport = false
               } else {
-                // Try to locate request pkg
-                const pkgPath = findPkgJsonPath(filePath, request)
-                if (pkgPath === false) {
-                  preferModuleImport = false
-                } else {
-                  const pkgData = userRequire(pkgPath)
-                  preferModuleImport = pkgData?.type === 'module'
-                  delete userRequire.cache[pkgPath]
-                }
-              }
-              PreferModuleCache.set(request, preferModuleImport)
-            } catch (e: any) {
-              if (e.code === 'MODULE_NOT_FOUND') {
-                preferModuleImport = false
-              } else {
-                console.error('SNext error during importType detection')
-                console.log(e)
-                throw e
+                preferModuleImport = foundPkg.content.type === 'module'
               }
             }
+            PreferModuleCache.set(request, preferModuleImport)
           }
           if (preferModuleImport) {
             return 'module ' + request
