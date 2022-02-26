@@ -1,0 +1,19 @@
+{
+  "name": "snext-as-worker",
+  "private": true,
+  "scripts": {
+    "dev": "snext dev"
+  },
+  "snext": {
+    "workerEntry": "./src/worker.js",
+    "runtime": "cloudflare-worker"
+  },
+  "dependencies": {
+    "react": "^18.0.0-rc.0",
+    "react-dom": "^18.0.0-rc.0",
+    "react-query": "^3.34.16"
+  },
+  "devDependencies": {
+    "snext": "latest"
+  }
+}

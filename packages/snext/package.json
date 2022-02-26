@@ -8,6 +8,10 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },
+    "./render": {
+      "require": "./dist/render.cjs",
+      "import": "./dist/render.js"
+    },
     "./statik": {
       "browser": {
         "require": "./dist/lib/statik.browser.cjs",
@@ -27,16 +31,15 @@
       ],
       "statik": [
         "./dist/lib/statik.d.ts"
+      ],
+      "render": [
+        "./dist/render.d.ts"
       ]
     }
   },
   "types": "./dist/index.d.ts",
   "author": "Giovanni Fumagalli",
   "license": "MIT",
-  "scripts": {
-    "build": "rimraf dist && rollup -c",
-    "build:watch": "rimraf dist && rollup -c -w"
-  },
   "bin": {
     "snext": "dist/cli.js"
   },
@@ -79,7 +82,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.0",
+    "@snext/cloudflare-worker": "^0.0.1",
     "@types/express": "^4.17.13",
     "@types/express-http-proxy": "^1.6.3",
     "@types/mkdirp": "^1.0.2",
@@ -91,12 +94,7 @@
     "@types/stream-buffers": "^3.0.4",
     "@types/webpack-hot-middleware": "^2.25.5",
     "@types/webpack-node-externals": "^2.5.3",
-    "rollup": "^2.67.1",
-    "rollup-plugin-node-externals": "^4.0.0",
-    "rollup-plugin-preserve-shebang": "^1.0.1",
-    "sass": "^1.49.7",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "sass": "^1.49.7"
   },
   "peerDependencies": {
     "react": "^18.0.0-rc.0",

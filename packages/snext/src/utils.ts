@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 
 export function readLibPkgSync() {
@@ -25,4 +25,8 @@ export function getUserPkgSync() {
   return JSON.parse(
     readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
   )
+}
+
+export function shouldUseTypescript() {
+  return existsSync(path.resolve(process.cwd(), 'tsconfig.json'))
 }

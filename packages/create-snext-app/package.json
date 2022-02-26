@@ -12,15 +12,8 @@
   "bin": {
     "create-snext-app": "dist/index.js"
   },
-  "scripts": {
-    "build": "rimraf dist && tsc",
-    "build:watch": "rimraf dist && tsc --watch",
-    "test-create": "node ./dist/index.js"
-  },
   "devDependencies": {
-    "@types/cross-spawn": "^6.0.2",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.5.5"
+    "@types/cross-spawn": "^6.0.2"
   },
   "dependencies": {
     "chalk": "^5.0.0",
