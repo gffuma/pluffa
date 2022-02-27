@@ -3,7 +3,6 @@ import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
 import { getWebPackClientConfig } from './webpack/client.js'
-import { shouldUseTypescript } from './utils.js'
 import { getWebPackNodeConfig } from './webpack/node.js'
 
 export interface BuildOptions {
@@ -11,9 +10,9 @@ export interface BuildOptions {
   serverComponent: string
   skeletonComponent: string
   registerStatik?: string
-  port: number
   compileNodeCommonJS: boolean
-  statikDataDir?: string | false
+  useTypescript: boolean,
+  statikDataDir: string | false
 }
 
 export default function build({
@@ -21,12 +20,11 @@ export default function build({
   serverComponent,
   skeletonComponent,
   registerStatik,
-  compileNodeCommonJS = false,
-  statikDataDir = 'snextdata',
+  useTypescript,
+  compileNodeCommonJS,
+  statikDataDir,
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.snext'))
-
-  const useTypescript = shouldUseTypescript()
 
   let statikDataUrl = ''
   if (statikDataDir !== false) {

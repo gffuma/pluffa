@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import App from './App'
 
 export default function StaticApp({ queryClient }) {

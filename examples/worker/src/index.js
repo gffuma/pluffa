@@ -1,6 +1,5 @@
 import { hydrateRoot } from 'react-dom'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
-// import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 
 const queryClient = new QueryClient({

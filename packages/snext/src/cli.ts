@@ -55,24 +55,52 @@ program.command('dev').action(async () => {
 
 program.command('build').action(async () => {
   console.log(chalk.magenta(logo))
-  const userPkg = await getUserPkg()
+  const config = await getUserSNextConfig()
+  const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'production'
-  const { default: build } = await import('./build.js')
-  console.log()
-  console.log('Creating an optimized build...')
-  console.log()
-  build(userPkg.snext)
+  if (config.runtime === 'cloudflare-worker') {
+    ensureSNextCloudflareWorkerInstalled()
+    const { buildForWorker } = await import('@snext/cloudflare-worker')
+    console.log()
+    console.log('Creating an optimized build...')
+    console.log()
+    buildForWorker({
+      ...config,
+      useTypescript,
+    })
+  } else {
+    const { default: build } = await import('./build.js')
+    console.log()
+    console.log('Creating an optimized build...')
+    console.log()
+    build({
+      ...config,
+      compileNodeCommonJS: config.runtime === 'commonjs',
+      useTypescript,
+    })
+  }
 })
 
 program.command('staticize').action(async () => {
   console.log(chalk.magenta(logo))
-  const userPkg = await getUserPkg()
+  const config = await getUserSNextConfig()
+  if (config.runtime === 'cloudflare-worker') {
+    console.log(
+      chalk.red(
+        `SNext error the staticize command is not supported for runtime ${config.runtime}\n`,
+      )
+    )
+    return
+  }
   process.env.NODE_ENV = 'production'
   const { default: staticize } = await import('./staticize.js')
   console.log()
   console.log('Exporting your build as a static website...')
   console.log()
-  await staticize(userPkg.snext)
+  await staticize({
+    ...config,
+    compileNodeCommonJS: config.runtime === 'commonjs',
+  })
 })
 
 program.parse()

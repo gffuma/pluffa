@@ -2,7 +2,7 @@ import { Suspense, useState } from 'react'
 import { useQuery } from 'react-query'
 
 function Babu() {
-  const pokemons = useQuery(['p'], () =>
+  const pokemons = useQuery(['pokedex'], () =>
     fetch(`https://pokeapi.co/api/v2/pokemon`).then((r) => r.json())
   )
   const [counter, setCounter] = useState(0)

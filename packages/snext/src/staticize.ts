@@ -69,19 +69,19 @@ async function processURLs(
 }
 
 export default async function staticize({
-  outputDir = 'build',
-  publicDir = 'public',
-  compileNodeCommonJS = false,
-  urls = ['/'],
-  crawlConcurrency = 4,
-  statikDataDir = 'snextdata',
+  outputDir,
+  publicDir,
+  compileNodeCommonJS,
+  urls,
+  crawlConcurrency,
+  statikDataDir,
 }: {
   outputDir: string
   publicDir: string
   compileNodeCommonJS: boolean
   urls: string[]
   crawlConcurrency: number
-  statikDataDir?: string | false
+  statikDataDir: string | false
 }) {
   rimraf.sync(path.resolve(process.cwd(), outputDir))
   await ncp(

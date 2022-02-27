@@ -67,11 +67,12 @@ export async function getUserSNextConfig(): Promise<SNextConfig> {
       process.exit(1)
     }
   } else if (cfg.runtime === 'cloudflare-worker') {
-    if (!cfg.workerEntry) {
+    if (!cfg.workerEntry || !cfg.clientEntry) {
       console.log(
         chalk.red(
           'SNext config error:' +
             '\nYou have to configure at least:\n\n' +
+            '"clientEntry"\n' +
             '"workerEntry"\n\n' +
             `for "runtime": "${cfg.runtime}"\n` +
             'check your package.josn\n'

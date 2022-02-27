@@ -1,4 +1,5 @@
 import path from 'path'
+import chalk from 'chalk'
 import { Log, LogLevel, Miniflare } from 'miniflare'
 import webpack from 'webpack'
 import proxy from 'express-http-proxy'
@@ -19,6 +20,7 @@ async function startMiniFlare() {
   const mf = new Miniflare({
     scriptPath: path.resolve(process.cwd(), './.snext/runtime/worker.js'),
     buildWatchPaths: [path.resolve(process.cwd(), './.snext/runtime')],
+    sourceMap: true,
     watch: true,
     log: new Log(LogLevel.INFO),
     globals: {
@@ -28,7 +30,9 @@ async function startMiniFlare() {
   })
   const server = await mf.createServer()
   server.listen(MINIFLARE_PORT, () => {
-    console.log(`Listening on http://localhost:${MINIFLARE_PORT}`)
+    console.log(chalk.green(`Worker started on port: ${MINIFLARE_PORT}`))
+    console.log()
+    console.log(`http://localhost:${MINIFLARE_PORT}`)
   })
 }
 
@@ -62,11 +66,19 @@ export default function startWokerDevServer({
 
   app.use(proxy(`http://localhost:${MINIFLARE_PORT}`))
 
+  let miniStarted = false
+
   app.listen(port, () => {
-    console.log('~.~')
+    console.log()
+    console.log(chalk.green(`SNext.js Dev Server listen on port: ${port}`))
+    console.log()
+    console.log(`http://localhost:${port}`)
+    console.log()
+    if (!miniStarted) {
+      console.log('Waiting first compilation to start the worker....')
+    }
   })
 
-  let miniStarted = false
   compiler.compilers[1].hooks.done.tap('startMiniflare', () => {
     if (miniStarted) {
       return

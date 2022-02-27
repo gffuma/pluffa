@@ -16,8 +16,7 @@ export function getWebPackWorkerConfig({
   return {
     name: 'server',
     mode: isProd ? 'production' : 'development',
-    // TODO: Check source maps 4 worker....
-    devtool: false,
+    devtool: isProd ? false : 'cheap-module-source-map',
     target: 'webworker',
     entry: {
       // NOTE: Polyfill setImmediate for React
@@ -28,6 +27,7 @@ export function getWebPackWorkerConfig({
       filename: '[name].js',
       publicPath: '/',
       assetModuleFilename: 'static/media/[name].[hash][ext]',
+      devtoolModuleFilenameTemplate: '[absolute-resource-path]',
     },
     module: {
       rules: getWebPackRules({
@@ -41,7 +41,7 @@ export function getWebPackWorkerConfig({
         stream: 'stream-browserify',
       },
       alias: {
-      'react-dom/server.js': 'react-dom/server.node.js',
+        'react-dom/server.js': 'react-dom/server.node.js',
       },
       extensions: [
         ...['.js', '.mjs', '.jsx'],
@@ -51,6 +51,11 @@ export function getWebPackWorkerConfig({
     plugins: [
       new webpack.DefinePlugin({
         'process.env.IS_SNEXT_SERVER': true,
+        ...(isProd
+          ? {}
+          : {
+              SNEXT_BUNDLE_ENTRYPOINTS: "['bundle.js']",
+            }),
       }),
       new webpack.ProvidePlugin({
         process: 'process',
