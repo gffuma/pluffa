@@ -12,14 +12,14 @@
     "react-helmet": "^6.1.0",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "showdown": "^1.9.1"
+    "showdown": "^1.9.1",
+    "snext": "latest"
   },
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
     "skeletonComponent": "./src/Skeleton.js",
     "registerStatik": "./src/registerStatik.js",
-    "compileNodeCommonJS": true,
     "urls": [
       "/",
       "/secret"

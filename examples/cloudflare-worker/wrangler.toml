@@ -1,4 +1,4 @@
-name = "snext-worker-example"
+name = "snext-cloudflare-worker-example"
 type = "javascript"
 zone_id = ""
 route = ""

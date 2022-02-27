@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { Log, LogLevel, Miniflare } from 'miniflare'
 import webpack from 'webpack'
 import proxy from 'express-http-proxy'
-import { getWebPackClientConfig, createBaseDevServer } from 'snext'
+import { getWebPackClientConfig, createBaseDevServer } from '@snext/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
 
 export interface StartWorkerDevServerOptions {

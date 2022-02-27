@@ -376,7 +376,7 @@ You can also compile your code as commonJS, if you want, with:
 ```json
 {
   "snext": {
-    "compileNodeCommonJS": true
+    "runtime": "commonjs"
   }
 }
 ```
@@ -493,7 +493,7 @@ Here all the available snext options with their defaults:
     "port": 7000,
     "outputDir": "build",
     "publicDir": "public",
-    "compileNodeCommonJS": false,
+    "runtime": "esm",
     "urls": ["/"],
     "crawlConcurrency": 4,
     "proxy": null,

@@ -52,34 +52,18 @@
     "static site"
   ],
   "dependencies": {
-    "@babel/core": "^7.16.12",
-    "@babel/preset-react": "^7.16.7",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
-    "@svgr/webpack": "^6.2.0",
-    "babel-loader": "^8.2.3",
-    "babel-preset-react-app": "^10.0.1",
+    "webpack": "^5.69.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
-    "css-loader": "^6.5.1",
-    "css-minimizer-webpack-plugin": "^3.4.1",
-    "express": "^4.17.2",
     "express-http-proxy": "^1.6.3",
-    "file-loader": "^6.2.0",
     "itty-router": "^2.4.10",
-    "mini-css-extract-plugin": "^2.5.3",
     "mkdirp": "^1.0.4",
     "ncp": "^2.0.0",
     "node-html-parser": "^5.2.0",
     "p-queue": "^7.2.0",
-    "react-refresh": "^0.11.0",
     "rimraf": "^3.0.2",
-    "sass-loader": "^12.5.0",
     "stream-buffers": "^3.0.2",
-    "style-loader": "^3.3.1",
-    "webpack": "^5.69.0",
-    "webpack-dev-middleware": "^5.3.0",
-    "webpack-hot-middleware": "^2.25.1",
-    "webpack-node-externals": "^3.0.0"
+    "@snext/build-tools": "^0.0.1"
   },
   "devDependencies": {
     "@snext/cloudflare-worker": "^0.0.1",
@@ -91,10 +75,7 @@
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "@types/rimraf": "^3.0.2",
-    "@types/stream-buffers": "^3.0.4",
-    "@types/webpack-hot-middleware": "^2.25.5",
-    "@types/webpack-node-externals": "^2.5.3",
-    "sass": "^1.49.7"
+    "@types/stream-buffers": "^3.0.4"
   },
   "peerDependencies": {
     "react": "^18.0.0-rc.0",

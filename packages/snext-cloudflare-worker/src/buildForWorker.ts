@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
-import { getWebPackClientConfig } from 'snext'
+import { getWebPackClientConfig } from '@snext/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
 
 export interface BuildForWorkerOptions {

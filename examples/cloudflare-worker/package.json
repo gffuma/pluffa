@@ -1,5 +1,5 @@
 {
-  "name": "snext-worker-example",
+  "name": "snext-cloudflare-worker-example",
   "private": true,
   "main": "build/runtime/worker.js",
   "scripts": {
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "snext": "latest",
+    "@snext/cloudflare-worker": "latest",
     "@cloudflare/kv-asset-handler": "^0.2.0",
     "itty-router": "^2.5.1",
     "react": "^18.0.0-rc.0",

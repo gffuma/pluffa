@@ -2,8 +2,10 @@ import path from 'path'
 import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
-import { getWebPackClientConfig } from './webpack/client.js'
-import { getWebPackNodeConfig } from './webpack/node.js'
+import {
+  getWebPackClientConfig,
+  getWebPackNodeConfig,
+} from '@snext/build-tools'
 
 export interface BuildOptions {
   clientEntry: string
@@ -11,7 +13,7 @@ export interface BuildOptions {
   skeletonComponent: string
   registerStatik?: string
   compileNodeCommonJS: boolean
-  useTypescript: boolean,
+  useTypescript: boolean
   statikDataDir: string | false
 }
 

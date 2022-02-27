@@ -25,7 +25,7 @@ router.get('/static/*', async (_, event) => {
 })
 
 router.all('*', async (req) => {
-  const urlParsed = new URL23(req.url)
+  const urlParsed = new URL(req.url)
   const html = await render(
     {
       App: StaticApp,

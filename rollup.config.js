@@ -25,6 +25,28 @@ function createSnextApp() {
   }))
 }
 
+function snextBuildTools() {
+  const baseDir = './packages/snext-build-tools'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.ts`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
 function snextCloudflareWorker() {
   const baseDir = './packages/snext-cloudflare-worker'
   return ['esm', 'cjs'].map((format) => ({
@@ -76,4 +98,9 @@ function snext() {
   }))
 }
 
-export default [...snext(), ...snextCloudflareWorker(), ...createSnextApp()]
+export default [
+  ...createSnextApp(),
+  ...snextBuildTools(),
+  ...snextCloudflareWorker(),
+  ...snext(),
+]

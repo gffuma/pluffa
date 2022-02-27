@@ -2,7 +2,7 @@ import webpack from 'webpack'
 import {
   getWebPackClientConfig,
   getWebPackNodeConfig,
-} from './webpack/index.js'
+} from '@snext/build-tools'
 import createDevServer from './createDevServer.js'
 import chalk from 'chalk'
 
