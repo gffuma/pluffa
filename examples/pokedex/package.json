@@ -6,12 +6,12 @@
     "staticize": "snext staticize"
   },
   "dependencies": {
-    "react": "^18.0.0-rc.0",
-    "react-dom": "^18.0.0-rc.0",
+    "react": "^18.0.0-rc.1",
+    "react-dom": "^18.0.0-rc.1",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "superagent": "^7.1.1",
-    "snext": "latest"
+    "snext": "latest",
+    "superagent": "^7.1.1"
   },
   "snext": {
     "clientEntry": "./src/index.js",

@@ -46,7 +46,7 @@ export function getWebPackWorkerConfig({
         // util: require.resolve('util/'),
       },
       alias: {
-        'react-dom/server.js': 'react-dom/server.node.js',
+        'react-dom/server': 'react-dom/server.node',
       },
       extensions: [
         ...['.js', '.mjs', '.jsx'],
