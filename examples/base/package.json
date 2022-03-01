@@ -13,6 +13,7 @@
   "snext": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/App.js",
-    "skeletonComponent": "./src/Skeleton.js"
+    "skeletonComponent": "./src/Skeleton.js",
+    "proxy": "https://timestrata.be"
   }
 }

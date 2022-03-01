@@ -12,7 +12,7 @@ export interface StartDevServerOptions {
   skeletonComponent: string
   registerStatik?: string
   compileNodeCommonJS: boolean
-  proxyUrl?: string
+  proxy?: string
   publicDir: string | false
   port: number
   useTypescript: boolean
@@ -24,10 +24,10 @@ export default function startDevServer({
   skeletonComponent,
   registerStatik,
   compileNodeCommonJS,
-  proxyUrl,
+  proxy: proxyUrl,
   port,
   publicDir,
-  useTypescript
+  useTypescript,
 }: StartDevServerOptions) {
   process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   const isProd = false
