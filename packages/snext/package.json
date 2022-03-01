@@ -52,10 +52,11 @@
     "static site"
   ],
   "dependencies": {
-    "webpack": "^5.69.0",
+    "@snext/build-tools": "^0.1.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
     "express-http-proxy": "^1.6.3",
+    "http-proxy-middleware": "^2.0.3",
     "itty-router": "^2.4.10",
     "mkdirp": "^1.0.4",
     "ncp": "^2.0.0",
@@ -63,7 +64,7 @@
     "p-queue": "^7.2.0",
     "rimraf": "^3.0.2",
     "stream-buffers": "^3.0.2",
-    "@snext/build-tools": "^0.1.0"
+    "webpack": "^5.69.0"
   },
   "devDependencies": {
     "@snext/cloudflare-worker": "^0.1.0",

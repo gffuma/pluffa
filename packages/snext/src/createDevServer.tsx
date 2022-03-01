@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import { Express } from 'express'
-import proxy from 'express-http-proxy'
+import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
 import { renderToString } from 'react-dom/server'
@@ -120,16 +120,17 @@ export default function createDevServer({
   }
 
   if (proxyUrl) {
+    const filterPorxy: Filter = (_, req) => {
+      return (
+        req.method !== 'GET' ||
+        Boolean(req.headers.accept && !req.headers.accept.includes('text/html'))
+      )
+    }
     app.use(
-      proxy(proxyUrl, {
-        filter: (req) => {
-          return (
-            req.method !== 'GET' ||
-            Boolean(
-              req.headers.accept && !req.headers.accept.includes('text/html')
-            )
-          )
-        },
+      createProxyMiddleware(filterPorxy, {
+        logLevel: 'silent',
+        target: proxyUrl,
+        changeOrigin: true,
       })
     )
   }

@@ -2,7 +2,7 @@ import path from 'path'
 import chalk from 'chalk'
 import { Log, LogLevel, Miniflare } from 'miniflare'
 import webpack from 'webpack'
-import proxy from 'express-http-proxy'
+import { createProxyMiddleware } from 'http-proxy-middleware'
 import { getWebPackClientConfig, createBaseDevServer } from '@snext/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
 
@@ -64,7 +64,13 @@ export default function startWokerDevServer({
     publicDir,
   })
 
-  app.use(proxy(`http://localhost:${MINIFLARE_PORT}`))
+  app.use(
+    createProxyMiddleware({
+      logLevel: 'silent',
+      target: `http://localhost:${MINIFLARE_PORT}`,
+      changeOrigin: true,
+    })
+  )
 
   let miniStarted = false
 
