@@ -2,7 +2,7 @@
   "name": "@snext/build-tools",
   "type": "module",
   "description": "SNext meta package to share build tools stuff",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
