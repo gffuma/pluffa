@@ -1,10 +1,7 @@
 import path from 'path'
 import chalk from 'chalk'
 import { Log, LogLevel, Miniflare } from 'miniflare'
-import webpack from 'webpack'
-import { createProxyMiddleware } from 'http-proxy-middleware'
-import { getWebPackClientConfig, createBaseDevServer } from '@snext/build-tools'
-import { getWebPackWorkerConfig } from './webpack'
+import createWokerDevServer from './createWorkerDevServer'
 
 export interface StartWorkerDevServerOptions {
   clientEntry: string
@@ -43,36 +40,15 @@ export default function startWokerDevServer({
   publicDir,
   port,
 }: StartWorkerDevServerOptions) {
-  const isProd = false
-
-  const compiler = webpack([
-    getWebPackClientConfig({
-      isProd,
-      clientEntry,
-      statikDataUrl: false,
-      useTypescript,
-    }),
-    getWebPackWorkerConfig({
-      isProd,
-      useTypescript,
-      workerEntry,
-    }),
-  ])
-
-  const app = createBaseDevServer({
-    compiler,
+  const app = createWokerDevServer({
+    port,
+    clientEntry,
+    workerEntry,
     publicDir,
+    miniflareUrl: `http://localhost:${MINIFLARE_PORT}`,
+    startMiniFlare,
+    useTypescript,
   })
-
-  app.use(
-    createProxyMiddleware({
-      logLevel: 'silent',
-      target: `http://localhost:${MINIFLARE_PORT}`,
-      changeOrigin: true,
-    })
-  )
-
-  let miniStarted = false
 
   app.listen(port, () => {
     console.log()
@@ -80,16 +56,6 @@ export default function startWokerDevServer({
     console.log()
     console.log(`http://localhost:${port}`)
     console.log()
-    if (!miniStarted) {
-      console.log('Waiting first compilation to start the worker....')
-    }
-  })
-
-  compiler.compilers[1].hooks.done.tap('startMiniflare', () => {
-    if (miniStarted) {
-      return
-    }
-    miniStarted = true
-    startMiniFlare()
+    console.log('Waiting first compilation to start the worker....')
   })
 }
