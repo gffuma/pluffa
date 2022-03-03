@@ -1,6 +1,3 @@
-import path from 'path'
-import chalk from 'chalk'
-import { Log, LogLevel, Miniflare } from 'miniflare'
 import webpack from 'webpack'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import { getWebPackClientConfig, createBaseDevServer } from '@snext/build-tools'
