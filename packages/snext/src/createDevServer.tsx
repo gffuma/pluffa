@@ -4,7 +4,10 @@ import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
 import { renderToString } from 'react-dom/server'
-import { createBaseDevServer } from '@snext/build-tools'
+import {
+  createBaseDevServer,
+  getFlatEntrypointsFromWebPackStats,
+} from '@snext/build-tools'
 import { fileURLToPath } from 'url'
 import { Compiler, MultiCompiler } from 'webpack'
 import { Worker } from 'worker_threads'
@@ -137,6 +140,11 @@ export default function createDevServer({
 
   if (compileNodeCommonJS) {
     app.use(async (req, res) => {
+      const { devMiddleware } = res.locals.webpack
+      const entrypoints = getFlatEntrypointsFromWebPackStats(
+        devMiddleware.stats.toJson(),
+        'client'
+      )
       try {
         const appPath = path.join(process.cwd(), '.snext/node', 'App.js')
         delete require.cache[require.resolve(appPath)]
@@ -169,7 +177,7 @@ export default function createDevServer({
             getSkeletonProps,
             Skeleton,
           },
-          { url: req.url, entrypoints: ['bundle.js'] }
+          { url: req.url, entrypoints }
         )
         res.send(html)
       } catch (error) {
@@ -186,6 +194,12 @@ export default function createDevServer({
     })
   } else {
     app.use(async (req, res) => {
+      const { devMiddleware } = res.locals.webpack
+      const entrypoints = getFlatEntrypointsFromWebPackStats(
+        devMiddleware.stats.toJson(),
+        'client'
+      )
+
       const appPath = path.join(process.cwd(), '.snext/node', 'App.mjs')
       const skeletonPath = path.join(
         process.cwd(),
@@ -204,7 +218,7 @@ export default function createDevServer({
             appPath,
             skeletonPath,
             url: req.url,
-            entrypoints: ['bundle.js'],
+            entrypoints,
           },
         }
       )

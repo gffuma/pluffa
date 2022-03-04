@@ -20,9 +20,9 @@ export interface SnextProps {
   url: string
 
   /**
-   * List of entrypoints file names
+   * List of entrypoints file names by webpack entry name
    */
-  entrypoints: string[]
+  entrypoints: Record<string, string[]>
 }
 
 export interface AppProps {
@@ -34,9 +34,9 @@ export interface AppProps {
 
 export interface SkeletonProps {
   /**
-   * List of entrypoints file names
+   * List of entrypoints file names by webpack entry name
    */
-  entrypoints: string[]
+  entrypoints: Record<string, string[]>
 
   /**
    * Rendered html of app

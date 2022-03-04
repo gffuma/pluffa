@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import webpack from 'webpack'
 import rimraf from 'rimraf'
 import {
+  getFlatEntrypointsFromWebPackStats,
   getWebPackClientConfig,
   getWebPackNodeConfig,
 } from '@snext/build-tools'
@@ -70,8 +71,7 @@ export default function build({
       info.errors!.forEach((e) => console.error(e))
       process.exit(1)
     } else {
-      const entrypoints =
-        info.children![0]!.entrypoints!['main'].assets?.map((a) => a.name) ?? []
+      const entrypoints = getFlatEntrypointsFromWebPackStats(info, 'client')
       await fs.writeFile(
         path.join(process.cwd(), '.snext/client', 'manifest.json'),
         JSON.stringify({ entrypoints }, null, 2)
