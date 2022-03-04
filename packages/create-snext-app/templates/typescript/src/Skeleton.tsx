@@ -7,7 +7,7 @@ export default function Skeleton({ appHtml, entrypoints }: SkeletonProps) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="/favicon.ico" />
-        {entrypoints
+        {entrypoints.main
           .filter((e) => e.endsWith('.css'))
           .map((e) => (
             <link key={e} href={`/${e}`} rel="stylesheet" />
@@ -21,7 +21,7 @@ export default function Skeleton({ appHtml, entrypoints }: SkeletonProps) {
           }}
         />
       </body>
-      {entrypoints
+      {entrypoints.main
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
           <script key={e} src={`/${e}`} />

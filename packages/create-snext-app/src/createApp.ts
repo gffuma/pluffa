@@ -75,7 +75,6 @@ export default async function createApp({
 }) {
   const baseDir = path.resolve(process.cwd(), appName)
   const appNameClean = path.basename(appName)
-  console.log(path.resolve(baseDir, 'gitignore'))
 
   console.log()
   console.log('Creating a new SNext App in ' + chalk.green(baseDir))
