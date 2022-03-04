@@ -25,6 +25,7 @@ export default function createBaseDevServer({
 
   app.use(
     webpackDevMiddleware(compiler, {
+      serverSideRender: true,
       writeToDisk: (target) => {
         if (path.relative(process.cwd(), target).startsWith('.snext')) {
           return true

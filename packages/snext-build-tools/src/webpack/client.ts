@@ -2,9 +2,8 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import path from 'path'
-import webpack, { Configuration } from 'webpack'
+import webpack, { Configuration, EntryObject } from 'webpack'
 import { getWebPackRules } from './rules.js'
-import { B } from './utils.js'
 
 // Map all native node packages to have empty fallback
 const NodeNativeModulesFallbacks: { [index: string]: false } = {
@@ -34,11 +33,41 @@ const NodeNativeModulesFallbacks: { [index: string]: false } = {
   zlib: false,
 }
 
+type WebPackEntry = Configuration['entry']
+
 export interface GetWebPackClientConfigOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
   useTypescript: boolean
   isProd: boolean
   statikDataUrl: string | false
+}
+
+function injectHotMiddlewareInEntry(entry: WebPackEntry): WebPackEntry {
+  if (entry === undefined) {
+    return undefined
+  }
+  const devEntry =
+    'webpack-hot-middleware/client?reload=true&name=client&quiet=true'
+  if (typeof entry === 'string') {
+    return [devEntry, entry]
+  }
+  if (Array.isArray(entry)) {
+    return [devEntry].concat(devEntry)
+  }
+  if (typeof entry === 'object' && entry !== null) {
+    return Object.keys(entry).reduce((newEntry, name) => {
+      const innerEntry = entry[name]
+      if (Array.isArray(innerEntry)) {
+        newEntry[name] = [devEntry].concat(innerEntry)
+      } else if (typeof innerEntry === 'string') {
+        newEntry[name] = [devEntry, innerEntry]
+      } else {
+        newEntry[name] = innerEntry
+      }
+      return newEntry
+    }, {} as EntryObject)
+  }
+  return entry
 }
 
 export function getWebPackClientConfig({
@@ -51,15 +80,13 @@ export function getWebPackClientConfig({
     name: 'client',
     mode: isProd ? 'production' : 'development',
     target: 'web',
-    entry: [
-      !isProd &&
-        'webpack-hot-middleware/client?reload=true&name=client&quiet=true',
-      clientEntry,
-    ].filter(B),
+    entry: isProd ? clientEntry : injectHotMiddlewareInEntry(clientEntry),
     devtool: isProd ? 'source-map' : 'eval-cheap-module-source-map',
     output: {
       path: isProd ? path.resolve(process.cwd(), '.snext/client') : undefined,
-      filename: isProd ? 'static/js/bundle.[contenthash:8].js' : 'bundle.js',
+      filename: isProd
+        ? 'static/js/bundle.[name].[contenthash:8].js'
+        : 'bundle.[name].js',
       publicPath: '/',
       assetModuleFilename: 'static/media/[name].[hash][ext]',
     },
@@ -95,7 +122,7 @@ export function getWebPackClientConfig({
     ],
     optimization: isProd
       ? {
-          minimizer: [new CssMinimizerPlugin()],
+          minimizer: [new CssMinimizerPlugin(), '...'],
         }
       : undefined,
     resolve: {
