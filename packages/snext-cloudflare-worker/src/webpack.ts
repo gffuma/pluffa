@@ -1,9 +1,6 @@
 import path from 'path'
 import { getWebPackRules } from '@snext/build-tools'
-import { createRequire } from 'module'
 import webpack, { Configuration } from 'webpack'
-
-const require = createRequire(import.meta.url)
 
 interface GetWebPackWorkerConfigOptions {
   isProd: boolean
@@ -42,8 +39,6 @@ export function getWebPackWorkerConfig({
     resolve: {
       fallback: {
         stream: 'stream-browserify',
-        // process: require.resolve('process/browser'),
-        // util: require.resolve('util/'),
       },
       alias: {
         'react-dom/server': 'react-dom/server.node',

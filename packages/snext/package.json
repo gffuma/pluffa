@@ -67,7 +67,7 @@
     "webpack": "^5.69.0"
   },
   "devDependencies": {
-    "@snext/cloudflare-worker": "^0.2.0",
+    "@snext/cloudflare-worker": "^0.4.0",
     "@types/express": "^4.17.13",
     "@types/express-http-proxy": "^1.6.3",
     "@types/mkdirp": "^1.0.2",

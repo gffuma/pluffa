@@ -23,6 +23,7 @@ export type SNextConfig =
       clientEntry: string
       outputDir: string
       publicDir: string
+      miniflareConfig?: Record<string, any>
     }
 
 const SNextDefaults: Partial<SNextConfig> = {

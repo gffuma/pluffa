@@ -1,7 +1,7 @@
 import path from 'path'
 import chalk from 'chalk'
-import { Log, LogLevel, Miniflare } from 'miniflare'
-import createWokerDevServer from './createWorkerDevServer'
+import { Log, LogLevel, Miniflare, MiniflareOptions } from 'miniflare'
+import createWorkerDevServer from './createWorkerDevServer'
 
 export interface StartWorkerDevServerOptions {
   clientEntry: string
@@ -9,29 +9,10 @@ export interface StartWorkerDevServerOptions {
   publicDir: string | false
   port: number
   useTypescript: boolean
+  miniflareConfig?: MiniflareOptions
 }
 
 const MINIFLARE_PORT = 8787
-
-async function startMiniFlare() {
-  const mf = new Miniflare({
-    scriptPath: path.resolve(process.cwd(), './.snext/runtime/worker.js'),
-    buildWatchPaths: [path.resolve(process.cwd(), './.snext/runtime')],
-    sourceMap: true,
-    watch: true,
-    log: new Log(LogLevel.INFO),
-    globals: {
-      'process.env.NODE_ENV': "'development'",
-    },
-    logUnhandledRejections: true,
-  })
-  const server = await mf.createServer()
-  server.listen(MINIFLARE_PORT, () => {
-    console.log(chalk.green(`Worker started on port: ${MINIFLARE_PORT}`))
-    console.log()
-    console.log(`http://localhost:${MINIFLARE_PORT}`)
-  })
-}
 
 export default function startWokerDevServer({
   clientEntry,
@@ -39,14 +20,35 @@ export default function startWokerDevServer({
   useTypescript,
   publicDir,
   port,
+  miniflareConfig = {},
 }: StartWorkerDevServerOptions) {
-  const app = createWokerDevServer({
+  const app = createWorkerDevServer({
     port,
     clientEntry,
     workerEntry,
     publicDir,
     miniflareUrl: `http://localhost:${MINIFLARE_PORT}`,
-    startMiniFlare,
+    startMiniFlare: async () => {
+      const mf = new Miniflare({
+        scriptPath: path.resolve(process.cwd(), './.snext/runtime/worker.js'),
+        buildWatchPaths: [path.resolve(process.cwd(), './.snext/runtime')],
+        sourceMap: true,
+        watch: true,
+        log: new Log(LogLevel.INFO),
+        globals: {
+          'process.env.NODE_ENV': "'development'",
+          ...miniflareConfig.globals,
+        },
+        logUnhandledRejections: true,
+        ...miniflareConfig,
+      })
+      const miniServer = await mf.createServer()
+      miniServer.listen(MINIFLARE_PORT, () => {
+        console.log(chalk.green(`Worker started on port: ${MINIFLARE_PORT}`))
+        console.log()
+        console.log(`http://localhost:${MINIFLARE_PORT}`)
+      })
+    },
     useTypescript,
   })
 
