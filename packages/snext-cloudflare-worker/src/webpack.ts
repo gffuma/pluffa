@@ -2,16 +2,41 @@ import path from 'path'
 import { getWebPackRules } from '@snext/build-tools'
 import webpack, { Configuration } from 'webpack'
 
+type WebPackEntry = Configuration['entry']
+
 interface GetWebPackWorkerConfigOptions {
   isProd: boolean
   useTypescript: boolean
   workerEntry: string
+  clientEntry: WebPackEntry
+}
+
+// NOTE: For now we stick to this very ugly workaround we calculate
+// the clientEntry we handle only simple case ... in future we can expose
+// an api with webpack stats and read it from worker ...
+// but for now ... Meglio Fatto Che Perfetto
+function naiveCalculateEntryPoints(
+  clientEntry: WebPackEntry
+): Record<string, string[]> {
+  if (typeof clientEntry === 'string') {
+    return {
+      main: ['bundle.main.js'],
+    }
+  }
+  if (typeof clientEntry === 'object' && clientEntry !== null) {
+    return Object.keys(clientEntry).reduce((flat, name) => {
+      flat[name] = [`bundle.${name}.js`]
+      return flat
+    }, {} as Record<string, string[]>)
+  }
+  throw new Error(`Can't calculate entrypoints for entry configuration`)
 }
 
 export function getWebPackWorkerConfig({
   isProd,
   useTypescript,
   workerEntry,
+  clientEntry,
 }: GetWebPackWorkerConfigOptions): Configuration {
   return {
     name: 'server',
@@ -54,7 +79,9 @@ export function getWebPackWorkerConfig({
         ...(isProd
           ? {}
           : {
-              SNEXT_BUNDLE_ENTRYPOINTS: "['bundle.js']",
+              SNEXT_BUNDLE_ENTRYPOINTS: JSON.stringify(
+                naiveCalculateEntryPoints(clientEntry)
+              ),
             }),
       }),
       new webpack.ProvidePlugin({

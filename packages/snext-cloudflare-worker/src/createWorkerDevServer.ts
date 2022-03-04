@@ -34,6 +34,7 @@ export default function createWokerDevServer({
       isProd,
       useTypescript,
       workerEntry,
+      clientEntry,
     }),
   ])
 
