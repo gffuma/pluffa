@@ -1,4 +1,4 @@
-import { SkeletonProps } from '../../../dist'
+import { SkeletonProps } from 'snext'
 
 export default function Skeleton({
   appHtml,
@@ -13,7 +13,7 @@ export default function Skeleton({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="/favicon.ico" />
-        {entrypoints
+        {entrypoints.main
           .filter((e) => e.endsWith('.css'))
           .map((e) => (
             <link key={e} href={`/${e}`} rel="stylesheet" />
@@ -32,7 +32,7 @@ export default function Skeleton({
           __html: `window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};`,
         }}
       />
-      {entrypoints
+      {entrypoints.main
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
           <script key={e} src={`/${e}`} />

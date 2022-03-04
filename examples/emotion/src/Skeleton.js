@@ -22,7 +22,7 @@ export default function Skeleton({ appHtml, entrypoints, cache }) {
           }}
         />
       </body>
-      {entrypoints
+      {entrypoints.main
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
           <script key={e} src={`/${e}`} />
