@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
-import logo from './logo.js'
+import { printLogo } from './logo.js'
 import chalk from 'chalk'
-import { readLibPkgSync, getUserPkg, shouldUseTypescript } from './utils.js'
+import { readLibPkgSync, shouldUseTypescript } from './utils.js'
 import { getUserSNextConfig } from './config.js'
 import { createRequire } from 'module'
 
@@ -32,7 +32,7 @@ const program = new Command()
   .description(pkg.description)
 
 program.command('dev').action(async () => {
-  console.log(chalk.magenta(logo))
+  printLogo()
   const config = await getUserSNextConfig()
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'development'
@@ -54,7 +54,7 @@ program.command('dev').action(async () => {
 })
 
 program.command('build').action(async () => {
-  console.log(chalk.magenta(logo))
+  printLogo()
   const config = await getUserSNextConfig()
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'production'
@@ -82,12 +82,12 @@ program.command('build').action(async () => {
 })
 
 program.command('staticize').action(async () => {
-  console.log(chalk.magenta(logo))
+  printLogo()
   const config = await getUserSNextConfig()
   if (config.runtime === 'cloudflare-worker') {
     console.log(
       chalk.red(
-        `SNext error the staticize command is not supported for runtime ${config.runtime}\n`,
+        `SNext error the staticize command is not supported for runtime ${config.runtime}\n`
       )
     )
     return

@@ -30,3 +30,9 @@ export function getUserPkgSync() {
 export function shouldUseTypescript() {
   return existsSync(path.resolve(process.cwd(), 'tsconfig.json'))
 }
+
+export function repeatString(n: number, str: string) {
+  return Array.apply(null, { length: n } as any)
+    .map((_) => str)
+    .join('')
+}
