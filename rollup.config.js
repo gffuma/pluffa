@@ -52,6 +52,7 @@ function snextCloudflareWorker() {
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
+      render: `${baseDir}/src/render.tsx`,
     },
     output: {
       dir: `${baseDir}/dist`,

@@ -1,4 +1,4 @@
-import render from 'snext/render'
+import render from '@snext/cloudflare-worker/render'
 import { Router } from 'itty-router'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 import StaticApp, { getStaticProps } from './StaticApp'

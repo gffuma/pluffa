@@ -44,8 +44,7 @@ export function getWebPackWorkerConfig({
     devtool: isProd ? false : 'cheap-module-source-map',
     target: 'webworker',
     entry: {
-      // NOTE: Polyfill setImmediate for React
-      worker: ['setimmediate', workerEntry],
+      worker: workerEntry,
     },
     output: {
       path: path.join(process.cwd(), '.snext/runtime'),
@@ -62,12 +61,6 @@ export function getWebPackWorkerConfig({
       }),
     },
     resolve: {
-      fallback: {
-        stream: 'stream-browserify',
-      },
-      alias: {
-        'react-dom/server': 'react-dom/server.node',
-      },
       extensions: [
         ...['.js', '.mjs', '.jsx'],
         ...(useTypescript ? ['.ts', '.tsx'] : []),
@@ -83,10 +76,6 @@ export function getWebPackWorkerConfig({
                 naiveCalculateEntryPoints(clientEntry)
               ),
             }),
-      }),
-      new webpack.ProvidePlugin({
-        process: 'process',
-        Buffer: ['buffer', 'Buffer'],
       }),
     ],
   }

@@ -1025,6 +1025,11 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
+"@cloudflare/workers-types@^3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-3.4.0.tgz#80311e14df2f7f8c2cfcdce945b4f4ad8f9b03b1"
+  integrity sha512-i/3czUrt6YqbOWl44OtIqd0cSZvEVXp/1oD/DZylC4PHZL3q/BhbamdEVeVhc/HPk4iD/7MZ2HGaIMO4Z4b12A==
+
 "@iarna/toml@^2.2.5":
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
@@ -3823,23 +3828,23 @@ raw-body@2.4.2, raw-body@^2.3.0:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-react-dom@^18.0.0-rc.1:
-  version "18.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-rc.1.tgz#97296d5a5e7582e65ea0d82a9ccd5953aa05e7f6"
-  integrity sha512-BZ9NEwUp56MEguEwAzuh3u4bYE9Jv3QrzjaTmu11PV4C/lJCARTELEI16vjnHLq184GoJcCHMBrDILqlCrkZFQ==
+react-dom@^0.0.0-experimental-a59f53a60-20220308:
+  version "0.0.0-experimental-a59f53a60-20220308"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-a59f53a60-20220308.tgz#3afd9413967e51c16f621f35dfdb2b1cfe4514ac"
+  integrity sha512-D23hQatrbYlDjaeU3JNbg2PzfaB0b0nsrMod5D2wIg99RGLlZ/ZHJiFxZhNNbaqgu7kTXDYq/SaY6U6fjSB2tA==
   dependencies:
     loose-envify "^1.1.0"
-    scheduler "^0.21.0-rc.1"
+    scheduler "0.0.0-experimental-a59f53a60-20220308"
 
 react-refresh@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
   integrity sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==
 
-react@^18.0.0-rc.1:
-  version "18.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.1.tgz#fbaef1cbf8b1eddb36a869ee1ea723044aa670c2"
-  integrity sha512-IdvjOtyeFhITZwDrj+GMvY7kbWnGklRzNByO7/pOVIt0o3VZi++BUybpK3Fen1gDPkOZDP/rag7lSh6RZuWOeQ==
+react@^0.0.0-experimental-a59f53a60-20220308:
+  version "0.0.0-experimental-a59f53a60-20220308"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-a59f53a60-20220308.tgz#5e2e679ea9e84311ce36a8be848c4ab5529edf89"
+  integrity sha512-Qux+GZBo5MSnOLZiOkB96KigeEh/Lgu7T3FidB5/rMkk8mWHm2D1+m6yNyktEUz53697Ek2ZM2Ul4aQJjzXspw==
   dependencies:
     loose-envify "^1.1.0"
 
@@ -3991,10 +3996,10 @@ sass@^1.49.7:
     immutable "^4.0.0"
     source-map-js ">=0.6.2 <2.0.0"
 
-scheduler@^0.21.0-rc.1:
-  version "0.21.0-rc.1-next-f468816ef-20220225"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0-rc.1-next-f468816ef-20220225.tgz#1909b9ce9e67de48f5ca06b52d98828401771e66"
-  integrity sha512-/maKldJ78Ba2o1e9kh2mUpqNZH7XrmSQ1o1aa3HUPN/OMotUB9+pBKX/y3Zihkjco21H4cujG9hK2sJOZUpzJw==
+scheduler@0.0.0-experimental-a59f53a60-20220308:
+  version "0.0.0-experimental-a59f53a60-20220308"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-a59f53a60-20220308.tgz#ca85e503edfdf7ac57cb691c63de9440c6bccef5"
+  integrity sha512-T9drJL5OVwPi9R0CCWLjc7or73k1P/cZq15LlMzA7uUpxoHRya4AszqtO54BQ7NNA166vAY6iBQ1T4kITIADSg==
   dependencies:
     loose-envify "^1.1.0"
 

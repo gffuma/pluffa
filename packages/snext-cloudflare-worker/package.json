@@ -7,12 +7,19 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
+    },
+    "./render": {
+      "require": "./dist/render.cjs",
+      "import": "./dist/render.js"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
         "./dist/index.d.ts"
+      ],
+      "render": [
+        "./dist/render.d.ts"
       ]
     }
   },
@@ -31,18 +38,19 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "ncp": "^2.0.0",
+    "@cloudflare/workers-types": "^3.4.0",
     "@snext/build-tools": "^0.2.0",
-    "buffer": "^6.0.3",
     "chalk": "^5.0.0",
     "http-proxy-middleware": "^2.0.3",
     "miniflare": "^2.3.0",
+    "ncp": "^2.0.0",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
-    "setimmediate": "^1.0.5",
-    "stream-browserify": "^3.0.0",
-    "util": "^0.12.4",
     "webpack": "^5.69.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0-rc.2",
+    "react-dom": "^18.0.0-rc.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

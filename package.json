@@ -9,8 +9,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.0",
-    "react": "^18.0.0-rc.1",
-    "react-dom": "^18.0.0-rc.1",
+    "react": "^0.0.0-experimental-a59f53a60-20220308",
+    "react-dom": "^0.0.0-experimental-a59f53a60-20220308",
     "rimraf": "^3.0.2",
     "rollup": "^2.67.1",
     "rollup-plugin-node-externals": "^4.0.0",
