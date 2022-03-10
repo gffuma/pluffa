@@ -7,7 +7,7 @@ const renderToPipeableStream = (ReacDOMServer as any)
   .renderToPipeableStream as (
   element: JSX.Element,
   options?: {
-    onCompleteAll?(): void
+    onAllReady?(): void
     onError?(err: any): void
   }
 ) => {
@@ -99,7 +99,7 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
     const { pipe } = renderToPipeableStream(
       <App {...staticProps!} url={props.url} />,
       {
-        onCompleteAll() {
+        onAllReady() {
           if (didError) {
             return
           }
