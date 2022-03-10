@@ -2,13 +2,15 @@ import { ComponentType } from 'react'
 import ReacDOMServer from 'react-dom/server'
 const { renderToString } = ReacDOMServer
 
+interface ReactRenderToReadableStreamOptions {
+  signal?: AbortSignal
+  onError?(err: any): void
+}
+
 const renderToReadableStream = (ReacDOMServer as any)
   .renderToReadableStream as (
   element: JSX.Element,
-  options?: {
-    onCompleteAll?(): void
-    onError?(err: any): void
-  }
+  options?: ReactRenderToReadableStreamOptions
 ) => Promise<
   ReadableStream & {
     allReady: Promise<void>
@@ -28,7 +30,7 @@ async function readResult(stream: ReadableStream) {
   }
 }
 
-export interface SnextProps {
+export interface SnextProps<A = any, K = any> {
   /**
    * URL of incoming request
    */
@@ -38,6 +40,16 @@ export interface SnextProps {
    * List of entrypoints file names by webpack entry name
    */
   entrypoints: Record<string, string[]>
+
+  /**
+   * Extra App props
+   */
+  appProps?: A
+
+  /**
+   * Extra Skeleton props
+   */
+  skeletonProps?: K
 }
 
 export interface AppProps {
@@ -72,17 +84,23 @@ export type AppComponent<Props> = ComponentType<AppProps & Props>
 
 export type SkeletonComponent<Props> = ComponentType<SkeletonProps & Props>
 
-export default async function render<StaticProps, HydrateSkeletonProps>(
+export default async function render<
+  StaticProps,
+  HydrateSkeletonProps,
+  ExtraAppProps,
+  ExtraSkeletonProps
+>(
   {
     App,
     getStaticProps,
     getSkeletonProps,
     Skeleton,
+    ...renderOptions
   }: {
     /**
      * The static App Component
      */
-    App: AppComponent<StaticProps>
+    App: AppComponent<StaticProps & ExtraAppProps>
     /**
      * Called before each request.
      * Get the static props to inject into the App Component.
@@ -96,9 +114,9 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
     /**
      * The Skeleton Component
      */
-    Skeleton: SkeletonComponent<HydrateSkeletonProps>
-  },
-  props: SnextProps
+    Skeleton: SkeletonComponent<HydrateSkeletonProps & ExtraSkeletonProps>
+  } & ReactRenderToReadableStreamOptions,
+  props: SnextProps<ExtraAppProps, ExtraSkeletonProps>
 ): Promise<string> {
   const { entrypoints, url } = props
   const appProps = { url }
@@ -109,7 +127,8 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
   }
 
   const stream = await renderToReadableStream(
-    <App {...staticProps!} url={props.url} />
+    <App {...staticProps!} {...props.appProps!} url={props.url} />,
+    renderOptions
   )
   await stream.allReady
   const appHtml = await readResult(stream)
@@ -121,6 +140,11 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
   }
 
   return renderToString(
-    <Skeleton {...skeletonProps!} entrypoints={entrypoints} appHtml={appHtml} />
+    <Skeleton
+      {...skeletonProps!}
+      {...props.skeletonProps!}
+      entrypoints={entrypoints}
+      appHtml={appHtml}
+    />
   )
 }
