@@ -68,14 +68,16 @@ export function getWebPackWorkerConfig({
     },
     plugins: [
       new webpack.DefinePlugin({
-        'process.env.IS_SNEXT_SERVER': true,
-        // Define only env process.env.REACT_APP_*
-        ...Object.keys(process.env).reduce((def, key) => {
-          if (key.startsWith('REACT_APP_')) {
-            def[`process.env.${key}`] = `'${process.env[key]}'`
-          }
-          return def
-        }, {} as Record<string, string>),
+        'process.env': {
+          IS_SNEXT_SERVER: true,
+          // Define only env process.env.REACT_APP_*
+          ...Object.keys(process.env).reduce((def, key) => {
+            if (key.startsWith('REACT_APP_')) {
+              def[key] = JSON.stringify(process.env[key])
+            }
+            return def
+          }, {} as Record<string, string>),
+        },
         ...(isProd
           ? {}
           : {
