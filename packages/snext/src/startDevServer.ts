@@ -5,6 +5,7 @@ import {
 } from '@snext/build-tools'
 import createDevServer from './createDevServer.js'
 import chalk from 'chalk'
+import { setUpEnv } from '@snext/env'
 
 export interface StartDevServerOptions {
   clientEntry: string
@@ -31,6 +32,7 @@ export default function startDevServer({
 }: StartDevServerOptions) {
   process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   const isProd = false
+  setUpEnv({ isProd })
 
   const compiler = webpack([
     getWebPackClientConfig({

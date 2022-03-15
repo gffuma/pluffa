@@ -7,6 +7,7 @@ import {
   getWebPackClientConfig,
   getWebPackNodeConfig,
 } from '@snext/build-tools'
+import { setUpEnv } from '@snext/env'
 
 export interface BuildOptions {
   clientEntry: string
@@ -38,6 +39,7 @@ export default function build({
   }
 
   const isProd = true
+  setUpEnv({ isProd })
 
   const compiler = webpack([
     getWebPackClientConfig({
