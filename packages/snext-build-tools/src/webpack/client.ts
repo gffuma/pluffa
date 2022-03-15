@@ -115,16 +115,18 @@ export function getWebPackClientConfig({
             new ReactRefreshWebpackPlugin(),
           ]),
       new webpack.DefinePlugin({
-        'process.env.IS_SNEXT_SERVER': false,
-        'process.env.SNEXT_STATIK_BASE_URL':
-          statikDataUrl === false ? false : `'${statikDataUrl}'`,
-        // Define only env process.env.REACT_APP_*
-        ...Object.keys(process.env).reduce((def, key) => {
-          if (key.startsWith('REACT_APP_')) {
-            def[`process.env.${key}`] = `'${process.env[key]}'`
-          }
-          return def
-        }, {} as Record<string, string>),
+        'process.env': {
+          IS_SNEXT_SERVER: false,
+          SNEXT_STATIK_BASE_URL:
+            statikDataUrl === false ? false : `'${statikDataUrl}'`,
+          // Define only env process.env.REACT_APP_*
+          ...Object.keys(process.env).reduce((def, key) => {
+            if (key.startsWith('REACT_APP_')) {
+              def[key] = JSON.stringify(process.env[key])
+            }
+            return def
+          }, {} as Record<string, string>),
+        },
       }),
     ],
     optimization: isProd

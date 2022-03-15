@@ -129,7 +129,7 @@ export function getWebPackNodeConfig({
         // Define only env process.env.REACT_APP_*
         ...Object.keys(process.env).reduce((def, key) => {
           if (key.startsWith('REACT_APP_')) {
-            def[`process.env.${key}`] = `'${process.env[key]}'`
+            def[`process.env.${key}`] = JSON.stringify(process.env[key])
           }
           return def
         }, {} as Record<string, string>),
