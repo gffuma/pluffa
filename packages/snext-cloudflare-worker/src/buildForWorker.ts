@@ -9,6 +9,7 @@ import {
   getWebPackClientConfig,
 } from '@snext/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
+import { setUpEnv } from '@snext/env'
 
 const ncp = util.promisify(ncpCB)
 
@@ -36,6 +37,7 @@ export default async function buildForWorker({
   rimraf.sync(buildOutPath)
 
   const isProd = true
+  setUpEnv({ isProd })
 
   const compiler = webpack([
     getWebPackClientConfig({

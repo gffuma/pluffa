@@ -1,6 +1,7 @@
 import path from 'path'
 import chalk from 'chalk'
 import { Log, LogLevel, Miniflare, MiniflareOptions } from 'miniflare'
+import { setUpEnv } from '@snext/env'
 import createWorkerDevServer from './createWorkerDevServer'
 
 export interface StartWorkerDevServerOptions {
@@ -22,6 +23,7 @@ export default function startWokerDevServer({
   port,
   miniflareConfig = {},
 }: StartWorkerDevServerOptions) {
+  setUpEnv({ isProd: false })
   const app = createWorkerDevServer({
     port,
     clientEntry,
@@ -35,12 +37,14 @@ export default function startWokerDevServer({
         sourceMap: true,
         watch: true,
         log: new Log(LogLevel.INFO),
+        wranglerConfigPath: true,
+        buildCommand: false,
+        envPath: false,
+        ...miniflareConfig,
         globals: {
           'process.env.NODE_ENV': "'development'",
           ...miniflareConfig.globals,
         },
-        logUnhandledRejections: true,
-        ...miniflareConfig,
       })
       const miniServer = await mf.createServer()
       miniServer.listen(MINIFLARE_PORT, () => {

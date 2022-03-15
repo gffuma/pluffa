@@ -2,7 +2,7 @@
   "name": "@snext/cloudflare-worker",
   "type": "module",
   "description": "SNext on cloudflare worker",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -38,8 +38,9 @@
     "node": ">=16.7"
   },
   "dependencies": {
+    "@snext/env": "^0.1.0",
     "@cloudflare/workers-types": "^3.4.0",
-    "@snext/build-tools": "^0.2.0",
+    "@snext/build-tools": "^0.3.0",
     "chalk": "^5.0.0",
     "http-proxy-middleware": "^2.0.3",
     "miniflare": "^2.3.0",
