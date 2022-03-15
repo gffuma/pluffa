@@ -118,6 +118,13 @@ export function getWebPackClientConfig({
         'process.env.IS_SNEXT_SERVER': false,
         'process.env.SNEXT_STATIK_BASE_URL':
           statikDataUrl === false ? false : `'${statikDataUrl}'`,
+        // Define only env process.env.REACT_APP_*
+        ...Object.keys(process.env).reduce((def, key) => {
+          if (key.startsWith('REACT_APP_')) {
+            def[`process.env.${key}`] = `'${process.env[key]}'`
+          }
+          return def
+        }, {} as Record<string, string>),
       }),
     ],
     optimization: isProd
