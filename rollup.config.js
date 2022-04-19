@@ -69,6 +69,28 @@ function snextEnv() {
   }))
 }
 
+function snextCrawl() {
+  const baseDir = './packages/snext-crawl'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.ts`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
 function snextCloudflareWorker() {
   const baseDir = './packages/snext-cloudflare-worker'
   return ['esm', 'cjs'].map((format) => ({
@@ -103,6 +125,7 @@ function snext() {
       statikWorker: `${baseDir}/src/statikWorker.ts`,
       'lib/statik.browser': `${baseDir}/src/lib/statik.browser.ts`,
       'lib/statik.node': `${baseDir}/src/lib/statik.node.ts`,
+      'lib/crawl': `${baseDir}/src/lib/crawl.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,
@@ -125,6 +148,7 @@ export default [
   ...createSnextApp(),
   ...snextBuildTools(),
   ...snextEnv(),
+  ...snextCrawl(),
   ...snextCloudflareWorker(),
   ...snext(),
 ]

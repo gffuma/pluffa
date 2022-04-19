@@ -22,6 +22,10 @@
         "import": "./dist/lib/statik.node.js"
       },
       "default": "./dist/lib/statik.browser.js"
+    },
+    "./crawl": {
+      "require": "./dist/lib/crawl.cjs",
+      "import": "./dist/lib/crawl.js"
     }
   },
   "typesVersions": {
@@ -34,6 +38,9 @@
       ],
       "render": [
         "./dist/render.d.ts"
+      ],
+      "crawl": [
+        "./dist/lib/crawl.d.ts"
       ]
     }
   },
@@ -53,6 +60,7 @@
   ],
   "dependencies": {
     "@snext/build-tools": "^0.3.1",
+    "@snext/crawl": "^0.0.1",
     "@snext/env": "^0.1.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
