@@ -1,21 +1,9 @@
 import { ComponentType } from 'react'
-import ReacDOMServer from 'react-dom/server'
-const { renderToString } = ReacDOMServer
-
-interface ReactRenderToReadableStreamOptions {
-  signal?: AbortSignal
-  onError?(err: any): void
-}
-
-const renderToReadableStream = (ReacDOMServer as any)
-  .renderToReadableStream as (
-  element: JSX.Element,
-  options?: ReactRenderToReadableStreamOptions
-) => Promise<
-  ReadableStream & {
-    allReady: Promise<void>
-  }
->
+import {
+  renderToString,
+  renderToReadableStream,
+  RenderToReadableStreamOptions,
+} from 'react-dom/server'
 
 async function readResult(stream: ReadableStream) {
   const reader = stream.getReader()
@@ -115,7 +103,7 @@ export default async function render<
      * The Skeleton Component
      */
     Skeleton: SkeletonComponent<HydrateSkeletonProps & ExtraSkeletonProps>
-  } & ReactRenderToReadableStreamOptions,
+  } & RenderToReadableStreamOptions,
   props: SnextProps<ExtraAppProps, ExtraSkeletonProps>
 ): Promise<string> {
   const { entrypoints, url } = props

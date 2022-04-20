@@ -1,7 +1,7 @@
 {
   "name": "@snext/crawl",
   "type": "module",
-  "description": "Crawl the world with SNext",
+  "description": "Crawl with SNext",
   "version": "0.0.1",
   "exports": {
     ".": {
@@ -31,8 +31,8 @@
     "node": ">=16.7"
   },
   "peerDependencies": {
-    "react": "^18.0.0-rc.2",
-    "react-dom": "^18.0.0-rc.2"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.5",

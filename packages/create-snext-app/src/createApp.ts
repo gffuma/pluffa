@@ -127,7 +127,7 @@ export default async function createApp({
 
   await install({
     cwd: baseDir,
-    deps: ['react@rc', 'react-dom@rc'],
+    deps: ['react', 'react-dom'],
     dev: false,
   })
   const devDeps = ['snext']

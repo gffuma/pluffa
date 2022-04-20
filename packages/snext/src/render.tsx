@@ -1,18 +1,8 @@
 import { ComponentType } from 'react'
 import streamBuffers from 'stream-buffers'
 import ReacDOMServer from 'react-dom/server'
-const { renderToString } = ReacDOMServer
+const { renderToString, renderToPipeableStream } = ReacDOMServer
 
-const renderToPipeableStream = (ReacDOMServer as any)
-  .renderToPipeableStream as (
-  element: JSX.Element,
-  options?: {
-    onAllReady?(): void
-    onError?(err: any): void
-  }
-) => {
-  pipe(stream: any): void
-}
 export interface SnextProps {
   /**
    * URL of incoming request
