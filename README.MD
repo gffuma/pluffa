@@ -8,11 +8,11 @@ Build static sites with React
 
 ## What is this?
 
-This is an experimental library based on [new React 18 server capabilities](https://github.com/reactwg/react-18/discussions/37) that combine the spirit of [Next.js](https://github.com/vercel/next.js) with the idea behinded [react-snap](https://github.com/stereobooster/react-snap) of creating a static site by crawling all links.
+Server Side Rendering with React 18 🚀 🚀 🚀
+
+This library is based on [new React 18 server capabilities](https://github.com/reactwg/react-18/discussions/37). SNext combine the spirit of [Next.js](https://github.com/vercel/next.js) with the idea behinded [react-snap](https://github.com/stereobooster/react-snap) of creating a static site by crawling all links.
 
 To do this instead of using [puppeter](https://github.com/puppeteer/puppeteer) and wait to all request to finish we use the output of your server side rendered application to crawl all the links. Thanks to React 18 we can execute all side effects of React tree using Suspense.
-
-SNext is an experimental project and is based on ogoing React 18 RC apis but by tests seems working like a charm 🎸 🎸 🎸
 
 ## Getting started
 
