@@ -1,4 +1,4 @@
-import { hydrateRoot } from 'react-dom'
+import { hydrateRoot } from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'

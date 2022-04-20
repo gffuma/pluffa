@@ -1,4 +1,4 @@
-import { hydrateRoot } from 'react-dom'
+import { hydrateRoot } from 'react-dom/client'
 import createCache from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
 import App from './App'

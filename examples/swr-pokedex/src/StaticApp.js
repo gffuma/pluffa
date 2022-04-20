@@ -1,5 +1,5 @@
 import { SWRConfig } from 'swr'
-import { StaticRouter } from 'react-router-dom/server.js'
+import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
 import fetcher from './fetcher'
 

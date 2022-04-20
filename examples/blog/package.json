@@ -7,10 +7,10 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
-    "react": "^18.0.0-rc.1",
-    "react-dom": "^18.0.0-rc.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-helmet": "^6.1.0",
-    "react-query": "^3.34.12",
+    "react-query": "^3.35.0",
     "react-router-dom": "^6.2.1",
     "showdown": "^1.9.1",
     "snext": "latest"
