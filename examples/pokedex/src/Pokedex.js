@@ -1,9 +1,6 @@
 import { useQuery } from 'react-query'
 import { Link } from 'react-router-dom'
-import { useCrawl } from 'snext/crawl'
 import request from 'superagent'
-
-// useCrawl()
 
 export default function Pokedex() {
   const {
@@ -11,7 +8,7 @@ export default function Pokedex() {
   } = useQuery('pokemons', () =>
     request.get(`https://pokeapi.co/api/v2/pokemon`).then((r) => r.body)
   )
-  useCrawl()
+
   return (
     <div>
       {pokemons.map((pokemon) => (

@@ -12,7 +12,11 @@ export function getNodeConfiguration(
   if (compileNodeCommonJS) {
     return {
       externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-      externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+      externals: [
+        nodeExternals({
+          allowlist: [/\.(?!(?:jsx?|json|tsx?)$).{1,5}$/i],
+        }),
+      ], // in order to ignore all modules in node_modules folder
       output: {
         path: path.join(process.cwd(), '.snext/node'),
         filename: '[name].js',
@@ -35,6 +39,7 @@ export function getNodeConfiguration(
     externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
     externals: [
       nodeExternals({
+        allowlist: [/\.(?!(?:jsx?|json|tsx?)$).{1,5}$/i],
         importType: (request) => {
           let preferModuleImport: boolean
           if (PreferModuleCache.has(request)) {

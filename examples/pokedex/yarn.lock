@@ -1508,6 +1508,11 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+bootstrap@^5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.1.3.tgz#ba081b0c130f810fa70900acbc1c6d3c28fa8f34"
+  integrity sha512-fcQztozJ8jToQWXxVuEyXWW+dSo8AiXWKwiSSrKWsRB/Qt+Ewwza+JWoLKiTuQLaEPhdNAJ7+Dosc9DOIqNy7Q==
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
@@ -3064,6 +3069,14 @@ raw-body@2.4.2:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-dom@^18.0.0:
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0.tgz#26b88534f8f1dbb80853e1eabe752f24100d8023"
+  integrity sha512-XqX7uzmFo0pUceWFCt7Gff6IyIMzFUn7QMZrbrQfGxtaxXZIcGQzoNpRLE3fQLnS4XzLLPMZX2T9TRcSrasicw==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.21.0"
+
 react-dom@^18.0.0-rc.0:
   version "18.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-rc.0.tgz#aa07044bdd6399ff94c664b2985e2e25948fbf3e"
@@ -3073,18 +3086,10 @@ react-dom@^18.0.0-rc.0:
     object-assign "^4.1.1"
     scheduler "^0.21.0-rc.0"
 
-react-dom@^18.0.0-rc.1:
-  version "18.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-rc.1.tgz#97296d5a5e7582e65ea0d82a9ccd5953aa05e7f6"
-  integrity sha512-BZ9NEwUp56MEguEwAzuh3u4bYE9Jv3QrzjaTmu11PV4C/lJCARTELEI16vjnHLq184GoJcCHMBrDILqlCrkZFQ==
-  dependencies:
-    loose-envify "^1.1.0"
-    scheduler "^0.21.0-rc.1"
-
-react-query@^3.34.12:
-  version "3.34.12"
-  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.34.12.tgz#dcaaf7b629f0868aae8afef9fb7692f6ea7643bf"
-  integrity sha512-flDdudQVH4CqE+kNYYYyo4g2Yjek3H/36G3b9bK5oe26jD5gFnx+PPwnq0gayq5z2dcSfr2z4+drvuyeZ3A5QQ==
+react-query@^3.35.0:
+  version "3.35.0"
+  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.35.0.tgz#f807ba8497f8d6218a73e81a977e44ea786a7267"
+  integrity sha512-mRBJdpELLV+snzyXDsXM5ZEXM+HYt05L7st6ihSXr3nHX+4ULFr30mDjsziZvx0oF5dhlSDB8aMdvG6Ah4Bukg==
   dependencies:
     "@babel/runtime" "^7.5.5"
     broadcast-channel "^3.4.1"
@@ -3110,6 +3115,13 @@ react-router@6.2.1:
   dependencies:
     history "^5.2.0"
 
+react@^18.0.0:
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0.tgz#b468736d1f4a5891f38585ba8e8fb29f91c3cb96"
+  integrity sha512-x+VL6wbT4JRVPm7EGxXhZ8w8LTROaxPXOqhlGyVSrv0sB1jkyFGgXxJ8LVoPRLvPR6/CIZGFmfzqUa2NYeMr2A==
+  dependencies:
+    loose-envify "^1.1.0"
+
 react@^18.0.0-rc.0:
   version "18.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.0.tgz#60bfcf1edd0b35fbeeeca852515c6cc2ce06a6eb"
@@ -3117,13 +3129,6 @@ react@^18.0.0-rc.0:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-
-react@^18.0.0-rc.1:
-  version "18.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.0.0-rc.1.tgz#fbaef1cbf8b1eddb36a869ee1ea723044aa670c2"
-  integrity sha512-IdvjOtyeFhITZwDrj+GMvY7kbWnGklRzNByO7/pOVIt0o3VZi++BUybpK3Fen1gDPkOZDP/rag7lSh6RZuWOeQ==
-  dependencies:
-    loose-envify "^1.1.0"
 
 readable-stream@^3.6.0:
   version "3.6.0"
@@ -3228,6 +3233,13 @@ safe-buffer@~5.1.1:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
+scheduler@^0.21.0:
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0.tgz#6fd2532ff5a6d877b6edb12f00d8ab7e8f308820"
+  integrity sha512-1r87x5fz9MXqswA2ERLo0EbOAU74DpIUO090gIasYTqlVoJeMcl+Z1Rg7WHz+qtPujhS/hGIt9kxZOYBV3faRQ==
+  dependencies:
+    loose-envify "^1.1.0"
+
 scheduler@^0.21.0-rc.0:
   version "0.21.0-rc.0-next-fe905f152-20220107"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0-rc.0-next-fe905f152-20220107.tgz#410f6df2f39d5543b00f98fbad7de6c9b374df89"
@@ -3235,13 +3247,6 @@ scheduler@^0.21.0-rc.0:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-
-scheduler@^0.21.0-rc.1:
-  version "0.21.0-rc.1-next-f468816ef-20220225"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.21.0-rc.1-next-f468816ef-20220225.tgz#1909b9ce9e67de48f5ca06b52d98828401771e66"
-  integrity sha512-/maKldJ78Ba2o1e9kh2mUpqNZH7XrmSQ1o1aa3HUPN/OMotUB9+pBKX/y3Zihkjco21H4cujG9hK2sJOZUpzJw==
-  dependencies:
-    loose-envify "^1.1.0"
 
 schema-utils@^2.6.5:
   version "2.7.1"
