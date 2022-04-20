@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Pokedex from './Pokedex'
 import Pokemon from './Pokemon'
-import statik from 'snext/statik'
 
 export default function App() {
   return (

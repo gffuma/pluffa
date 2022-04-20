@@ -1,9 +1,7 @@
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-
-const hydrateRoot = (ReactDOM as any).hydrateRoot
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,8 +21,8 @@ const queryClient = new QueryClient({
 hydrate(queryClient, (window as any).__INITIAL_DATA__)
 delete (window as any).__INITIAL_DATA__
 
-hydrateRoot(
-  document.getElementById('root'),
+ReactDOM.hydrateRoot(
+  document.getElementById('root')!,
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <App />
