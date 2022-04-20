@@ -2,7 +2,7 @@
   "name": "snext",
   "type": "module",
   "description": "Build static sites with React",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -59,8 +59,8 @@
     "static site"
   ],
   "dependencies": {
-    "@snext/build-tools": "^0.3.1",
-    "@snext/crawl": "^0.0.1",
+    "@snext/build-tools": "^0.3.2",
+    "@snext/crawl": "^0.0.2",
     "@snext/env": "^0.1.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
