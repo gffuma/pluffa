@@ -2,7 +2,7 @@
   "name": "@snext/crawl",
   "type": "module",
   "description": "Crawl with SNext",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -28,7 +28,7 @@
     "static site"
   ],
   "engines": {
-    "node": ">=16.7"
+    "node": ">=14.0.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",
