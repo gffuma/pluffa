@@ -8,11 +8,12 @@ import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
 import render from './render.js'
+import { createCrawlSession, SnextCrawlContext } from '@snext/crawl'
 
 const ncp = util.promisify(ncpCB)
 
 interface ProcessContract {
-  renderURL(url: string): Promise<string>
+  renderURL(url: string): Promise<[string, string[]]>
   saveFile(url: string, html: string): Promise<void>
 }
 
@@ -28,9 +29,8 @@ function isUrlAbsolute(url: string) {
 async function processURL(url: string, config: ProcessContract) {
   console.log(chalk.bold.cyan(url))
   const { renderURL, saveFile } = config
-  const html = await renderURL(url)
+  const [html, urls] = await renderURL(url)
   const document = parseHTML(html)
-  const urls: string[] = []
   document
     .getElementsByTagName('a')
     .map((l) => l.attributes.href)
@@ -129,9 +129,15 @@ export default async function staticize({
 
   await processURLs(urls, crawlConcurrency, {
     async renderURL(url) {
-      return render(
+      const crawlSess = createCrawlSession()
+      const WrappedApp = (props: unknown) => (
+        <SnextCrawlContext.Provider value={crawlSess}>
+          <App {...props} />
+        </SnextCrawlContext.Provider>
+      )
+      const html = await render(
         {
-          App,
+          App: WrappedApp,
           getSkeletonProps,
           getStaticProps,
           Skeleton,
@@ -141,6 +147,8 @@ export default async function staticize({
           entrypoints: manifest.entrypoints,
         }
       )
+      const urls = await crawlSess.rewind()
+      return [html, urls]
     },
     async saveFile(url, html) {
       let filePath = path.join(outputDir, url)
