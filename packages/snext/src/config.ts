@@ -11,6 +11,7 @@ export type SNextConfig =
       outputDir: string
       publicDir: string
       urls: string[]
+      exitStaticizeOnError: boolean
       crawlConcurrency: number
       statikDataDir: string | false
       registerStatik?: string
@@ -34,6 +35,7 @@ const SNextDefaults: Partial<SNextConfig> = {
   urls: ['/'],
   crawlConcurrency: 4,
   statikDataDir: 'snextdata',
+  exitStaticizeOnError: false,
 }
 
 export async function getUserSNextConfig(): Promise<SNextConfig> {

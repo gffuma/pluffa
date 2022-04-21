@@ -99,6 +99,7 @@ program.command('staticize').action(async () => {
   console.log()
   await staticize({
     ...config,
+    exitOnError: config.exitStaticizeOnError,
     compileNodeCommonJS: config.runtime === 'commonjs',
   })
 })

@@ -25,6 +25,7 @@ export const getStaticProps = () => {
             refetchIntervalInBackground: false,
             refetchOnMount: false,
             staleTime: Infinity,
+            retry: false,
             suspense: true,
           },
         },

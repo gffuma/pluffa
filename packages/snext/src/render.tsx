@@ -1,7 +1,10 @@
 import { ComponentType } from 'react'
 import streamBuffers from 'stream-buffers'
-import ReacDOMServer from 'react-dom/server'
-const { renderToString, renderToPipeableStream } = ReacDOMServer
+import {
+  RenderToPipeableStreamOptions,
+  renderToString,
+  renderToPipeableStream,
+} from 'react-dom/server'
 
 export interface SnextProps {
   /**
@@ -53,6 +56,8 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
     getStaticProps,
     getSkeletonProps,
     Skeleton,
+    throwOnError = false,
+    ...renderOptions
   }: {
     /**
      * The static App Component
@@ -72,7 +77,12 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
      * The Skeleton Component
      */
     Skeleton: SkeletonComponent<HydrateSkeletonProps>
-  },
+
+    /**
+     * Shoudl throw promise on error
+     */
+    throwOnError?: boolean
+  } & RenderToPipeableStreamOptions,
   props: SnextProps
 ): Promise<string> {
   const out = new streamBuffers.WritableStreamBuffer()
@@ -89,8 +99,10 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
     const { pipe } = renderToPipeableStream(
       <App {...staticProps!} url={props.url} />,
       {
+        ...renderOptions,
         onAllReady() {
-          if (didError) {
+          renderOptions?.onAllReady?.()
+          if (didError && throwOnError) {
             return
           }
           out.on('finish', async () => {
@@ -112,9 +124,12 @@ export default async function render<StaticProps, HydrateSkeletonProps>(
           })
           pipe(out)
         },
-        onError(err) {
+        onError(error) {
           didError = true
-          reject(err)
+          renderOptions?.onError?.(error)
+          if (throwOnError) {
+            reject(error)
+          }
         },
       }
     )

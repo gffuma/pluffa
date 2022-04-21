@@ -13,6 +13,7 @@ import { createCrawlSession, SnextCrawlContext } from '@snext/crawl'
 const ncp = util.promisify(ncpCB)
 
 interface ProcessContract {
+  exitOnError: boolean
   renderURL(url: string): Promise<[string, string[]]>
   saveFile(url: string, html: string): Promise<void>
 }
@@ -29,20 +30,31 @@ function isUrlAbsolute(url: string) {
 async function processURL(url: string, config: ProcessContract) {
   console.log(chalk.bold.cyan(url))
   const { renderURL, saveFile } = config
-  const [html, urls] = await renderURL(url)
-  const document = parseHTML(html)
-  document
-    .getElementsByTagName('a')
-    .map((l) => l.attributes.href)
-    .filter((url) => !isUrlAbsolute(url))
-    .forEach((url) => urls.push(getPathFromUrl(url)))
-  document
-    .querySelectorAll('[data-crawl-url]')
-    .map((l) => l.attributes['data-crawl-url'])
-    .filter((url) => !isUrlAbsolute(url))
-    .forEach((url) => urls.push(getPathFromUrl(url)))
-  await saveFile(url, html)
-  return urls
+
+  try {
+    const [html, urls] = await renderURL(url)
+    const document = parseHTML(html)
+    document
+      .getElementsByTagName('a')
+      .map((l) => l.attributes.href)
+      .filter((url) => !isUrlAbsolute(url))
+      .forEach((url) => urls.push(getPathFromUrl(url)))
+    document
+      .querySelectorAll('[data-crawl-url]')
+      .map((l) => l.attributes['data-crawl-url'])
+      .filter((url) => !isUrlAbsolute(url))
+      .forEach((url) => urls.push(getPathFromUrl(url)))
+    await saveFile(url, html)
+    return urls
+  } catch (error) {
+    console.log(chalk.bold.red(`⚠️  ${url}`))
+    console.log(chalk.red('Error during rendering'))
+    console.error(error)
+    if (config.exitOnError) {
+      process.exit(1)
+    }
+    return []
+  }
 }
 
 async function processURLs(
@@ -75,6 +87,7 @@ export default async function staticize({
   urls,
   crawlConcurrency,
   statikDataDir,
+  exitOnError = false,
 }: {
   outputDir: string
   publicDir: string
@@ -82,6 +95,7 @@ export default async function staticize({
   urls: string[]
   crawlConcurrency: number
   statikDataDir: string | false
+  exitOnError: boolean
 }) {
   rimraf.sync(path.resolve(process.cwd(), outputDir))
   await ncp(
@@ -131,6 +145,7 @@ export default async function staticize({
   const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
 
   await processURLs(urls, crawlConcurrency, {
+    exitOnError,
     async renderURL(url) {
       const crawlSess = createCrawlSession()
       const WrappedApp = (props: unknown) => (
@@ -144,6 +159,7 @@ export default async function staticize({
           getSkeletonProps,
           getStaticProps,
           Skeleton,
+          throwOnError: true,
         },
         {
           url,
