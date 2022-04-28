@@ -505,12 +505,6 @@ Here all the available snext options with their defaults:
 
 ## [EXAMPLES](./examples)
 
-## TODO:
-
-- [ ] Post CSS
-- [ ] Custom env ecc
-- [ ] Configure Babel
-
 ## LICENSE
 
 MIT

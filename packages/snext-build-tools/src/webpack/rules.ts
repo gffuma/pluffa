@@ -30,6 +30,36 @@ export function getWebPackStyleRule({
       : 'style-loader'
     : // Skip loading css on "runtime"
       false
+  const postCssLoader: RuleSetUseItem | false = isClient
+    ? {
+        loader: require.resolve('postcss-loader'),
+        // NOTE: Stolen from https://github.com/facebook/create-react-app/blob/main/packages/react-scripts/config/webpack.config.js
+        options: {
+          postcssOptions: {
+            ident: 'postcss',
+            config: false,
+            plugins: [
+              'postcss-flexbugs-fixes',
+              [
+                'postcss-preset-env',
+                {
+                  autoprefixer: {
+                    flexbox: 'no-2009',
+                  },
+                  stage: 3,
+                },
+                // Adds PostCSS Normalize as the reset css with default options,
+                // so that it honors browserslist config in package.json
+                // which in turn let's users customize the target behavior as per their needs.
+                'postcss-normalize',
+              ],
+            ],
+          },
+          sourceMap: isProd,
+        },
+      }
+    : // Skip post css on "runtime"
+      false
   return {
     test,
     exclude,
@@ -38,12 +68,15 @@ export function getWebPackStyleRule({
       {
         loader: require.resolve('css-loader'),
         options: {
-          modules: isClient ? useModules : {
-            mode: useModules ? 'local' : undefined,
-            exportOnlyLocals: true,
-          },
+          modules: isClient
+            ? useModules
+            : {
+                mode: useModules ? 'local' : undefined,
+                exportOnlyLocals: true,
+              },
         },
       },
+      postCssLoader,
       ...processors,
     ].filter(B),
   }
