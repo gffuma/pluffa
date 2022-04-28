@@ -81,27 +81,31 @@ program.command('build').action(async () => {
   }
 })
 
-program.command('staticize').action(async () => {
-  printLogo()
-  const config = await getUserSNextConfig()
-  if (config.runtime === 'cloudflare-worker') {
-    console.log(
-      chalk.red(
-        `SNext error the staticize command is not supported for runtime ${config.runtime}\n`
+program
+  .command('staticize')
+  .option('-u, --url [urls...]', 'urls to crawl')
+  .action(async (options) => {
+    printLogo()
+    const config = await getUserSNextConfig()
+    if (config.runtime === 'cloudflare-worker') {
+      console.log(
+        chalk.red(
+          `SNext error the staticize command is not supported for runtime ${config.runtime}\n`
+        )
       )
-    )
-    return
-  }
-  process.env.NODE_ENV = 'production'
-  const { default: staticize } = await import('./staticize.js')
-  console.log()
-  console.log('Exporting your build as a static website...')
-  console.log()
-  await staticize({
-    ...config,
-    exitOnError: config.exitStaticizeOnError,
-    compileNodeCommonJS: config.runtime === 'commonjs',
+      return
+    }
+    process.env.NODE_ENV = 'production'
+    const { default: staticize } = await import('./staticize.js')
+    console.log()
+    console.log('Exporting your build as a static website...')
+    console.log()
+    await staticize({
+      ...config,
+      urls: options.url ?? config.urls,
+      exitOnError: config.exitStaticizeOnError,
+      compileNodeCommonJS: config.runtime === 'commonjs',
+    })
   })
-})
 
 program.parse()
