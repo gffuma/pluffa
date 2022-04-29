@@ -12,12 +12,18 @@ export default function Skeleton({ appHtml, entrypoints }) {
           ))}
       </head>
       <body>
-        <div
-          id="root"
-          dangerouslySetInnerHTML={{
-            __html: appHtml,
-          }}
-        />
+        {process.env.EXPORT_STATIC_SPA_APP ? (
+          <div id="root">
+            <noscript>Enable JS Please</noscript>
+          </div>
+        ) : (
+          <div
+            id="root"
+            dangerouslySetInnerHTML={{
+              __html: appHtml,
+            }}
+          ></div>
+        )}
       </body>
       {entrypoints.main
         .filter((e) => e.endsWith('.js'))

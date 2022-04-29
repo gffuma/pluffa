@@ -83,6 +83,12 @@ program.command('build').action(async () => {
 
 program
   .command('staticize')
+  .description('Export your SNext builded app as a static website')
+  .option('-o, --output [output]', 'output directory')
+  .option(
+    '--no-crawl',
+    'disable links crawling and explict crawling via snext/crawl'
+  )
   .option('-u, --url [urls...]', 'urls to crawl')
   .action(async (options) => {
     printLogo()
@@ -93,6 +99,7 @@ program
           `SNext error the staticize command is not supported for runtime ${config.runtime}\n`
         )
       )
+      process.exit(1)
       return
     }
     process.env.NODE_ENV = 'production'
@@ -102,9 +109,12 @@ program
     console.log()
     await staticize({
       ...config,
+      // When --no-crawl is specified disable crawl otherwise let config enable/disable crawl
+      crawEnabled: options.crawl === false ? false : config.crawlEnabled,
       urls: options.url ?? config.urls,
       exitOnError: config.exitStaticizeOnError,
       compileNodeCommonJS: config.runtime === 'commonjs',
+      outputDir: options.output ?? config.outputDir,
     })
   })
 

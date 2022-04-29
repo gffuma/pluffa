@@ -8,12 +8,17 @@ import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
 import render from './render.js'
-import { createCrawlSession, SnextCrawlContext } from '@snext/crawl'
+import {
+  CrawlSession,
+  createCrawlSession,
+  SnextCrawlContext,
+} from '@snext/crawl'
 
 const ncp = util.promisify(ncpCB)
 
 interface ProcessContract {
   exitOnError: boolean
+  crawEnabled: boolean
   renderURL(url: string): Promise<[string, string[]]>
   saveFile(url: string, html: string): Promise<void>
 }
@@ -33,17 +38,19 @@ async function processURL(url: string, config: ProcessContract) {
 
   try {
     const [html, urls] = await renderURL(url)
-    const document = parseHTML(html)
-    document
-      .getElementsByTagName('a')
-      .map((l) => l.attributes.href)
-      .filter((url) => !isUrlAbsolute(url))
-      .forEach((url) => urls.push(getPathFromUrl(url)))
-    document
-      .querySelectorAll('[data-crawl-url]')
-      .map((l) => l.attributes['data-crawl-url'])
-      .filter((url) => !isUrlAbsolute(url))
-      .forEach((url) => urls.push(getPathFromUrl(url)))
+    if (config.crawEnabled) {
+      const document = parseHTML(html)
+      document
+        .getElementsByTagName('a')
+        .map((l) => l.attributes.href)
+        .filter((url) => !isUrlAbsolute(url))
+        .forEach((url) => urls.push(getPathFromUrl(url)))
+      document
+        .querySelectorAll('[data-crawl-url]')
+        .map((l) => l.attributes['data-crawl-url'])
+        .filter((url) => !isUrlAbsolute(url))
+        .forEach((url) => urls.push(getPathFromUrl(url)))
+    }
     await saveFile(url, html)
     return urls
   } catch (error) {
@@ -87,6 +94,7 @@ export default async function staticize({
   urls,
   crawlConcurrency,
   statikDataDir,
+  crawEnabled = true,
   exitOnError = false,
 }: {
   outputDir: string
@@ -94,23 +102,23 @@ export default async function staticize({
   compileNodeCommonJS: boolean
   urls: string[]
   crawlConcurrency: number
+  crawEnabled: boolean
   statikDataDir: string | false
   exitOnError: boolean
 }) {
-  rimraf.sync(path.resolve(process.cwd(), outputDir))
-  await ncp(
-    path.resolve(process.cwd(), publicDir),
-    path.resolve(process.cwd(), outputDir)
-  )
-  await ncp(
-    path.resolve(process.cwd(), '.snext/client'),
-    path.resolve(process.cwd(), outputDir)
-  )
+  const outPath = path.resolve(process.cwd(), outputDir)
+  const publicPath = path.resolve(process.cwd(), publicDir)
+  const buildClientPath = path.resolve(process.cwd(), '.snext/client')
+
+  // Remove stale ourput
+  rimraf.sync(outPath)
+  // Copy public
+  await ncp(publicPath, outPath)
+  // Copy static from builded client
+  await ncp(path.join(buildClientPath, 'static'), path.join(outPath, 'static'))
+  // Read build manifest
   const manifest = JSON.parse(
-    await fs.readFile(
-      path.join(process.cwd(), 'build', 'manifest.json'),
-      'utf-8'
-    )
+    await fs.readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
   )
 
   process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
@@ -146,16 +154,21 @@ export default async function staticize({
 
   await processURLs(urls, crawlConcurrency, {
     exitOnError,
+    crawEnabled,
     async renderURL(url) {
-      const crawlSess = createCrawlSession()
-      const WrappedApp = (props: unknown) => (
-        <SnextCrawlContext.Provider value={crawlSess}>
-          <App {...props} />
-        </SnextCrawlContext.Provider>
-      )
+      let RenderApp = App
+      let crawlSess: CrawlSession
+      if (crawEnabled) {
+        crawlSess = createCrawlSession()
+        RenderApp = (props: unknown) => (
+          <SnextCrawlContext.Provider value={crawlSess}>
+            <App {...props} />
+          </SnextCrawlContext.Provider>
+        )
+      }
       const html = await render(
         {
-          App: WrappedApp,
+          App: RenderApp,
           getSkeletonProps,
           getStaticProps,
           Skeleton,
@@ -166,7 +179,10 @@ export default async function staticize({
           entrypoints: manifest.entrypoints,
         }
       )
-      const urls = await crawlSess.rewind()
+      let urls: string[] = []
+      if (crawEnabled) {
+        urls = await crawlSess!.rewind()
+      }
       return [html, urls]
     },
     async saveFile(url, html) {
