@@ -179,17 +179,14 @@ export default function createDevServer({
           },
           { url: req.url, entrypoints }
         )
-        res.send(html)
+        res.send(`<!DOCTYPE html>${html}`)
       } catch (error) {
         console.error(chalk.red('Error during render'))
         console.error(error)
-        res
-          .status(500)
-          .send(
-            renderToString(
-              <ErrorPage title="Error during render" error={error as any} />
-            )
-          )
+        const html = renderToString(
+          <ErrorPage title="Error during render" error={error as any} />
+        )
+        res.status(500).send(`<!DOCTYPE html>${html}`)
       }
     })
   } else {
@@ -224,19 +221,16 @@ export default function createDevServer({
       )
 
       worker.once('message', (html) => {
-        res.send(html)
+        res.send(`<!DOCTYPE html>${html}`)
       })
 
       worker.on('error', (error) => {
         console.error(chalk.red('Error during render'))
         console.error(error)
-        res
-          .status(500)
-          .send(
-            renderToString(
-              <ErrorPage title="Error during render" error={error} />
-            )
-          )
+        const html = renderToString(
+          <ErrorPage title="Error during render" error={error} />
+        )
+        res.status(500).send(`<!DOCTYPE html>${html}`)
       })
     })
   }

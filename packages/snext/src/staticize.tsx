@@ -166,7 +166,7 @@ export default async function staticize({
           </SnextCrawlContext.Provider>
         )
       }
-      const html = await render(
+      let html = await render(
         {
           App: RenderApp,
           getSkeletonProps,
@@ -179,6 +179,7 @@ export default async function staticize({
           entrypoints: manifest.entrypoints,
         }
       )
+      html = `<!DOCTYPE html>${html}`
       let urls: string[] = []
       if (crawEnabled) {
         urls = await crawlSess!.rewind()

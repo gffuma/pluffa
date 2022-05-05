@@ -59,7 +59,7 @@
     "static site"
   ],
   "dependencies": {
-    "@snext/build-tools": "^0.5.0",
+    "@snext/build-tools": "^0.6.0",
     "@snext/crawl": "^0.0.2",
     "@snext/env": "^0.1.0",
     "chalk": "^5.0.0",
