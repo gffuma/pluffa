@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-vm-modules
 import { Command } from 'commander'
 import { printLogo } from './logo.js'
 import chalk from 'chalk'

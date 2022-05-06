@@ -14,6 +14,49 @@ import { Worker } from 'worker_threads'
 import ErrorPage from './components/ErrorPage.js'
 import render from './render.js'
 import runStatik from './runStatik.js'
+import vm from 'vm'
+import { readFileSync } from 'fs'
+
+async function importVm(path: string) {
+  // TODO: Improve use module lol
+  const content = readFileSync(path, 'utf-8')
+  console.log('co', content)
+  const SourceTextModule = (vm as any).SourceTextModule
+  const SyntheticModule = (vm as any).SyntheticModule
+  const mod = new SourceTextModule(content, {
+    initializeImportMeta(meta: any) {
+      // Note: this object is created in the top context. As such,
+      // Object.getPrototypeOf(import.meta.prop) points to the
+      // Object.prototype in the top context rather than that in
+      // the contextified object.
+      meta.url = path
+    },
+  })
+
+  await mod.link(async (specifier: any, referencingModule: any) => {
+    return new Promise(async (resolve, reject) => {
+      const module = await import(specifier)
+      const exportNames = Object.keys(module)
+      // console.log('N', exportNames)
+      console.log('What?', specifier)
+
+      const syntheticModule = new SyntheticModule(exportNames, function (
+        this: any
+      ) {
+        // console.log('SET!')
+        // this.setExport('default', { createElement: () => 'Kulo' })
+        exportNames.forEach((key) => {
+          // console.log('Set', key)
+          this.setExport(key, module[key])
+        })
+      })
+
+      resolve(syntheticModule)
+    })
+  })
+  await mod.evaluate()
+  return mod.namespace
+}
 
 const require = createRequire(import.meta.url)
 
@@ -191,6 +234,43 @@ export default function createDevServer({
     })
   } else {
     app.use(async (req, res) => {
+      // const SourceTextModule = (vm as any).SourceTextModule
+      // const SyntheticModule = (vm as any).SyntheticModule
+      // const bar = new SourceTextModule(
+      //   `
+      //     import React from 'react'
+      //     export default function() { return React.createElement('div'); }
+      //   `
+      // )
+      // // // const x = await bar.evalutate()
+      // console.log('--->', bar)
+      // // await bar.link(() => {})
+      // await bar.link(async (specifier: any, referencingModule: any) => {
+      //   return new Promise(async (resolve, reject) => {
+      //     const module = await import(specifier)
+      //     const exportNames = Object.keys(module)
+      //     // console.log('N', exportNames)
+
+      //     const syntheticModule = new SyntheticModule(exportNames, function (
+      //       this: any
+      //     ) {
+      //       // console.log('SET!')
+      //       // this.setExport('default', { createElement: () => 'Kulo' })
+      //       exportNames.forEach((key) => {
+      //         // console.log('Set', key)
+      //         this.setExport(key, module[key])
+      //       })
+      //     })
+
+      //     resolve(syntheticModule)
+      //   })
+      // })
+      // await bar.evaluate()
+      // // const gang = await bar.evaluate()
+      // console.log(bar.namespace.default())
+      // // const bar = new vm.Script(`export default function() { return 23; }`)
+      // // bar.ev
+
       const { devMiddleware } = res.locals.webpack
       const entrypoints = getFlatEntrypointsFromWebPackStats(
         devMiddleware.stats.toJson(),
@@ -204,34 +284,54 @@ export default function createDevServer({
         'Skeleton.mjs'
       )
 
-      const worker = new Worker(
-        path.resolve(
-          path.dirname(fileURLToPath(import.meta.url)),
-          './renderWorker.js'
-        ),
+      const {
+        default: App,
+        getStaticProps,
+        getSkeletonProps,
+      } = await importVm(appPath)
+      // console.log('?', App)
+      const { default: Skeleton } = await importVm(skeletonPath)
+      const html = await render(
         {
-          execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
-          workerData: {
-            appPath,
-            skeletonPath,
-            url: req.url,
-            entrypoints,
-          },
-        }
+          App,
+          getStaticProps,
+          getSkeletonProps,
+          Skeleton,
+        },
+        { url: req.url, entrypoints }
       )
+      res.send(`<!DOCTYPE html>${html}`)
 
-      worker.once('message', (html) => {
-        res.send(`<!DOCTYPE html>${html}`)
-      })
+      // res.send('X')
 
-      worker.on('error', (error) => {
-        console.error(chalk.red('Error during render'))
-        console.error(error)
-        const html = renderToString(
-          <ErrorPage title="Error during render" error={error} />
-        )
-        res.status(500).send(`<!DOCTYPE html>${html}`)
-      })
+      // const worker = new Worker(
+      //   path.resolve(
+      //     path.dirname(fileURLToPath(import.meta.url)),
+      //     './renderWorker.js'
+      //   ),
+      //   {
+      //     execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
+      //     workerData: {
+      //       appPath,
+      //       skeletonPath,
+      //       url: req.url,
+      //       entrypoints,
+      //     },
+      //   }
+      // )
+
+      // worker.once('message', (html) => {
+      //   res.send(`<!DOCTYPE html>${html}`)
+      // })
+
+      // worker.on('error', (error) => {
+      //   console.error(chalk.red('Error during render'))
+      //   console.error(error)
+      //   const html = renderToString(
+      //     <ErrorPage title="Error during render" error={error} />
+      //   )
+      //   res.status(500).send(`<!DOCTYPE html>${html}`)
+      // })
     })
   }
 
