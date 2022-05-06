@@ -2,7 +2,7 @@
   "name": "snext",
   "type": "module",
   "description": "Build static sites with React",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
