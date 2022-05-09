@@ -220,17 +220,19 @@ export default function createDevServer({
         }
       )
 
-      worker.once('message', (html) => {
+      worker.once('message', async (html) => {
         res.send(`<!DOCTYPE html>${html}`)
+        await worker.terminate()
       })
 
-      worker.on('error', (error) => {
+      worker.on('error', async (error) => {
         console.error(chalk.red('Error during render'))
         console.error(error)
         const html = renderToString(
           <ErrorPage title="Error during render" error={error} />
-        )
-        res.status(500).send(`<!DOCTYPE html>${html}`)
+          )
+          res.status(500).send(`<!DOCTYPE html>${html}`)
+          await worker.terminate()
       })
     })
   }
