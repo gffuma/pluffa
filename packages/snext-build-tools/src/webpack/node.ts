@@ -111,7 +111,10 @@ export function getWebPackNodeConfig({
     name: 'server',
     mode: isProd ? 'production' : 'development',
     // TODO: Check node support for source map in prod ....
-    devtool: isProd ? false : 'eval-cheap-module-source-map',
+    // devtool: isProd ? false : 'eval-cheap-module-source-map',
+    // TODO: Check soruce map in node fuck off ... side note ...
+    // on large project eval soruce map cause crash
+    devtool: false,
     target: 'node',
     entry,
     ...getNodeConfiguration(compileNodeCommonJS),
