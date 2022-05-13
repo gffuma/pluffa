@@ -2,7 +2,7 @@
   "name": "snext",
   "type": "module",
   "description": "Build static sites with React",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -59,12 +59,11 @@
     "static site"
   ],
   "dependencies": {
-    "@snext/build-tools": "^0.7.0",
+    "@snext/build-tools": "^0.8.0",
     "@snext/crawl": "^0.1.0",
     "@snext/env": "^0.2.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
-    "express-http-proxy": "^1.6.3",
     "http-proxy-middleware": "^2.0.3",
     "itty-router": "^2.4.10",
     "mkdirp": "^1.0.4",
@@ -77,9 +76,8 @@
     "webpack": "^5.72.1"
   },
   "devDependencies": {
-    "@snext/cloudflare-worker": "^0.11.0",
+    "@snext/cloudflare-worker": "^0.11.1",
     "@types/express": "^4.17.13",
-    "@types/express-http-proxy": "^1.6.3",
     "@types/mkdirp": "^1.0.2",
     "@types/ncp": "^2.0.5",
     "@types/node": "^17.0.31",
@@ -94,6 +92,6 @@
     "react-dom": "^18.0.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.7"
   }
 }
