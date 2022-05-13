@@ -120,6 +120,7 @@ function snext() {
     input: {
       index: `${baseDir}/src/index.ts`,
       cli: `${baseDir}/src/cli.ts`,
+      render: `${baseDir}/src/render.tsx`,
       'lib/statik.browser': `${baseDir}/src/lib/statik.browser.ts`,
       'lib/statik.node': `${baseDir}/src/lib/statik.node.ts`,
       'lib/crawl': `${baseDir}/src/lib/crawl.ts`,
