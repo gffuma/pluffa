@@ -8,6 +8,7 @@ export default function ErrorPage({
   return (
     <html>
       <head>
+        <meta charSet="utf-8" />
         <style
           type="text/css"
           dangerouslySetInnerHTML={{

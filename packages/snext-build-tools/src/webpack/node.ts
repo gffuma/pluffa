@@ -110,8 +110,7 @@ export function getWebPackNodeConfig({
   return {
     name: 'server',
     mode: isProd ? 'production' : 'development',
-    // TODO: Check node support for source map in prod ....
-    devtool: isProd ? false : 'eval-cheap-module-source-map',
+    devtool:  isProd ? 'source-map' : 'cheap-module-source-map',
     target: 'node',
     entry,
     ...getNodeConfiguration(compileNodeCommonJS),

@@ -1,3 +1,4 @@
+import sourceMap from 'source-map-support'
 import fs from 'fs/promises'
 import path from 'path'
 import ncpCB from 'ncp'
@@ -13,6 +14,7 @@ import {
   createCrawlSession,
   SnextCrawlContext,
 } from '@snext/crawl'
+import { RegisterStatik } from './statikRuntime.js'
 
 const ncp = util.promisify(ncpCB)
 
@@ -94,6 +96,7 @@ export default async function staticize({
   urls,
   crawlConcurrency,
   statikDataDir,
+  statikEnabled = false,
   crawEnabled = true,
   exitOnError = false,
 }: {
@@ -103,12 +106,17 @@ export default async function staticize({
   urls: string[]
   crawlConcurrency: number
   crawEnabled: boolean
+  statikEnabled: boolean
   statikDataDir: string | false
   exitOnError: boolean
 }) {
+  sourceMap.install()
+
   const outPath = path.resolve(process.cwd(), outputDir)
   const publicPath = path.resolve(process.cwd(), publicDir)
   const buildClientPath = path.resolve(process.cwd(), '.snext/client')
+  const buildNodePath = path.resolve(process.cwd(), '.snext/node')
+  const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
   // Remove stale ourput
   rimraf.sync(outPath)
@@ -121,35 +129,37 @@ export default async function staticize({
     await fs.readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
   )
 
-  process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   // NOTE: Set a flag so we can do different stuff during staticize
   process.env.SNEXT_RUN_STATICIZE = '1'
 
-  if (statikDataDir !== false) {
-    process.env.SNEXT_STATIK_DATA_DIR = path.resolve(
-      path.resolve(process.cwd(), outputDir),
-      statikDataDir
-    )
-  }
-
+  // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
 
-  const appPath = path.join(
-    process.cwd(),
-    '.snext/node',
-    `App.${compileNodeCommonJS ? '' : 'm'}js`
-  )
+  // Configure Statik
+  if (statikEnabled) {
+    const { configureRegisterStatik, configureStatikDataDir } = (await import(
+      `./statikRuntime.${compileNodeCommonJS ? 'cjs' : 'js'}`
+    ).then(uniformExport)) as {
+      configureStatikDataDir(dataDir: string): void
+      configureRegisterStatik(register: RegisterStatik): void
+    }
+    const { default: registerStatik } = await import(
+      path.join(buildNodePath, `statik.${buildImportExt}`)
+    ).then(uniformExport)
+    configureRegisterStatik(registerStatik)
+    if (statikDataDir !== false) {
+      configureStatikDataDir(path.resolve(outPath, statikDataDir))
+    }
+  }
+
+  const appPath = path.join(buildNodePath, `App.${buildImportExt}`)
   const {
     default: App,
     getSkeletonProps,
     getStaticProps,
   } = await import(appPath).then(uniformExport)
 
-  const skeletonPath = path.join(
-    process.cwd(),
-    '.snext/node',
-    `Skeleton.${compileNodeCommonJS ? '' : 'm'}js`
-  )
+  const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
   const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
 
   await processURLs(urls, crawlConcurrency, {

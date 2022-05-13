@@ -30,7 +30,6 @@ export default function startDevServer({
   publicDir,
   useTypescript,
 }: StartDevServerOptions) {
-  process.env.SNEXT_COMPILE_NODE_COMMONJS = compileNodeCommonJS ? '1' : ''
   const isProd = false
   setUpEnv({ isProd })
 
@@ -55,7 +54,7 @@ export default function startDevServer({
     compileNodeCommonJS,
     compiler,
     proxyUrl,
-    registerStatik,
+    statikEnabled: Boolean(registerStatik),
     publicDir,
   })
 

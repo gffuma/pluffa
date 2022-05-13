@@ -111,6 +111,7 @@ program
       ...config,
       // When --no-crawl is specified disable crawl otherwise let config enable/disable crawl
       crawEnabled: options.crawl === false ? false : config.crawlEnabled,
+      statikEnabled: Boolean(config.registerStatik),
       urls: options.url ?? config.urls,
       exitOnError: config.exitStaticizeOnError,
       compileNodeCommonJS: config.runtime === 'commonjs',
