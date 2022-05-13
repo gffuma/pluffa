@@ -60,8 +60,8 @@
   ],
   "dependencies": {
     "@snext/build-tools": "^0.7.0",
-    "@snext/crawl": "^0.0.2",
-    "@snext/env": "^0.1.0",
+    "@snext/crawl": "^0.1.0",
+    "@snext/env": "^0.2.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
     "express-http-proxy": "^1.6.3",
@@ -74,7 +74,7 @@
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.21",
     "stream-buffers": "^3.0.2",
-    "webpack": "^5.69.0"
+    "webpack": "^5.72.1"
   },
   "devDependencies": {
     "@snext/cloudflare-worker": "^0.11.0",
