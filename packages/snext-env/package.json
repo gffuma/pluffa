@@ -2,7 +2,7 @@
   "name": "@snext/env",
   "type": "module",
   "description": "SNext meta package to handle env vars",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -28,9 +28,9 @@
     "static site"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.7"
   },
   "dependencies": {
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.1"
   }
 }
