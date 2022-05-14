@@ -54,7 +54,7 @@ async function processURL(url: string, config: ProcessContract) {
         .forEach((url) => urls.push(getPathFromUrl(url)))
     }
     await saveFile(url, html)
-    return urls
+    return { sourceUrl: url, success: true, urls }
   } catch (error) {
     console.log(chalk.bold.red(`⚠️  ${url}`))
     console.log(chalk.red('Error during rendering'))
@@ -62,7 +62,7 @@ async function processURL(url: string, config: ProcessContract) {
     if (config.exitOnError) {
       process.exit(1)
     }
-    return []
+    return { sourceUrl: url, success: false, urls: [] }
   }
 }
 
@@ -70,9 +70,11 @@ async function processURLs(
   urls: string[],
   concurrency: number,
   config: ProcessContract
-): Promise<void> {
+) {
   const queue = new PQueue({ concurrency })
   const uniqeUrls = new Set<string>()
+  let succeded = 0
+  const failedUrls: string[] = []
 
   function enqueueUrl(url: string) {
     if (!uniqeUrls.has(url)) {
@@ -81,12 +83,32 @@ async function processURLs(
     }
   }
 
-  queue.on('completed', (urls: string[]) => {
-    urls.forEach((url) => enqueueUrl(url))
-  })
+  queue.on(
+    'completed',
+    ({
+      urls,
+      success,
+      sourceUrl,
+    }: {
+      urls: string[]
+      success: boolean
+      sourceUrl: string
+    }) => {
+      urls.forEach((url) => enqueueUrl(url))
+      if (success) {
+        succeded++
+      } else {
+        failedUrls.push(sourceUrl)
+      }
+    }
+  )
 
   urls.forEach((url) => enqueueUrl(url))
-  return queue.onIdle()
+  await queue.onIdle()
+  return {
+    succeded,
+    failedUrls,
+  }
 }
 
 export default async function staticize({
@@ -162,7 +184,7 @@ export default async function staticize({
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
   const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
 
-  await processURLs(urls, crawlConcurrency, {
+  const { succeded, failedUrls } = await processURLs(urls, crawlConcurrency, {
     exitOnError,
     crawEnabled,
     async renderURL(url) {
@@ -207,4 +229,20 @@ export default async function staticize({
       await fs.writeFile(filePath, html)
     },
   })
+  console.log()
+  if (failedUrls.length === 0) {
+    console.log(chalk.green('WoW all site staticized!'))
+  } else {
+    console.log(chalk.red('Wops! Some urls fails to staticized ....'))
+  }
+  console.log()
+  console.log('Success:' + '  ' + chalk.green.bold(succeded))
+  if (failedUrls.length > 0) {
+    console.log('Failed:' + '   ' + chalk.red.bold(failedUrls.length))
+    console.log()
+    console.log(chalk.red('Urls failed:'))
+    failedUrls.forEach((url) => {
+      console.log(chalk.red(url))
+    })
+  }
 }
