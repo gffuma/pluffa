@@ -1,7 +1,7 @@
 {
   "name": "snext",
   "type": "module",
-  "description": "Build static sites with React",
+  "description": "Build sites with React",
   "version": "0.18.0",
   "exports": {
     ".": {
@@ -48,10 +48,11 @@
   "author": "Giovanni Fumagalli",
   "license": "MIT",
   "bin": {
-    "snext": "dist/cli.js"
+    "snext": "bootstrap.cjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "bootstrap.cjs"
   ],
   "repository": "gffuma/snext",
   "keywords": [
