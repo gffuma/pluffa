@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet'
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
-import statik from 'pluffa/statik'
+import statik from '@pluffa/statik'
 
 export default function Post() {
   const { slug } = useParams()

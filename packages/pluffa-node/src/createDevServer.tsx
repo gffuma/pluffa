@@ -49,8 +49,8 @@ export default function createDevServer({
     runStatik<T = any>(req: StatikRequest): Promise<T>
     configureRegisterStatik(register: RegisterStatik): void
   }> = compileNodeCommonJS
-    ? async () => require('@pluffa/statik/runtime.cjs')
-    : async () => await import('@pluffa/statik/runtime.js')
+    ? async () => require('@pluffa/statik/runtime')
+    : async () => await import('@pluffa/statik/runtime')
 
   const getFreshRegiterStatik = compileNodeCommonJS
     ? // Use require to have CommonJS version of register statik

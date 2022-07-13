@@ -16,6 +16,9 @@ export type Config =
       statikDataDir: string | false
       registerStatik?: string
       proxy?: string
+      productionProxy?: string
+      productionServeStaticAssets: boolean
+      productionServePublicAssets: boolean
     }
   | {
       workerEntry: string

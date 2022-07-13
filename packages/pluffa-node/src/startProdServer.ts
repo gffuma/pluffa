@@ -3,22 +3,20 @@ import { setUpEnv } from '@pluffa/env'
 import createProdServer from './createProdServer.js'
 
 export interface StartProdServerOptions {
-  clientEntry: string
-  serverComponent: string
-  skeletonComponent: string
-  registerStatik?: string
+  statikEnabled: boolean
+  statikDataDir: string | false
   compileNodeCommonJS: boolean
+  serveStaticAssets?: boolean
   proxy?: string
   publicDir: string | false
   port: number
 }
 
 export default async function startProdServer({
-  clientEntry,
-  serverComponent,
-  skeletonComponent,
-  registerStatik,
   compileNodeCommonJS,
+  statikEnabled,
+  statikDataDir,
+  serveStaticAssets,
   proxy: proxyUrl,
   port,
   publicDir,
@@ -27,9 +25,11 @@ export default async function startProdServer({
   setUpEnv({ isProd })
 
   const app = await createProdServer({
+    statikDataDir,
+    serveStaticAssets,
+    proxyUrl,
     compileNodeCommonJS,
-    // proxyUrl,
-    // statikEnabled: Boolean(registerStatik),
+    statikEnabled,
     publicDir,
   })
 

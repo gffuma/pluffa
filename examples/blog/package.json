@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "pluffa dev",
+    "start": "pluffa start",
     "build": "pluffa build",
     "staticize": "pluffa staticize"
   },
@@ -14,15 +15,5 @@
     "react-router-dom": "^6.2.1",
     "showdown": "^1.9.1",
     "pluffa": "latest"
-  },
-  "pluffa": {
-    "clientEntry": "./src/index.js",
-    "serverComponent": "./src/StaticApp.js",
-    "skeletonComponent": "./src/Skeleton.js",
-    "registerStatik": "./src/registerStatik.js",
-    "urls": [
-      "/",
-      "/secret"
-    ]
   }
 }

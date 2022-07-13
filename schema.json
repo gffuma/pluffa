@@ -28,6 +28,15 @@
                 "port": {
                     "type": "number"
                 },
+                "productionProxy": {
+                    "type": "string"
+                },
+                "productionServePublicAssets": {
+                    "type": "boolean"
+                },
+                "productionServeStaticAssets": {
+                    "type": "boolean"
+                },
                 "proxy": {
                     "type": "string"
                 },

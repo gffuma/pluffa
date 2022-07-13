@@ -9,11 +9,7 @@ import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
 import { render } from '@pluffa/node-render'
-import {
-  CrawlSession,
-  createCrawlSession,
-  CrawlContext,
-} from '@pluffa/crawl'
+import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
 import { RegisterStatik } from '@pluffa/statik/runtime'
 
 const ncp = util.promisify(ncpCB)
@@ -159,15 +155,23 @@ export default async function staticize({
 
   // Configure Statik
   if (statikEnabled) {
-    const { configureRegisterStatik, configureStatikDataDir } = (await import(
-      `@pluffa/statik/runtime.${compileNodeCommonJS ? 'cjs' : 'js'}`
-    ).then(uniformExport)) as {
+    // NOTE: We Inject the current user code for registerStatik
+    // to inject into the correct version CommonJS vs ESM
+    // we also import the correct version of statik runtime
+    const getStatikRunTime: () => Promise<{
       configureStatikDataDir(dataDir: string): void
       configureRegisterStatik(register: RegisterStatik): void
-    }
+    }> = compileNodeCommonJS
+      ? async () => require('@pluffa/statik/runtime')
+      : async () => await import('@pluffa/statik/runtime')
+
+    const { configureRegisterStatik, configureStatikDataDir } =
+      await getStatikRunTime()
+
     const { default: registerStatik } = await import(
       path.join(buildNodePath, `statik.${buildImportExt}`)
     ).then(uniformExport)
+
     configureRegisterStatik(registerStatik)
     if (statikDataDir !== false) {
       configureStatikDataDir(path.resolve(outPath, statikDataDir))

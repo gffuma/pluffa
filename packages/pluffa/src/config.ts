@@ -14,6 +14,8 @@ const ConfigDefaults: Partial<Config> = {
   statikDataDir: 'data',
   exitStaticizeOnError: false,
   crawlEnabled: true,
+  productionServePublicAssets: true,
+  productionServeStaticAssets: true
 }
 
 const require = createRequire(import.meta.url)
@@ -36,10 +38,13 @@ export function ensureRuntimePkgsInstalled(runtime: string) {
 export async function getUserConfig(): Promise<Config> {
   const pkg = await getUserPkg()
   let cfg: Partial<Config> = pkg.pluffa
+  if (!cfg) {
+    try {
+      cfg = await getUserJsonCfg()
+    } catch (_) {}
+  }
 
-  try {
-    cfg = await getUserJsonCfg()
-  } catch (err) {
+  if (!cfg) {
     console.log()
     console.log(
       chalk.red(

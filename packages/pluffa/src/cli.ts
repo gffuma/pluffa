@@ -113,8 +113,13 @@ program.command('start').action(async () => {
   } else {
     const { startProdServer } = await import('@pluffa/node')
     startProdServer({
-      ...config,
+      statikDataDir: config.statikDataDir,
+      port: config.port,
+      publicDir: config.productionServePublicAssets ? config.publicDir : false,
       compileNodeCommonJS: config.nodeModule === 'commonjs',
+      statikEnabled: Boolean(config.registerStatik),
+      proxy: config.productionProxy,
+      serveStaticAssets: config.productionServeStaticAssets,
     })
   }
 })

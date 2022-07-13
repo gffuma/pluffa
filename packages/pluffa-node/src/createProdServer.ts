@@ -1,18 +1,20 @@
 import chalk from 'chalk'
+import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import sourceMap from 'source-map-support'
 import fs from 'fs/promises'
 import path from 'path'
 import { render } from '@pluffa/node-render'
 import express, { Express } from 'express'
+import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 
 export interface CreateProdServerOptions {
-  // compiler: Compiler | MultiCompiler
   publicDir: string | false
-  // statikEnabled?: boolean
+  statikEnabled?: boolean
   compileNodeCommonJS: boolean
-  serveStatic?: boolean
+  serveStaticAssets?: boolean
   createServer?: () => Express
-  // proxyUrl?: string
+  statikDataDir: string | false
+  proxyUrl?: string
 }
 
 function createDefaultServer() {
@@ -24,7 +26,10 @@ function createDefaultServer() {
 export default async function createProdServer({
   createServer = createDefaultServer,
   publicDir,
-  serveStatic = true,
+  statikDataDir,
+  proxyUrl,
+  statikEnabled = false,
+  serveStaticAssets = true,
   compileNodeCommonJS,
 }: CreateProdServerOptions): Promise<Express> {
   sourceMap.install()
@@ -40,7 +45,7 @@ export default async function createProdServer({
   const buildClientPath = path.resolve(process.cwd(), '.pluffa/client')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
-  if (serveStatic) {
+  if (serveStaticAssets) {
     app.use('/static', express.static(path.resolve(buildClientPath, 'static')))
   }
 
@@ -63,13 +68,77 @@ export default async function createProdServer({
     await fs.readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
   )
 
+  // NOTE: We Inject the current user code for registerStatik
+  // to inject into the correct version CommonJS vs ESM
+  // we also import the correct version of statik runtime
+  const getStatikRunTime: () => Promise<{
+    runStatik<T = any>(req: StatikRequest): Promise<T>
+    configureRegisterStatik(register: RegisterStatik): void
+  }> = compileNodeCommonJS
+    ? async () => require('@pluffa/statik/runtime')
+    : async () => await import('@pluffa/statik/runtime')
+
+  if (statikEnabled && statikDataDir) {
+    // Register stuff for run time in server rendering
+    const { configureRegisterStatik, runStatik } = await getStatikRunTime()
+    const { default: registerStatik } = await import(
+      path.join(buildNodePath, `statik.${buildImportExt}`)
+    ).then(uniformExport)
+    configureRegisterStatik(registerStatik)
+
+    const statikDaraUrl = statikDataDir.startsWith('/')
+      ? statikDataDir
+      : `/${statikDataDir}`
+    // Serve API
+    app.use(statikDaraUrl, async (req, res) => {
+      try {
+        // Run them!
+        const data = await runStatik({
+          method: req.method,
+          body: req.body,
+          // NOTE: Note not perfect solution lol
+          url: req.url.replace('.json', ''),
+        })
+        res.send(data)
+      } catch (error: any) {
+        if (error.status === 404) {
+          res
+            .status(404)
+            .send(
+              `<!DOCTYPE html><html><body><h1>404 Not Found</h1></body></html>`
+            )
+          return
+        }
+        console.error(chalk.red('Error during processing statik handler'))
+        console.error(error)
+        res
+          .status(500)
+          .send(
+            `<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>`
+          )
+      }
+    })
+  }
+
+  // Set Up Proxy
+  if (proxyUrl) {
+    const filterPorxy: Filter = (_, req) => {
+      return (
+        req.method !== 'GET' ||
+        Boolean(req.headers.accept && !req.headers.accept.includes('text/html'))
+      )
+    }
+    app.use(
+      createProxyMiddleware(filterPorxy, {
+        logLevel: 'silent',
+        target: proxyUrl,
+        changeOrigin: true,
+      })
+    )
+  }
+
   app.use(async (req, res) => {
     try {
-      // if (statikEnabled) {
-      //   const { configureRegisterStatik } = await getStatikRunTime()
-      //   const registerStatik = await getFreshRegiterStatik()
-      //   configureRegisterStatik(registerStatik)
-      // }
       const html = await render(
         {
           App,
@@ -90,7 +159,7 @@ export default async function createProdServer({
       res
         .status(500)
         .send(
-          `<!DOCTYPE html><html><body>500 Internal Server Error</body></html>`
+          `<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>`
         )
     }
   })
