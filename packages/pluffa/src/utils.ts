@@ -21,6 +21,12 @@ export async function getUserPkg() {
   )
 }
 
+export async function getUserJsonCfg() {
+  return JSON.parse(
+    await fs.readFile(path.join(process.cwd(), 'pluffa.json'), 'utf-8')
+  )
+}
+
 export function getUserPkgSync() {
   return JSON.parse(
     readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')

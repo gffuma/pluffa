@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "pluffa dev",
+    "start": "pluffa start",
     "build": "pluffa build",
     "staticize": "pluffa staticize"
   },
@@ -9,11 +10,6 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "pluffa": "latest"
-  },
-  "pluffa": {
-    "clientEntry": "./src/index.js",
-    "serverComponent": "./src/App.js",
-    "skeletonComponent": "./src/Skeleton.js"
   },
   "browserslist": {
     "production": [

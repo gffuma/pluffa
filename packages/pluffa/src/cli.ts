@@ -4,27 +4,8 @@ import { printLogo } from './logo.js'
 import chalk from 'chalk'
 import { readLibPkgSync, shouldUseTypescript } from './utils.js'
 import { getUserConfig } from './config.js'
-import { createRequire } from 'module'
 
 const pkg = readLibPkgSync()
-
-const require = createRequire(import.meta.url)
-
-function ensurePluffaCloudflareWorkerInstalled() {
-  try {
-    require.resolve('@pluffa/cloudflare-worker')
-  } catch (_) {
-    console.log(
-      chalk.red(
-        'Pluffa error you have to install the package:\n',
-        '\n@pluffa/cloudflare-worker\n\n' +
-          'to use the cloudflare-worker rutime\n'
-      )
-    )
-    process.exit(1)
-    return
-  }
-}
 
 const program = new Command()
   .name(pkg.name)
@@ -36,19 +17,18 @@ program.command('dev').action(async () => {
   const config = await getUserConfig()
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'development'
-  if (config.runtime === 'cloudflare-worker') {
-    ensurePluffaCloudflareWorkerInstalled()
+  if (config.runtime === 'cloudflare-workers') {
     const { startWorkerDevServer } = await import('@pluffa/cloudflare-worker')
     startWorkerDevServer({
       ...config,
       useTypescript,
     })
   } else {
-    const { default: startDevServer } = await import('./startDevServer.js')
+    const { startDevServer } = await import('@pluffa/node')
     startDevServer({
       ...config,
       useTypescript,
-      compileNodeCommonJS: config.runtime === 'commonjs',
+      compileNodeCommonJS: config.nodeModule === 'commonjs',
     })
   }
 })
@@ -58,8 +38,7 @@ program.command('build').action(async () => {
   const config = await getUserConfig()
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'production'
-  if (config.runtime === 'cloudflare-worker') {
-    ensurePluffaCloudflareWorkerInstalled()
+  if (config.runtime === 'cloudflare-workers') {
     const { buildForWorker } = await import('@pluffa/cloudflare-worker')
     console.log()
     console.log('Creating an optimized build...')
@@ -69,13 +48,13 @@ program.command('build').action(async () => {
       useTypescript,
     })
   } else {
-    const { default: build } = await import('./build.js')
+    const { build } = await import('@pluffa/node')
     console.log()
     console.log('Creating an optimized build...')
     console.log()
     build({
       ...config,
-      compileNodeCommonJS: config.runtime === 'commonjs',
+      compileNodeCommonJS: config.nodeModule === 'commonjs',
       useTypescript,
     })
   }
@@ -93,7 +72,7 @@ program
   .action(async (options) => {
     printLogo()
     const config = await getUserConfig()
-    if (config.runtime === 'cloudflare-worker') {
+    if (config.runtime === 'cloudflare-workers') {
       console.log(
         chalk.red(
           `Pluffa error the staticize command is not supported for runtime ${config.runtime}\n`
@@ -103,7 +82,7 @@ program
       return
     }
     process.env.NODE_ENV = 'production'
-    const { default: staticize } = await import('./staticize.js')
+    const { staticize } = await import('@pluffa/node')
     console.log()
     console.log('Exporting your build as a static website...')
     console.log()
@@ -114,9 +93,30 @@ program
       statikEnabled: Boolean(config.registerStatik),
       urls: options.url ?? config.urls,
       exitOnError: config.exitStaticizeOnError,
-      compileNodeCommonJS: config.runtime === 'commonjs',
+      compileNodeCommonJS: config.nodeModule === 'commonjs',
       outputDir: options.output ?? config.outputDir,
     })
   })
+
+program.command('start').action(async () => {
+  printLogo()
+  const config = await getUserConfig()
+  process.env.NODE_ENV = 'production'
+  if (config.runtime === 'cloudflare-workers') {
+    console.log(
+      chalk.red(
+        `Pluffa error the start command is not supported for runtime ${config.runtime}\n`
+      )
+    )
+    process.exit(1)
+    return
+  } else {
+    const { startProdServer } = await import('@pluffa/node')
+    startProdServer({
+      ...config,
+      compileNodeCommonJS: config.nodeModule === 'commonjs',
+    })
+  }
+})
 
 program.parse()

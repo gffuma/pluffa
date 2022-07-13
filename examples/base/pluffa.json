@@ -1,0 +1,5 @@
+{
+  "clientEntry": "./src/index.js",
+  "skeletonComponent": "./src/Skeleton.js",
+  "serverComponent": "./src/App.js"
+}

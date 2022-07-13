@@ -9,11 +9,11 @@ import {
   createBaseDevServer,
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
+import { render } from '@pluffa/node-render'
 import { Compiler, MultiCompiler } from 'webpack'
 import ErrorPage from './components/ErrorPage.js'
-import render from './render.js'
 import importVm from './importVm.js'
-import { RegisterStatik, StatikRequest } from './statikRuntime.js'
+import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 
 const require = createRequire(import.meta.url)
 
@@ -49,8 +49,8 @@ export default function createDevServer({
     runStatik<T = any>(req: StatikRequest): Promise<T>
     configureRegisterStatik(register: RegisterStatik): void
   }> = compileNodeCommonJS
-    ? async () => require('./statikRuntime.cjs')
-    : async () => await import('./statikRuntime.js')
+    ? async () => require('@pluffa/statik/runtime.cjs')
+    : async () => await import('@pluffa/statik/runtime.js')
 
   const getFreshRegiterStatik = compileNodeCommonJS
     ? // Use require to have CommonJS version of register statik

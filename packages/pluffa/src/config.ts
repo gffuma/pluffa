@@ -1,36 +1,12 @@
+import { createRequire } from 'module'
 import chalk from 'chalk'
-import { getUserPkg } from './utils'
-
-export type Config =
-  | {
-      clientEntry: string
-      skeletonComponent: string
-      serverComponent: string
-      runtime: 'commonjs' | 'esm'
-      port: number
-      outputDir: string
-      publicDir: string
-      urls: string[]
-      exitStaticizeOnError: boolean
-      crawlConcurrency: number
-      crawlEnabled: boolean
-      statikDataDir: string | false
-      registerStatik?: string
-      proxy?: string
-    }
-  | {
-      workerEntry: string
-      runtime: 'cloudflare-worker'
-      port: number
-      clientEntry: string
-      outputDir: string
-      publicDir: string
-      miniflareConfig?: Record<string, any>
-    }
+import { getUserJsonCfg, getUserPkg } from './utils'
+import { Config } from './types'
 
 const ConfigDefaults: Partial<Config> = {
   port: 7000,
-  runtime: 'esm',
+  runtime: 'node',
+  nodeModule: 'esm',
   outputDir: 'build',
   publicDir: 'public',
   urls: ['/'],
@@ -40,15 +16,37 @@ const ConfigDefaults: Partial<Config> = {
   crawlEnabled: true,
 }
 
+const require = createRequire(import.meta.url)
+
+export function ensureRuntimePkgsInstalled(runtime: string) {
+  try {
+    require.resolve(`@pluffa/${runtime}`)
+  } catch (_) {
+    console.log(
+      chalk.red(
+        'Pluffa error you have to install the package:\n',
+        `\n@pluffa/${runtime}\n\n` + `to use the ${runtime} rutime\n`
+      )
+    )
+    process.exit(1)
+    return
+  }
+}
+
 export async function getUserConfig(): Promise<Config> {
   const pkg = await getUserPkg()
   let cfg: Partial<Config> = pkg.pluffa
 
-  if (!cfg) {
+  try {
+    cfg = await getUserJsonCfg()
+  } catch (err) {
     console.log()
     console.log(
       chalk.red(
-        'Pluffa config error:\nMissing "pluffa" key configuration check your package.json\n'
+        'Pluffa.js configuration error.' +
+          '\nTo configure Pluffa.js you need one ot theese options:\n' +
+          '\n- A "pluffa" key in your package.json' +
+          '\n- A pluffa.json file in your directory'
       )
     )
     process.exit(1)
@@ -56,11 +54,11 @@ export async function getUserConfig(): Promise<Config> {
 
   cfg = { ...ConfigDefaults, ...cfg }
 
-  if (cfg.runtime === 'commonjs' || cfg.runtime === 'esm') {
+  if (cfg.runtime === 'node') {
     if (!(cfg.clientEntry && cfg.skeletonComponent && cfg.serverComponent)) {
       console.log(
         chalk.red(
-          'Pluffa config error:' +
+          'Pluffa.js config error:' +
             '\nYou have to configure at least:\n\n' +
             '"clientEntry"\n' +
             '"skeletonComponent"\n' +
@@ -71,11 +69,11 @@ export async function getUserConfig(): Promise<Config> {
       )
       process.exit(1)
     }
-  } else if (cfg.runtime === 'cloudflare-worker') {
+  } else if (cfg.runtime === 'cloudflare-workers') {
     if (!cfg.workerEntry || !cfg.clientEntry) {
       console.log(
         chalk.red(
-          'Pluffa config error:' +
+          'Pluffa.js config error:' +
             '\nYou have to configure at least:\n\n' +
             '"clientEntry"\n' +
             '"workerEntry"\n\n' +
@@ -88,13 +86,15 @@ export async function getUserConfig(): Promise<Config> {
   } else {
     console.log(
       chalk.red(
-        'Pluffa config error:' +
+        'Pluffa.js config error:' +
           `Invalid "runtime": "${cfg.runtime}"\n` +
           'check your package.josn\n'
       )
     )
     process.exit(1)
   }
+
+  ensureRuntimePkgsInstalled(cfg.runtime)
 
   return cfg as Config
 }

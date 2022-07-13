@@ -1,0 +1,110 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "anyOf": [
+        {
+            "properties": {
+                "clientEntry": {
+                    "type": "string"
+                },
+                "crawlConcurrency": {
+                    "type": "number"
+                },
+                "crawlEnabled": {
+                    "type": "boolean"
+                },
+                "exitStaticizeOnError": {
+                    "type": "boolean"
+                },
+                "nodeModule": {
+                    "enum": [
+                        "commonjs",
+                        "esm"
+                    ],
+                    "type": "string"
+                },
+                "outputDir": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "proxy": {
+                    "type": "string"
+                },
+                "publicDir": {
+                    "type": "string"
+                },
+                "registerStatik": {
+                    "type": "string"
+                },
+                "runtime": {
+                    "enum": [
+                        "node"
+                    ],
+                    "type": "string"
+                },
+                "serverComponent": {
+                    "type": "string"
+                },
+                "skeletonComponent": {
+                    "type": "string"
+                },
+                "statikDataDir": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "urls": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        {
+            "properties": {
+                "clientEntry": {
+                    "type": "string"
+                },
+                "miniflareConfig": {
+                    "$ref": "#/definitions/Record<string,any>"
+                },
+                "outputDir": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "publicDir": {
+                    "type": "string"
+                },
+                "runtime": {
+                    "enum": [
+                        "cloudflare-workers"
+                    ],
+                    "type": "string"
+                },
+                "workerEntry": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    ],
+    "definitions": {
+        "Record<string,any>": {
+            "type": "object"
+        }
+    }
+}
+

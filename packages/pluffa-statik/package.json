@@ -1,0 +1,54 @@
+{
+  "name": "@pluffa/statik",
+  "type": "module",
+  "description": "Pluffa statik",
+  "version": "0.1.0",
+  "exports": {
+    ".": {
+      "browser": {
+        "require": "./dist/statik.browser.cjs",
+        "import": "./dist/statik.browser.js"
+      },
+      "node": {
+        "require": "./dist/statik.node.cjs",
+        "import": "./dist/statik.node.js"
+      },
+      "default": "./dist/statik.browser.js"
+    },
+    "./runtime": {
+      "require": "./dist/runtime.cjs",
+      "import": "./dist/runtime.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/statik.d.ts"
+      ],
+      "runtime": [
+        "./dist/runtime.d.ts"
+      ]
+    }
+  },
+  "types": "./dist/statik.d.ts",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "static site"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "dependencies": {
+    "itty-router": "^2.4.10",
+    "mkdirp": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/mkdirp": "^1.0.2"
+  }
+}

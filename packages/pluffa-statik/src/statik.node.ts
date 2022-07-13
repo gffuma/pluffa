@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 import { StatikReqConfig } from './statik.js'
-import { getStatikDataDir, runStatik } from '../statikRuntime.js'
+import { getStatikDataDir, runStatik } from './runtime.js'
 
 export default async function statik(url: string, config?: StatikReqConfig) {
   const req = {

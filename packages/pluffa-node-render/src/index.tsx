@@ -50,7 +50,7 @@ export type AppComponent<Props> = ComponentType<AppProps & Props>
 
 export type SkeletonComponent<Props> = ComponentType<SkeletonProps & Props>
 
-export default async function render<StaticProps, HydrateSkeletonProps>(
+export async function render<StaticProps, HydrateSkeletonProps>(
   {
     App,
     getStaticProps,

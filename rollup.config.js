@@ -25,6 +25,50 @@ function createPluffaApp() {
   }))
 }
 
+function pluffaNodeRender() {
+  const baseDir = './packages/pluffa-node-render'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.tsx`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
+function pluffaEdgeRender() {
+  const baseDir = './packages/pluffa-edge-render'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.tsx`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
 function pluffaBuildTools() {
   const baseDir = './packages/pluffa-build-tools'
   return ['esm', 'cjs'].map((format) => ({
@@ -49,6 +93,52 @@ function pluffaBuildTools() {
 
 function pluffaEnv() {
   const baseDir = './packages/pluffa-env'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.ts`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
+function pluffaStatik() {
+  const baseDir = './packages/pluffa-statik'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      runtime: `${baseDir}/src/runtime.ts`,
+      'statik.browser': `${baseDir}/src/statik.browser.ts`,
+      'statik.node': `${baseDir}/src/statik.node.ts`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
+function pluffaNode() {
+  const baseDir = './packages/pluffa-node'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -96,7 +186,6 @@ function pluffaCloudflareWorker() {
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
-      render: `${baseDir}/src/render.tsx`,
     },
     output: {
       dir: `${baseDir}/dist`,
@@ -118,12 +207,7 @@ function pluffa() {
   const baseDir = './packages/pluffa'
   return ['esm', 'cjs'].map((format) => ({
     input: {
-      index: `${baseDir}/src/index.ts`,
       cli: `${baseDir}/src/cli.ts`,
-      render: `${baseDir}/src/render.tsx`,
-      'lib/statik.browser': `${baseDir}/src/lib/statik.browser.ts`,
-      'lib/statik.node': `${baseDir}/src/lib/statik.node.ts`,
-      'lib/crawl': `${baseDir}/src/lib/crawl.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,
@@ -144,9 +228,13 @@ function pluffa() {
 
 export default [
   ...createPluffaApp(),
+  ...pluffaNodeRender(),
+  ...pluffaEdgeRender(),
   ...pluffaBuildTools(),
   ...pluffaEnv(),
+  ...pluffaStatik(),
   ...pluffaCrawl(),
+  ...pluffaNode(),
   ...pluffaCloudflareWorker(),
   ...pluffa(),
 ]

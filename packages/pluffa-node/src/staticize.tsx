@@ -8,13 +8,13 @@ import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
-import render from './render.js'
+import { render } from '@pluffa/node-render'
 import {
   CrawlSession,
   createCrawlSession,
   CrawlContext,
 } from '@pluffa/crawl'
-import { RegisterStatik } from './statikRuntime.js'
+import { RegisterStatik } from '@pluffa/statik/runtime'
 
 const ncp = util.promisify(ncpCB)
 
@@ -160,7 +160,7 @@ export default async function staticize({
   // Configure Statik
   if (statikEnabled) {
     const { configureRegisterStatik, configureStatikDataDir } = (await import(
-      `./statikRuntime.${compileNodeCommonJS ? 'cjs' : 'js'}`
+      `@pluffa/statik/runtime.${compileNodeCommonJS ? 'cjs' : 'js'}`
     ).then(uniformExport)) as {
       configureStatikDataDir(dataDir: string): void
       configureRegisterStatik(register: RegisterStatik): void
