@@ -38,9 +38,9 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "@/env": "^0.2.0",
+    "@pluffa/env": "^0.2.0",
     "@cloudflare/workers-types": "^3.4.0",
-    "@/build-tools": "^0.8.0",
+    "@pluffa/build-tools": "^0.8.0",
     "chalk": "^5.0.0",
     "http-proxy-middleware": "^2.0.3",
     "miniflare": "^2.3.0",

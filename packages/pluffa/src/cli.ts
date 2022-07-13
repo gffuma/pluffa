@@ -60,7 +60,7 @@ program.command('build').action(async () => {
   process.env.NODE_ENV = 'production'
   if (config.runtime === 'cloudflare-worker') {
     ensurePluffaCloudflareWorkerInstalled()
-    const { buildForWorker } = await import('@pluffacloudflare-worker')
+    const { buildForWorker } = await import('@pluffa/cloudflare-worker')
     console.log()
     console.log('Creating an optimized build...')
     console.log()
