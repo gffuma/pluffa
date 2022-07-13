@@ -1,4 +1,4 @@
-import { SkeletonProps } from 'snext'
+import { SkeletonProps } from 'pluffa'
 
 export default function Skeleton({
   appHtml,

@@ -1,16 +1,16 @@
 {
   "private": true,
   "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
+    "dev": "pluffa dev",
+    "build": "pluffa build",
+    "staticize": "pluffa staticize"
   },
   "dependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "snext": "latest"
+    "pluffa": "latest"
   },
-  "snext": {
+  "pluffa": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/App.js",
     "skeletonComponent": "./src/Skeleton.js"

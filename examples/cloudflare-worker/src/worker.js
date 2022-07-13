@@ -1,4 +1,4 @@
-import render from '@snext/cloudflare-worker/render'
+import render from '@pluffa/cloudflare-worker/render'
 import { Router } from 'itty-router'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 import StaticApp, { getStaticProps } from './StaticApp'
@@ -33,7 +33,7 @@ router.all('*', async (req) => {
       getStaticProps,
     },
     {
-      entrypoints: SNEXT_BUNDLE_ENTRYPOINTS,
+      entrypoints: pluffa_BUNDLE_ENTRYPOINTS,
       url: urlParsed.pathname,
     }
   )

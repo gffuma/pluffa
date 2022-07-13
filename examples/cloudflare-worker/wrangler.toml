@@ -1,4 +1,4 @@
-name = "snext-cloudflare-worker-example"
+name = "pluffa-cloudflare-worker-example"
 type = "javascript"
 zone_id = ""
 route = ""

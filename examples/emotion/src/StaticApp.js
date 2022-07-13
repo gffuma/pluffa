@@ -13,7 +13,7 @@ export default function StaticApp({ cache }) {
 export function getStaticProps() {
   return {
     props: {
-      cache: createCache({ key: 'snext' }),
+      cache: createCache({ key: 'pluffa' }),
     },
   }
 }

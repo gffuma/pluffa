@@ -1,4 +1,4 @@
-import { AppProps, GetStaticProps, GetSkeletonProps } from 'snext'
+import { AppProps, GetStaticProps, GetSkeletonProps } from 'pluffa'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App'

@@ -2,8 +2,8 @@ import shebang from 'rollup-plugin-preserve-shebang'
 import typescript from '@rollup/plugin-typescript'
 import externals from 'rollup-plugin-node-externals'
 
-function createSnextApp() {
-  const baseDir = './packages/create-snext-app'
+function createPluffaApp() {
+  const baseDir = './packages/create-pluffa-app'
   return ['esm'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -25,8 +25,8 @@ function createSnextApp() {
   }))
 }
 
-function snextBuildTools() {
-  const baseDir = './packages/snext-build-tools'
+function pluffaBuildTools() {
+  const baseDir = './packages/pluffa-build-tools'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -47,8 +47,8 @@ function snextBuildTools() {
   }))
 }
 
-function snextEnv() {
-  const baseDir = './packages/snext-env'
+function pluffaEnv() {
+  const baseDir = './packages/pluffa-env'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -69,8 +69,8 @@ function snextEnv() {
   }))
 }
 
-function snextCrawl() {
-  const baseDir = './packages/snext-crawl'
+function pluffaCrawl() {
+  const baseDir = './packages/pluffa-crawl'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -91,8 +91,8 @@ function snextCrawl() {
   }))
 }
 
-function snextCloudflareWorker() {
-  const baseDir = './packages/snext-cloudflare-worker'
+function pluffaCloudflareWorker() {
+  const baseDir = './packages/pluffa-cloudflare-worker'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -114,8 +114,8 @@ function snextCloudflareWorker() {
   }))
 }
 
-function snext() {
-  const baseDir = './packages/snext'
+function pluffa() {
+  const baseDir = './packages/pluffa'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -143,10 +143,10 @@ function snext() {
 }
 
 export default [
-  ...createSnextApp(),
-  ...snextBuildTools(),
-  ...snextEnv(),
-  ...snextCrawl(),
-  ...snextCloudflareWorker(),
-  ...snext(),
+  ...createPluffaApp(),
+  ...pluffaBuildTools(),
+  ...pluffaEnv(),
+  ...pluffaCrawl(),
+  ...pluffaCloudflareWorker(),
+  ...pluffa(),
 ]
