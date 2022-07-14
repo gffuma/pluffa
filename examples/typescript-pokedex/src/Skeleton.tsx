@@ -1,4 +1,4 @@
-import { SkeletonProps } from 'pluffa'
+import { SkeletonProps } from '@pluffa/node-render'
 
 export default function Skeleton({
   appHtml,

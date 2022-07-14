@@ -18,7 +18,7 @@ program.command('dev').action(async () => {
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'development'
   if (config.runtime === 'cloudflare-workers') {
-    const { startWorkerDevServer } = await import('@pluffa/cloudflare-worker')
+    const { startWorkerDevServer } = await import('@pluffa/cloudflare-workers')
     startWorkerDevServer({
       ...config,
       useTypescript,
@@ -39,7 +39,7 @@ program.command('build').action(async () => {
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'production'
   if (config.runtime === 'cloudflare-workers') {
-    const { buildForWorker } = await import('@pluffa/cloudflare-worker')
+    const { buildForWorker } = await import('@pluffa/cloudflare-workers')
     console.log()
     console.log('Creating an optimized build...')
     console.log()

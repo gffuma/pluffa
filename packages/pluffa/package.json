@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.31",
-    "@pluffa/cloudflare-worker": "^0.11.1"
+    "@pluffa/cloudflare-workers": "^0.11.1"
   },
   "peerDependencies": {
     "react": "^18.0.0",

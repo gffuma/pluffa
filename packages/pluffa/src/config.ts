@@ -15,7 +15,7 @@ const ConfigDefaults: Partial<Config> = {
   exitStaticizeOnError: false,
   crawlEnabled: true,
   productionServePublicAssets: true,
-  productionServeStaticAssets: true
+  productionServeStaticAssets: true,
 }
 
 const require = createRequire(import.meta.url)
@@ -69,7 +69,7 @@ export async function getUserConfig(): Promise<Config> {
             '"skeletonComponent"\n' +
             '"serverComponent"\n\n' +
             `for "runtime": "${cfg.runtime}"\n` +
-            'check your package.josn\n'
+            'Check your configuration\n'
         )
       )
       process.exit(1)
@@ -83,7 +83,7 @@ export async function getUserConfig(): Promise<Config> {
             '"clientEntry"\n' +
             '"workerEntry"\n\n' +
             `for "runtime": "${cfg.runtime}"\n` +
-            'check your package.josn\n'
+            'Check your configuration.\n'
         )
       )
       process.exit(1)
@@ -91,9 +91,9 @@ export async function getUserConfig(): Promise<Config> {
   } else {
     console.log(
       chalk.red(
-        'Pluffa.js config error:' +
-          `Invalid "runtime": "${cfg.runtime}"\n` +
-          'check your package.josn\n'
+        'Pluffa.js config error. ' +
+          `Invalid runtime "${cfg.runtime}".\n` +
+          'Check your configuration.\n'
       )
     )
     process.exit(1)

@@ -33,7 +33,7 @@ export default function App() {
           color: hotpink;
         `}
       >
-        Emotion + pluffa.js = ❤️
+        Emotion + Pluffa.js = ❤️
       </h1>
       <Image src={logo} />
     </div>

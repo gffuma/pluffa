@@ -107,6 +107,32 @@ async function processURLs(
   }
 }
 
+function informMissingBuildStep() {
+  console.error(
+    chalk.red(
+      'Pluffa.js error you need to build your project before run staticize.\n'
+    )
+  )
+}
+
+function handleImportError(err: any): never {
+  if (err.code === 'ERR_MODULE_NOT_FOUND') {
+    informMissingBuildStep()
+  }
+  throw err
+}
+
+function handleFileNotFoundError(err: any): never {
+  if (
+    Array.isArray(err)
+      ? err.some((e) => e.code === 'ENOENT')
+      : err.code === 'ENOENT'
+  ) {
+    informMissingBuildStep()
+  }
+  throw err
+}
+
 export default async function staticize({
   outputDir,
   publicDir,
@@ -136,15 +162,25 @@ export default async function staticize({
   const buildNodePath = path.resolve(process.cwd(), '.pluffa/node')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
-  // Remove stale ourput
-  rimraf.sync(outPath)
-  // Copy public
-  await ncp(publicPath, outPath)
-  // Copy static from builded client
-  await ncp(path.join(buildClientPath, 'static'), path.join(outPath, 'static'))
+  try {
+    // Remove stale ourput
+    rimraf.sync(outPath)
+    // Copy public
+    await ncp(publicPath, outPath)
+    // Copy static from builded client
+    await ncp(
+      path.join(buildClientPath, 'static'),
+      path.join(outPath, 'static')
+    )
+  } catch (err) {
+    handleFileNotFoundError(err)
+  }
+
   // Read build manifest
   const manifest = JSON.parse(
-    await fs.readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
+    await fs
+      .readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
+      .catch(handleFileNotFoundError)
   )
 
   // NOTE: Set a flag so we can do different stuff during staticize
@@ -170,7 +206,9 @@ export default async function staticize({
 
     const { default: registerStatik } = await import(
       path.join(buildNodePath, `statik.${buildImportExt}`)
-    ).then(uniformExport)
+    )
+      .catch(handleImportError)
+      .then(uniformExport)
 
     configureRegisterStatik(registerStatik)
     if (statikDataDir !== false) {
@@ -183,10 +221,12 @@ export default async function staticize({
     default: App,
     getSkeletonProps,
     getStaticProps,
-  } = await import(appPath).then(uniformExport)
+  } = await import(appPath).catch(handleImportError).then(uniformExport)
 
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
-  const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
+  const { default: Skeleton } = await import(skeletonPath)
+    .catch(handleImportError)
+    .then(uniformExport)
 
   const { succeded, failedUrls } = await processURLs(urls, crawlConcurrency, {
     exitOnError,

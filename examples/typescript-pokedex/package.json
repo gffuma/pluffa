@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "start": "pluffa start",
     "dev": "pluffa dev",
     "build": "pluffa build",
     "staticize": "pluffa staticize"

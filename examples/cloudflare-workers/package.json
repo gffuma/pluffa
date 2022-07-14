@@ -9,7 +9,7 @@
   "pluffa": {
     "workerEntry": "./src/worker.js",
     "clientEntry": "./src/index.js",
-    "runtime": "cloudflare-worker"
+    "runtime": "cloudflare-workers"
   },
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.2.0",

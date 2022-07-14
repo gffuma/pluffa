@@ -23,6 +23,28 @@ function createDefaultServer() {
   return app
 }
 
+function informMissingBuildStep() {
+  console.error(
+    chalk.red(
+      'Pluffa.js error you need to build your project before start production server.\n'
+    )
+  )
+}
+
+function handleImportError(err: any): never {
+  if (err.code === 'ERR_MODULE_NOT_FOUND') {
+    informMissingBuildStep()
+  }
+  throw err
+}
+
+function handleFileNotFoundError(err: any): never {
+  if (err.code === 'ENOENT') {
+    informMissingBuildStep()
+  }
+  throw err
+}
+
 export default async function createProdServer({
   createServer = createDefaultServer,
   publicDir,
@@ -58,14 +80,18 @@ export default async function createProdServer({
     default: App,
     getSkeletonProps,
     getStaticProps,
-  } = await import(appPath).then(uniformExport)
+  } = await import(appPath).catch(handleImportError).then(uniformExport)
 
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
-  const { default: Skeleton } = await import(skeletonPath).then(uniformExport)
+  const { default: Skeleton } = await import(skeletonPath)
+    .catch(handleImportError)
+    .then(uniformExport)
 
   // Read build manifest
   const manifest = JSON.parse(
-    await fs.readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
+    await fs
+      .readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
+      .catch(handleFileNotFoundError)
   )
 
   // NOTE: We Inject the current user code for registerStatik
@@ -83,7 +109,9 @@ export default async function createProdServer({
     const { configureRegisterStatik, runStatik } = await getStatikRunTime()
     const { default: registerStatik } = await import(
       path.join(buildNodePath, `statik.${buildImportExt}`)
-    ).then(uniformExport)
+    )
+      .catch(handleImportError)
+      .then(uniformExport)
     configureRegisterStatik(registerStatik)
 
     const statikDaraUrl = statikDataDir.startsWith('/')

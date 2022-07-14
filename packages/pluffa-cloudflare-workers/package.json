@@ -1,5 +1,5 @@
 {
-  "name": "@pluffa/cloudflare-worker",
+  "name": "@pluffa/cloudflare-workers",
   "type": "module",
   "description": "Pluffa on cloudflare workers",
   "version": "0.11.1",
@@ -7,10 +7,6 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./render": {
-      "require": "./dist/render.cjs",
-      "import": "./dist/render.js"
     }
   },
   "typesVersions": {
@@ -29,7 +25,7 @@
   "files": [
     "dist"
   ],
-  "repository": "gffuma/",
+  "repository": "gffuma/pluffa",
   "keywords": [
     "react",
     "static site"
@@ -38,12 +34,12 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "@pluffa/env": "^0.2.0",
     "@cloudflare/workers-types": "^3.4.0",
     "@pluffa/build-tools": "^0.8.0",
+    "@pluffa/env": "^0.2.0",
     "chalk": "^5.0.0",
     "http-proxy-middleware": "^2.0.3",
-    "miniflare": "^2.3.0",
+    "miniflare": "^2.6.0",
     "ncp": "^2.0.0",
     "process": "^0.11.10",
     "rimraf": "^3.0.2",
