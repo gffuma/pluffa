@@ -181,8 +181,8 @@ function pluffaCrawl() {
   }))
 }
 
-function pluffaCloudflareWorker() {
-  const baseDir = './packages/pluffa-cloudflare-worker'
+function pluffaCloudflareWorkers() {
+  const baseDir = './packages/pluffa-cloudflare-workers'
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
@@ -235,6 +235,6 @@ export default [
   ...pluffaStatik(),
   ...pluffaCrawl(),
   ...pluffaNode(),
-  ...pluffaCloudflareWorker(),
+  ...pluffaCloudflareWorkers(),
   ...pluffa(),
 ]

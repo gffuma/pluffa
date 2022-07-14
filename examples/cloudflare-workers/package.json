@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.2.0",
-    "@pluffa/cloudflare-worker": "latest",
+    "@pluffa/cloudflare-workers": "latest",
     "itty-router": "^2.5.1",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-query": "^3.35.0",
-    "pluffa": "latest"
+    "pluffa": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-query": "^3.39.1"
   }
 }

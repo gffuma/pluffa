@@ -1,5 +1,7 @@
 {
+  "$schema": "https://cdn.giova.fun/pluffa/schema.json",
   "runtime": "node",
   "clientEntry": "./src/index.js",
+  "serverComponent": "./src/App.js",
   "skeletonComponent": "./src/Skeleton.js"
 }
