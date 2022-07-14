@@ -2,7 +2,7 @@
   "name": "pluffa",
   "type": "module",
   "description": "Build sites with React",
-  "version": "0.19.0",
+  "version": "0.1.0",
   "author": "Giovanni Fumagalli",
   "license": "MIT",
   "bin": {
@@ -18,13 +18,13 @@
     "static site"
   ],
   "dependencies": {
-    "chalk": "^5.0.0",
-    "commander": "^9.0.0",
-    "http-proxy-middleware": "^2.0.3"
+    "chalk": "^5.0.1",
+    "commander": "^9.3.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.31",
-    "@pluffa/cloudflare-workers": "^0.11.1"
+    "@pluffa/cloudflare-workers": "^0.1.0",
+    "@pluffa/node": "^0.1.0",
+    "@types/node": "^18.0.4"
   },
   "peerDependencies": {
     "react": "^18.0.0",
