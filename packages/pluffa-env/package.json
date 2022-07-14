@@ -1,0 +1,36 @@
+{
+  "name": "@pluffa/env",
+  "type": "module",
+  "description": "Pluffa meta package to handle env vars",
+  "version": "0.1.0",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "static site"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1"
+  }
+}

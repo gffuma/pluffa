@@ -1,4 +1,4 @@
-import { SkeletonProps } from 'snext'
+import { SkeletonProps } from '@pluffa/node-render'
 
 export default function Skeleton({
   appHtml,

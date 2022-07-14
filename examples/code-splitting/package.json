@@ -1,18 +1,19 @@
 {
   "private": true,
   "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
+    "dev": "pluffa dev",
+    "start": "pluffa start",
+    "build": "pluffa build",
+    "staticize": "pluffa staticize"
   },
   "dependencies": {
     "qrcode.react": "^3.0.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
-    "snext": "latest"
+    "pluffa": "latest"
   },
-  "snext": {
+  "pluffa": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
     "skeletonComponent": "./src/Skeleton.js"

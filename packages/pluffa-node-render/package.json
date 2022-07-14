@@ -1,0 +1,45 @@
+{
+  "name": "@pluffa/node-render",
+  "type": "module",
+  "description": "Pluffa render runtime for Node.js",
+  "version": "0.1.0",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "static site"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "dependencies": {
+    "stream-buffers": "^3.0.2"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@types/stream-buffers": "^3.0.4"
+  }
+}

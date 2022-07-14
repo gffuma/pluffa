@@ -1,5 +1,5 @@
 /node_modules
-/.snext
+/.pluffa
 /build
 
 npm-debug.log*

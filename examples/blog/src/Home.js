@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet'
 import { useQuery } from 'react-query'
 import jolteon from './jolteon.jpg'
 import { ReactComponent as Rocket } from './rocket.svg'
-import statik from 'snext/statik'
+import statik from '@pluffa/statik'
 import { Link } from 'react-router-dom'
 
 function Post({ title, slug }) {

@@ -5,17 +5,19 @@
   ],
   "scripts": {
     "build": "rimraf ./packages/**/dist && rollup -c",
-    "build:watch": "rimraf ./packages/**/dist && rollup -c -w"
+    "build:watch": "rimraf ./packages/**/dist && rollup -c -w",
+    "schema": "typescript-json-schema -o schema.json ./packages/pluffa/src/types.ts Config"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.67.1",
-    "rollup-plugin-node-externals": "^4.0.0",
+    "rollup": "^2.76.0",
+    "rollup-plugin-node-externals": "^4.1.1",
     "rollup-plugin-preserve-shebang": "^1.0.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4",
+    "typescript-json-schema": "^0.54.0"
   }
 }

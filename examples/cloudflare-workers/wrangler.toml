@@ -1,0 +1,16 @@
+name = "pluffa-cloudflare-worker-example"
+type = "javascript"
+zone_id = ""
+route = ""
+workers_dev = true
+compatibility_date = "2022-02-27"
+
+[build]
+command = "yarn build"
+
+[build.upload]
+format = "service-worker"
+
+[site]
+bucket = "./build/client"
+entry-point = "."

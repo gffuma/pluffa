@@ -1,0 +1,36 @@
+{
+  "name": "pluffa",
+  "type": "module",
+  "description": "Build sites with React",
+  "version": "0.1.0",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "bin": {
+    "pluffa": "bootstrap.cjs"
+  },
+  "files": [
+    "dist",
+    "bootstrap.cjs"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "static site"
+  ],
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "commander": "^9.3.0"
+  },
+  "devDependencies": {
+    "@pluffa/cloudflare-workers": "^0.1.0",
+    "@pluffa/node": "^0.1.0",
+    "@types/node": "^18.0.4"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "engines": {
+    "node": ">=16.7"
+  }
+}

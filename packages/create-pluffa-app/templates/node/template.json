@@ -1,0 +1,13 @@
+{
+  "package": {
+    "scripts": {
+      "dev": "pluffa dev",
+      "build": "pluffa build",
+      "start": "pluffa start",
+      "staticize": "pluffa staticize"
+    }
+  },
+  "install": {
+    "devDependencies": ["@pluffa/node"]
+  }
+}

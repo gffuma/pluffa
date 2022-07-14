@@ -1,9 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
+    "dev": "pluffa dev",
+    "start": "pluffa start",
+    "build": "pluffa build",
+    "staticize": "pluffa staticize"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -11,9 +12,9 @@
     "@emotion/styled": "^11.8.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "snext": "latest"
+    "pluffa": "latest"
   },
-  "snext": {
+  "pluffa": {
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",
     "skeletonComponent": "./src/Skeleton.js"

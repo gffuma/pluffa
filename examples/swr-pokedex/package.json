@@ -1,19 +1,20 @@
 {
   "private": true,
   "scripts": {
-    "dev": "snext dev",
-    "build": "snext build",
-    "staticize": "snext staticize"
+    "dev": "pluffa dev",
+    "start": "pluffa start",
+    "build": "pluffa build",
+    "staticize": "pluffa staticize"
   },
   "dependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.2.1",
-    "snext": "latest",
+    "pluffa": "latest",
     "superagent": "^7.1.1",
     "swr": "^1.3.0"
   },
-  "snext": {
+  "pluffa": {
     "crawlConcurrency": 1,
     "clientEntry": "./src/index.js",
     "serverComponent": "./src/StaticApp.js",

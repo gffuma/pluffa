@@ -1,0 +1,24 @@
+{
+  "name": "create-pluffa-app",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Create Pluffa App",
+  "license": "MIT",
+  "author": "Giovanni Fumagalli",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "bin": {
+    "create-pluffa-app": "dist/index.js"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.2"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "commander": "^9.3.0",
+    "cross-spawn": "^7.0.3",
+    "ncp": "^2.0.0"
+  }
+}
