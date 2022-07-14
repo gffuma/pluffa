@@ -1,0 +1,5 @@
+{
+  "runtime": "node",
+  "clientEntry": "./src/index.tsx",
+  "skeletonComponent": "./src/Skeleton.tsx"
+}

@@ -21,7 +21,7 @@ const program = new Command()
   .version(pkg.version)
   .description(pkg.description)
   .argument('<app_name>', 'The name of your app')
-  .option('-ts --typescript', 'Use Typescript', false)
+  .option('-t --template <template>', 'Template name', 'node')
   .action(async (appName) => {
     try {
       await createApp({

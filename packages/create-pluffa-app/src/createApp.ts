@@ -66,13 +66,44 @@ function install({
   })
 }
 
+interface TemplateConfig {
+  // Inject pkg json...
+  package: Record<string, any>
+  install?: {
+    devDependencies?: string[]
+    dependencies?: string[]
+  }
+}
+
 export default async function createApp({
   appName,
-  typescript: useTypescript,
+  template,
 }: {
   appName: string
-  typescript: boolean
+  template: string
 }) {
+  const templatesPath = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../templates'
+  )
+  const templatePath = path.join(templatesPath, template)
+
+  // Validate template name
+  try {
+    await fs.access(templatePath)
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      console.error(chalk.red(`Invalid template name: ${template}`))
+      process.exit(1)
+      return
+    }
+    throw err
+  }
+
+  const templateConfig = (await JSON.parse(
+    await fs.readFile(path.join(templatePath, 'template.json'), 'utf-8')
+  )) as TemplateConfig
+
   const baseDir = path.resolve(process.cwd(), appName)
   const appNameClean = path.basename(appName)
 
@@ -81,41 +112,21 @@ export default async function createApp({
   console.log()
 
   await fs.mkdir(baseDir)
-  const fileExt = useTypescript ? 'tsx' : 'js'
+
+  const appPkg = {
+    name: appNameClean,
+    private: true,
+    ...templateConfig?.package,
+  } as Record<string, any>
 
   await fs.writeFile(
     path.join(baseDir, 'package.json'),
-    JSON.stringify(
-      {
-        name: appNameClean,
-        private: true,
-        scripts: {
-          dev: 'pluffa dev',
-          build: 'pluffa build',
-          staticize: 'pluffa staticize',
-        },
-        pluffa: {
-          clientEntry: `./src/index.${fileExt}`,
-          serverComponent: `./src/App.${fileExt}`,
-          skeletonComponent: `./src/Skeleton.${fileExt}`,
-        },
-      },
-      null,
-      2
-    )
+    JSON.stringify(appPkg, null, 2)
   )
 
-  let templatePath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '../templates'
-  )
-  if (useTypescript) {
-    templatePath = path.join(templatePath, 'typescript')
-  } else {
-    templatePath = path.join(templatePath, 'default')
-  }
-
-  await ncp(templatePath, baseDir)
+  await ncp(templatePath, baseDir, {
+    filter: /^(?!.*template\.json).*$/,
+  })
   await fs.rename(
     path.resolve(baseDir, 'gitignore'),
     path.resolve(baseDir, '.gitignore')
@@ -125,14 +136,18 @@ export default async function createApp({
   console.log('Installing dependencies...')
   console.log()
 
+  const deps = ['react', 'react-dom']
+  if (templateConfig.install?.dependencies) {
+    deps.push(...templateConfig.install.dependencies)
+  }
   await install({
     cwd: baseDir,
-    deps: ['react', 'react-dom'],
+    deps,
     dev: false,
   })
   const devDeps = ['pluffa']
-  if (useTypescript) {
-    devDeps.push('@types/react', '@types/node', '@types/react-dom')
+  if (templateConfig.install?.devDependencies) {
+    devDeps.push(...templateConfig.install.devDependencies)
   }
   await install({
     cwd: baseDir,
@@ -145,22 +160,34 @@ export default async function createApp({
   console.log(`G4ng! created ${appNameClean} at ${baseDir}`)
   console.log('Some hints to beat the dragon:')
   console.log()
-  console.log(space(2) + chalk.blue(`${friendlyRunCmd} dev`))
-  console.log(space(4) + 'Starts the development server.')
-  console.log()
-  console.log(space(2) + chalk.blue(`${friendlyRunCmd} build`))
-  console.log(
-    space(4) + 'Bundles the app into static and node files for production.'
-  )
-  console.log()
-  console.log(space(2) + chalk.blue(`${friendlyRunCmd} staticize`))
-  console.log(space(4) + 'Using your bundled app make a static site by')
-  console.log(
-    space(4) +
-      'recursively crawling all links generated ' +
-      'during server side rendering.'
-  )
-  console.log()
+  if (typeof appPkg?.scripts?.dev === 'string') {
+    console.log(space(2) + chalk.blue(`${friendlyRunCmd} dev`))
+    console.log(space(4) + 'Starts a development server with hot reload.')
+    console.log()
+  }
+  if (typeof appPkg?.scripts?.build === 'string') {
+    console.log(space(2) + chalk.blue(`${friendlyRunCmd} build`))
+    console.log(
+      space(4) +
+        'Bundles the app into static and js runtimes files for production.'
+    )
+    console.log()
+  }
+  if (typeof appPkg?.scripts?.staticize === 'string') {
+    console.log(space(2) + chalk.blue(`${friendlyRunCmd} staticize`))
+    console.log(space(4) + 'Using your bundled app make a static site by')
+    console.log(
+      space(4) +
+        'recursively crawling all links generated ' +
+        'during server side rendering.'
+    )
+    console.log()
+  }
+  if (typeof appPkg?.scripts?.start === 'string') {
+    console.log(space(2) + chalk.blue(`${friendlyRunCmd} start`))
+    console.log(space(4) + 'Start a production server.')
+    console.log()
+  }
   console.log('"oh shit here we go again"')
   console.log()
   console.log(space(2) + `${chalk.blue('cd')} ${appName}`)
