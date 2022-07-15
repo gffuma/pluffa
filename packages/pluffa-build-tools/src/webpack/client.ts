@@ -37,6 +37,7 @@ type WebPackEntry = Configuration['entry']
 
 export interface GetWebPackClientConfigOptions {
   clientEntry: WebPackEntry
+  sourceMapEnabled?: boolean
   useTypescript: boolean
   isProd: boolean
   statikDataUrl: string | false
@@ -74,6 +75,7 @@ export function getWebPackClientConfig({
   clientEntry,
   useTypescript,
   isProd,
+  sourceMapEnabled = true,
   statikDataUrl,
 }: GetWebPackClientConfigOptions): Configuration {
   return {
@@ -81,7 +83,11 @@ export function getWebPackClientConfig({
     mode: isProd ? 'production' : 'development',
     target: 'web',
     entry: isProd ? clientEntry : injectHotMiddlewareInEntry(clientEntry),
-    devtool: isProd ? 'source-map' : 'eval-cheap-module-source-map',
+    devtool: sourceMapEnabled
+      ? isProd
+        ? 'source-map'
+        : 'eval-cheap-module-source-map'
+      : false,
     output: {
       path: isProd ? path.resolve(process.cwd(), '.pluffa/client') : undefined,
       filename: isProd

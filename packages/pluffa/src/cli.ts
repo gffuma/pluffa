@@ -21,6 +21,7 @@ program.command('dev').action(async () => {
     const { startWorkerDevServer } = await import('@pluffa/cloudflare-workers')
     startWorkerDevServer({
       ...config,
+      clientSourceMapEnabled: config.clientSourceMap,
       useTypescript,
     })
   } else {
@@ -28,6 +29,7 @@ program.command('dev').action(async () => {
     startDevServer({
       ...config,
       useTypescript,
+      clientSourceMapEnabled: config.clientSourceMap,
       compileNodeCommonJS: config.nodeModule === 'commonjs',
     })
   }
@@ -45,6 +47,9 @@ program.command('build').action(async () => {
     console.log()
     buildForWorker({
       ...config,
+      clientEntry: config.productionClientEntry ?? config.clientEntry,
+      clientSourceMapEnabled:
+        config.productionClientSourceMap ?? config.clientSourceMap,
       useTypescript,
     })
   } else {
@@ -54,6 +59,9 @@ program.command('build').action(async () => {
     console.log()
     build({
       ...config,
+      clientEntry: config.productionClientEntry ?? config.clientEntry,
+      clientSourceMapEnabled:
+        config.productionClientSourceMap ?? config.clientSourceMap,
       compileNodeCommonJS: config.nodeModule === 'commonjs',
       useTypescript,
     })

@@ -4,7 +4,23 @@
         {
             "properties": {
                 "clientEntry": {
-                    "type": "string"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/definitions/Record<string,any>"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "clientSourceMap": {
+                    "type": "boolean"
                 },
                 "crawlConcurrency": {
                     "type": "number"
@@ -27,6 +43,25 @@
                 },
                 "port": {
                     "type": "number"
+                },
+                "productionClientEntry": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/definitions/Record<string,any>"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "productionClientSourceMap": {
+                    "type": "boolean"
                 },
                 "productionProxy": {
                     "type": "string"
@@ -83,7 +118,23 @@
         {
             "properties": {
                 "clientEntry": {
-                    "type": "string"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/definitions/Record<string,any>"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "clientSourceMap": {
+                    "type": "boolean"
                 },
                 "miniflareConfig": {
                     "$ref": "#/definitions/Record<string,any>"
@@ -93,6 +144,25 @@
                 },
                 "port": {
                     "type": "number"
+                },
+                "productionClientEntry": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/definitions/Record<string,any>"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "productionClientSourceMap": {
+                    "type": "boolean"
                 },
                 "publicDir": {
                     "type": "string"

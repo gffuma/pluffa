@@ -71,6 +71,10 @@ export default async function createProdServer({
     app.use('/static', express.static(path.resolve(buildClientPath, 'static')))
   }
 
+  // NOTE: Ok, this should be do better but for now as workaround
+  // expose them as env var...
+  process.env.PLUFFA_BUILD_CLIENT_PATH = buildClientPath
+
   // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
 

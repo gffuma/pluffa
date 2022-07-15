@@ -2,7 +2,7 @@ import path from 'path'
 import ncpCB from 'ncp'
 import fs from 'fs/promises'
 import util from 'util'
-import webpack from 'webpack'
+import webpack, { Configuration } from 'webpack'
 import rimraf from 'rimraf'
 import {
   getFlatEntrypointsFromWebPackStats,
@@ -13,8 +13,11 @@ import { setUpEnv } from '@pluffa/env'
 
 const ncp = util.promisify(ncpCB)
 
+type WebPackEntry = Configuration['entry']
+
 export interface BuildForWorkerOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
+  clientSourceMapEnabled?: boolean
   workerEntry: string
   useTypescript: boolean
   outputDir: string
@@ -27,6 +30,7 @@ export default async function buildForWorker({
   useTypescript,
   outputDir,
   publicDir,
+  clientSourceMapEnabled = true
 }: BuildForWorkerOptions) {
   const libOutPath = path.resolve(process.cwd(), '.pluffa')
   const buildOutPath = path.resolve(process.cwd(), outputDir)
@@ -45,6 +49,7 @@ export default async function buildForWorker({
       useTypescript,
       clientEntry,
       statikDataUrl: false,
+      sourceMapEnabled: clientSourceMapEnabled,
     }),
     getWebPackWorkerConfig({
       isProd,

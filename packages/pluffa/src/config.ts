@@ -16,6 +16,7 @@ const ConfigDefaults: Partial<Config> = {
   crawlEnabled: true,
   productionServePublicAssets: true,
   productionServeStaticAssets: true,
+  clientSourceMap: true,
 }
 
 const require = createRequire(import.meta.url)

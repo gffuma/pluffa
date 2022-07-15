@@ -2,7 +2,7 @@
   "name": "@pluffa/node",
   "type": "module",
   "description": "Pluffa on Node.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -29,7 +29,7 @@
     "static site"
   ],
   "dependencies": {
-    "@pluffa/build-tools": "^0.1.0",
+    "@pluffa/build-tools": "^0.2.0",
     "@pluffa/crawl": "^0.1.0",
     "@pluffa/env": "^0.1.0",
     "@pluffa/statik": "^0.1.0",

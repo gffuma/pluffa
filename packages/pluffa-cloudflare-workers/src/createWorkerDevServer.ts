@@ -1,10 +1,13 @@
-import webpack from 'webpack'
+import webpack, { Configuration } from 'webpack'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import { getWebPackClientConfig, createBaseDevServer } from '@pluffa/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
 
+type WebPackEntry = Configuration['entry']
+
 export interface createWorkerDevServerOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
+  clientSourceMapEnabled?: boolean
   workerEntry: string
   publicDir: string | false
   port: number
@@ -20,6 +23,7 @@ export default function createWokerDevServer({
   publicDir,
   miniflareUrl,
   startMiniFlare,
+  clientSourceMapEnabled = true,
 }: createWorkerDevServerOptions) {
   const isProd = false
 
@@ -29,6 +33,7 @@ export default function createWokerDevServer({
       clientEntry,
       statikDataUrl: false,
       useTypescript,
+      sourceMapEnabled: clientSourceMapEnabled,
     }),
     getWebPackWorkerConfig({
       isProd,

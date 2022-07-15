@@ -1,7 +1,13 @@
+// TODO: Improve note 100% correct should be a subset of webpack
+// Configuration['entry']
+type Entry = string | string[] | Record<string, any>
 
 export type Config =
   | {
-      clientEntry: string
+      clientEntry: Entry
+      productionClientEntry?: Entry
+      clientSourceMap?: boolean,
+      productionClientSourceMap?: boolean,
       skeletonComponent: string
       serverComponent: string
       runtime: 'node'
@@ -24,7 +30,10 @@ export type Config =
       workerEntry: string
       runtime: 'cloudflare-workers'
       port: number
-      clientEntry: string
+      clientEntry: Entry
+      clientSourceMap?: boolean,
+      productionClientSourceMap?: boolean,
+      productionClientEntry?: Entry
       outputDir: string
       publicDir: string
       miniflareConfig?: Record<string, any>

@@ -162,6 +162,10 @@ export default async function staticize({
   const buildNodePath = path.resolve(process.cwd(), '.pluffa/node')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
+  // NOTE: Ok, this should be do better but for now as workaround
+  // expose them as env var...
+  process.env.PLUFFA_BUILD_CLIENT_PATH = buildClientPath
+
   try {
     // Remove stale ourput
     rimraf.sync(outPath)

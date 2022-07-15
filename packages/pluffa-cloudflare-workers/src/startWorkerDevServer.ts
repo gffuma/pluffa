@@ -1,11 +1,15 @@
 import path from 'path'
 import chalk from 'chalk'
+import { Configuration } from 'webpack'
 import { Log, LogLevel, Miniflare, MiniflareOptions } from 'miniflare'
 import { setUpEnv } from '@pluffa/env'
 import createWorkerDevServer from './createWorkerDevServer'
 
+type WebPackEntry = Configuration['entry']
+
 export interface StartWorkerDevServerOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
+  clientSourceMapEnabled?: boolean
   workerEntry: string
   publicDir: string | false
   port: number
@@ -22,11 +26,13 @@ export default function startWokerDevServer({
   publicDir,
   port,
   miniflareConfig = {},
+  clientSourceMapEnabled = true,
 }: StartWorkerDevServerOptions) {
   setUpEnv({ isProd: false })
   const app = createWorkerDevServer({
     port,
     clientEntry,
+    clientSourceMapEnabled,
     workerEntry,
     publicDir,
     miniflareUrl: `http://localhost:${MINIFLARE_PORT}`,

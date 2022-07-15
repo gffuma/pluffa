@@ -1,4 +1,4 @@
-import webpack from 'webpack'
+import webpack, { Configuration } from 'webpack'
 import {
   getWebPackClientConfig,
   getWebPackNodeConfig,
@@ -7,8 +7,11 @@ import createDevServer from './createDevServer.js'
 import chalk from 'chalk'
 import { setUpEnv } from '@pluffa/env'
 
+type WebPackEntry = Configuration['entry']
+
 export interface StartDevServerOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
+  clientSourceMapEnabled?: boolean
   serverComponent: string
   skeletonComponent: string
   registerStatik?: string
@@ -21,6 +24,7 @@ export interface StartDevServerOptions {
 
 export default function startDevServer({
   clientEntry,
+  clientSourceMapEnabled = true,
   serverComponent,
   skeletonComponent,
   registerStatik,
@@ -39,6 +43,7 @@ export default function startDevServer({
       useTypescript,
       clientEntry,
       statikDataUrl: false,
+      sourceMapEnabled: clientSourceMapEnabled,
     }),
     getWebPackNodeConfig({
       isProd,

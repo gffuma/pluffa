@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
-import webpack from 'webpack'
+import webpack, { Configuration } from 'webpack'
 import rimraf from 'rimraf'
 import {
   getFlatEntrypointsFromWebPackStats,
@@ -9,8 +9,11 @@ import {
 } from '@pluffa/build-tools'
 import { setUpEnv } from '@pluffa/env'
 
+type WebPackEntry = Configuration['entry']
+
 export interface BuildOptions {
-  clientEntry: string
+  clientEntry: WebPackEntry
+  clientSourceMapEnabled?: boolean
   serverComponent: string
   skeletonComponent: string
   registerStatik?: string
@@ -27,6 +30,7 @@ export default function build({
   useTypescript,
   compileNodeCommonJS,
   statikDataDir,
+  clientSourceMapEnabled = true
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.pluffa'))
 
@@ -47,6 +51,7 @@ export default function build({
       useTypescript,
       clientEntry,
       statikDataUrl,
+      sourceMapEnabled: clientSourceMapEnabled
     }),
     getWebPackNodeConfig({
       compileNodeCommonJS,
