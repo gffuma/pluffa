@@ -20,6 +20,7 @@ export interface BuildOptions {
   compileNodeCommonJS: boolean
   useTypescript: boolean
   statikDataDir: string | false
+  useSwc?: boolean
 }
 
 export default function build({
@@ -30,7 +31,8 @@ export default function build({
   useTypescript,
   compileNodeCommonJS,
   statikDataDir,
-  clientSourceMapEnabled = true
+  useSwc = false,
+  clientSourceMapEnabled = true,
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.pluffa'))
 
@@ -60,6 +62,7 @@ export default function build({
       skeletonComponent,
       useTypescript,
       registerStatik,
+      useSwc,
     }),
   ])
 

@@ -9,6 +9,7 @@ interface GetWebPackWorkerConfigOptions {
   useTypescript: boolean
   workerEntry: string
   clientEntry: WebPackEntry
+  useSwc: boolean
 }
 
 // NOTE: For now we stick to this very ugly workaround we calculate
@@ -37,6 +38,7 @@ export function getWebPackWorkerConfig({
   useTypescript,
   workerEntry,
   clientEntry,
+  useSwc,
 }: GetWebPackWorkerConfigOptions): Configuration {
   return {
     name: 'server',
@@ -58,6 +60,7 @@ export function getWebPackWorkerConfig({
         useTypescript,
         isClient: false,
         isProd,
+        useSwc,
       }),
     },
     resolve: {

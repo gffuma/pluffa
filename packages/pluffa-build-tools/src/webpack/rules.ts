@@ -82,16 +82,117 @@ export function getWebPackStyleRule({
   }
 }
 
+export interface GetWebPackCodeRulesOptions {
+  useTypescript: boolean
+  isProd: boolean
+  isClient: boolean
+  useSwc: boolean
+}
+
+export function getWebPackCodeRules({
+  useTypescript,
+  useSwc,
+  isClient,
+  isProd,
+}: GetWebPackCodeRulesOptions): RuleSetRule {
+  if (isClient) {
+    // JavaScript running in the broswer
+    if (useSwc) {
+      // Experiment using swc for speed up compilation step
+      return {
+        loader: 'swc-loader',
+        options: {
+          jsc: {
+            parser: {
+              syntax: useTypescript ? 'typescript' : 'ecmascript',
+              tsx: true,
+              jsx: true,
+            },
+            transform: {
+              react: {
+                runtime: 'automatic',
+                refresh: !isProd,
+              },
+            },
+          },
+        },
+      }
+    } else {
+      // Old good babel
+      return {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              'react-app',
+              {
+                runtime: 'automatic',
+                flow: false,
+                typescript: useTypescript,
+              },
+            ],
+          ],
+          plugins: [!isProd && require.resolve('react-refresh/babel')].filter(
+            Boolean
+          ),
+        },
+      }
+    }
+  } else {
+    // JavaScript running in runtime like Node, Deno, Bun, CF Workers ecc
+    if (useSwc) {
+      // Experiment using swc for speed up compilation step
+      return {
+        loader: 'swc-loader',
+        options: {
+          jsc: {
+            target: 'es2016',
+            parser: {
+              syntax: useTypescript ? 'typescript' : 'ecmascript',
+              tsx: true,
+              jsx: true,
+            },
+            transform: {
+              react: {
+                runtime: 'automatic',
+              },
+            },
+          },
+        },
+      }
+    } else {
+      // Old good babel
+      return {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            useTypescript && '@babel/preset-typescript',
+            [
+              '@babel/preset-react',
+              {
+                runtime: 'automatic',
+              },
+            ],
+          ].filter(Boolean),
+          plugins: ['macros'],
+        },
+      }
+    }
+  }
+}
+
 export interface GetWebPackRulesOptions {
   useTypescript: boolean
   isProd: boolean
   isClient: boolean
+  useSwc: boolean
 }
 
 export function getWebPackRules({
   useTypescript,
   isProd,
   isClient,
+  useSwc,
 }: GetWebPackRulesOptions): RuleSetRule[] {
   return [
     {
@@ -100,42 +201,12 @@ export function getWebPackRules({
         {
           test: useTypescript ? /\.(js|mjs|jsx|ts|tsx)$/ : /\.(js|mjs|jsx)$/,
           exclude: /(node_modules)/,
-          use: isClient
-            ? // CLIENT BABEL
-              {
-                loader: 'babel-loader',
-                options: {
-                  presets: [
-                    [
-                      'react-app',
-                      {
-                        runtime: 'automatic',
-                        flow: false,
-                        typescript: useTypescript,
-                      },
-                    ],
-                  ],
-                  plugins: [
-                    !isProd && require.resolve('react-refresh/babel'),
-                  ].filter(Boolean),
-                },
-              }
-            : // "RUNTIME" BABEL
-              {
-                loader: 'babel-loader',
-                options: {
-                  presets: [
-                    useTypescript && '@babel/preset-typescript',
-                    [
-                      '@babel/preset-react',
-                      {
-                        runtime: 'automatic',
-                      },
-                    ],
-                  ].filter(Boolean),
-                  plugins: ['macros'],
-                },
-              },
+          use: getWebPackCodeRules({
+            isClient,
+            isProd,
+            useTypescript,
+            useSwc,
+          }),
         },
         // ... STYLES ...
         getWebPackStyleRule({

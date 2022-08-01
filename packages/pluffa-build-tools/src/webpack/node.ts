@@ -90,6 +90,7 @@ export interface GetWebPackNodeConfigOptions {
   compileNodeCommonJS: boolean
   useTypescript: boolean
   isProd: boolean
+  useSwc: boolean
 }
 
 export function getWebPackNodeConfig({
@@ -99,6 +100,7 @@ export function getWebPackNodeConfig({
   registerStatik,
   compileNodeCommonJS,
   isProd,
+  useSwc,
 }: GetWebPackNodeConfigOptions): Configuration {
   const entry: EntryObject = {
     App: serverComponent,
@@ -110,7 +112,7 @@ export function getWebPackNodeConfig({
   return {
     name: 'server',
     mode: isProd ? 'production' : 'development',
-    devtool:  isProd ? 'source-map' : 'cheap-module-source-map',
+    devtool: isProd ? 'source-map' : 'cheap-module-source-map',
     target: 'node',
     entry,
     ...getNodeConfiguration(compileNodeCommonJS),
@@ -119,6 +121,7 @@ export function getWebPackNodeConfig({
         useTypescript,
         isClient: false,
         isProd,
+        useSwc,
       }),
     },
     resolve: {

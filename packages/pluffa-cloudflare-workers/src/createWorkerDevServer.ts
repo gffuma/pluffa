@@ -13,6 +13,7 @@ export interface createWorkerDevServerOptions {
   port: number
   useTypescript?: boolean
   miniflareUrl: string
+  useSwc?: boolean,
   startMiniFlare(): void
 }
 
@@ -24,6 +25,7 @@ export default function createWokerDevServer({
   miniflareUrl,
   startMiniFlare,
   clientSourceMapEnabled = true,
+  useSwc = false,
 }: createWorkerDevServerOptions) {
   const isProd = false
 
@@ -40,6 +42,7 @@ export default function createWokerDevServer({
       useTypescript,
       workerEntry,
       clientEntry,
+      useSwc,
     }),
   ])
 

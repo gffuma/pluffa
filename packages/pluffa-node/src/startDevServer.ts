@@ -20,6 +20,7 @@ export interface StartDevServerOptions {
   publicDir: string | false
   port: number
   useTypescript: boolean
+  useSwc?: boolean
 }
 
 export default function startDevServer({
@@ -33,6 +34,7 @@ export default function startDevServer({
   port,
   publicDir,
   useTypescript,
+  useSwc = false,
 }: StartDevServerOptions) {
   const isProd = false
   setUpEnv({ isProd })
@@ -52,6 +54,7 @@ export default function startDevServer({
       serverComponent,
       skeletonComponent,
       registerStatik,
+      useSwc,
     }),
   ])
 

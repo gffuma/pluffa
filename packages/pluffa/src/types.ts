@@ -23,8 +23,9 @@ export type Config =
       registerStatik?: string
       proxy?: string
       productionProxy?: string
-      productionServeStaticAssets: boolean
-      productionServePublicAssets: boolean
+      productionServeStaticAssets?: boolean
+      productionServePublicAssets?: boolean
+      experimentalUseSwc?: boolean
     }
   | {
       workerEntry: string
@@ -37,4 +38,5 @@ export type Config =
       outputDir: string
       publicDir: string
       miniflareConfig?: Record<string, any>
+      experimentalUseSwc?: boolean
     }

@@ -22,6 +22,7 @@ export interface BuildForWorkerOptions {
   useTypescript: boolean
   outputDir: string
   publicDir: string
+  useSwc?: boolean
 }
 
 export default async function buildForWorker({
@@ -30,7 +31,8 @@ export default async function buildForWorker({
   useTypescript,
   outputDir,
   publicDir,
-  clientSourceMapEnabled = true
+  clientSourceMapEnabled = true,
+  useSwc = false,
 }: BuildForWorkerOptions) {
   const libOutPath = path.resolve(process.cwd(), '.pluffa')
   const buildOutPath = path.resolve(process.cwd(), outputDir)
@@ -56,6 +58,7 @@ export default async function buildForWorker({
       useTypescript,
       workerEntry,
       clientEntry,
+      useSwc,
     }),
   ])
 

@@ -23,6 +23,7 @@ program.command('dev').action(async () => {
       ...config,
       clientSourceMapEnabled: config.clientSourceMap,
       useTypescript,
+      useSwc: config.experimentalUseSwc,
     })
   } else {
     const { startDevServer } = await import('@pluffa/node')
@@ -31,6 +32,7 @@ program.command('dev').action(async () => {
       useTypescript,
       clientSourceMapEnabled: config.clientSourceMap,
       compileNodeCommonJS: config.nodeModule === 'commonjs',
+      useSwc: config.experimentalUseSwc,
     })
   }
 })
@@ -51,6 +53,7 @@ program.command('build').action(async () => {
       clientSourceMapEnabled:
         config.productionClientSourceMap ?? config.clientSourceMap,
       useTypescript,
+      useSwc: config.experimentalUseSwc,
     })
   } else {
     const { build } = await import('@pluffa/node')
@@ -64,6 +67,7 @@ program.command('build').action(async () => {
         config.productionClientSourceMap ?? config.clientSourceMap,
       compileNodeCommonJS: config.nodeModule === 'commonjs',
       useTypescript,
+      useSwc: config.experimentalUseSwc,
     })
   }
 })

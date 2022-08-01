@@ -15,6 +15,7 @@ export interface StartWorkerDevServerOptions {
   port: number
   useTypescript: boolean
   miniflareConfig?: MiniflareOptions
+  useSwc?: boolean
 }
 
 const MINIFLARE_PORT = 8787
@@ -27,6 +28,7 @@ export default function startWokerDevServer({
   port,
   miniflareConfig = {},
   clientSourceMapEnabled = true,
+  useSwc = false,
 }: StartWorkerDevServerOptions) {
   setUpEnv({ isProd: false })
   const app = createWorkerDevServer({
@@ -35,6 +37,7 @@ export default function startWokerDevServer({
     clientSourceMapEnabled,
     workerEntry,
     publicDir,
+    useSwc,
     miniflareUrl: `http://localhost:${MINIFLARE_PORT}`,
     startMiniFlare: async () => {
       const mf = new Miniflare({
