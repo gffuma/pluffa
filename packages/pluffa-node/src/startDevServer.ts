@@ -46,6 +46,7 @@ export default function startDevServer({
       clientEntry,
       statikDataUrl: false,
       sourceMapEnabled: clientSourceMapEnabled,
+      useSwc,
     }),
     getWebPackNodeConfig({
       isProd,

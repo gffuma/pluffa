@@ -41,6 +41,7 @@ export interface GetWebPackClientConfigOptions {
   useTypescript: boolean
   isProd: boolean
   statikDataUrl: string | false
+  useSwc: boolean
 }
 
 function injectHotMiddlewareInEntry(entry: WebPackEntry): WebPackEntry {
@@ -77,6 +78,7 @@ export function getWebPackClientConfig({
   isProd,
   sourceMapEnabled = true,
   statikDataUrl,
+  useSwc,
 }: GetWebPackClientConfigOptions): Configuration {
   return {
     name: 'client',
@@ -101,6 +103,7 @@ export function getWebPackClientConfig({
         isClient: true,
         isProd,
         useTypescript,
+        useSwc,
       }),
     },
     plugins: [

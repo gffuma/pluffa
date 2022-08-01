@@ -53,7 +53,8 @@ export default function build({
       useTypescript,
       clientEntry,
       statikDataUrl,
-      sourceMapEnabled: clientSourceMapEnabled
+      sourceMapEnabled: clientSourceMapEnabled,
+      useSwc,
     }),
     getWebPackNodeConfig({
       compileNodeCommonJS,

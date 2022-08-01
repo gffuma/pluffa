@@ -36,6 +36,7 @@ export default function createWokerDevServer({
       statikDataUrl: false,
       useTypescript,
       sourceMapEnabled: clientSourceMapEnabled,
+      useSwc,
     }),
     getWebPackWorkerConfig({
       isProd,

@@ -17,6 +17,7 @@ const ConfigDefaults: Partial<Config> = {
   productionServePublicAssets: true,
   productionServeStaticAssets: true,
   clientSourceMap: true,
+  experimentalUseSwc: false,
 }
 
 const require = createRequire(import.meta.url)

@@ -52,6 +52,7 @@ export default async function buildForWorker({
       clientEntry,
       statikDataUrl: false,
       sourceMapEnabled: clientSourceMapEnabled,
+      useSwc,
     }),
     getWebPackWorkerConfig({
       isProd,
