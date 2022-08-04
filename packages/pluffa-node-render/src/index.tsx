@@ -89,13 +89,14 @@ export async function render<StaticProps, HydrateSkeletonProps>(
   const { entrypoints, url } = props
   const appProps = { url }
 
-  return new Promise(async (resolve, reject) => {
+  let staticProps: StaticProps | undefined
+  if (getStaticProps) {
+    const result = await getStaticProps(appProps)
+    staticProps = result.props
+  }
+
+  const appHtml = await new Promise<string>(async (resolve, reject) => {
     let didError = false
-    let staticProps: StaticProps | undefined
-    if (getStaticProps) {
-      const result = await getStaticProps(appProps)
-      staticProps = result.props
-    }
     const { pipe } = renderToPipeableStream(
       <App {...staticProps!} url={props.url} />,
       {
@@ -105,22 +106,8 @@ export async function render<StaticProps, HydrateSkeletonProps>(
           if (didError && throwOnError) {
             return
           }
-          out.on('finish', async () => {
-            const appHtml = out.getContentsAsString() || ''
-            let skeletonProps: HydrateSkeletonProps | undefined
-            if (getSkeletonProps) {
-              const result = await getSkeletonProps(appProps, staticProps!)
-              skeletonProps = result.props
-            }
-            resolve(
-              renderToString(
-                <Skeleton
-                  {...skeletonProps!}
-                  entrypoints={entrypoints}
-                  appHtml={appHtml}
-                />
-              )
-            )
+          out.on('finish', () => {
+            resolve(out.getContentsAsString() || '')
           })
           pipe(out)
         },
@@ -134,4 +121,13 @@ export async function render<StaticProps, HydrateSkeletonProps>(
       }
     )
   })
+
+  let skeletonProps: HydrateSkeletonProps | undefined
+  if (getSkeletonProps) {
+    const result = await getSkeletonProps(appProps, staticProps!)
+    skeletonProps = result.props
+  }
+  return renderToString(
+    <Skeleton {...skeletonProps!} entrypoints={entrypoints} appHtml={appHtml} />
+  )
 }
