@@ -9,11 +9,17 @@ import {
   createBaseDevServer,
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
-import { render } from '@pluffa/node-render'
+import {
+  render,
+  AppComponent,
+  SkeletonComponent,
+  GetSkeletonProps,
+  GetStaticProps,
+} from '@pluffa/node-render'
 import { Compiler, MultiCompiler } from 'webpack'
 import ErrorPage from './components/ErrorPage.js'
-import importVm from './importVm.js'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
+import { createHotModule, HotModule } from './hotModule.js'
 
 const require = createRequire(import.meta.url)
 
@@ -52,27 +58,46 @@ export default function createDevServer({
     ? async () => require('@pluffa/statik/runtime')
     : async () => await import('@pluffa/statik/runtime')
 
-  const getFreshRegiterStatik = compileNodeCommonJS
-    ? // Use require to have CommonJS version of register statik
-      async () => {
-        const statikPath = path.join(buildedNodeDir, 'statik.js')
-        delete require.cache[require.resolve(statikPath)]
-        const { default: registerStatik } = require(statikPath)
-        return registerStatik
-      }
-    : // Use VM To have fresh ESM module
-      async () => {
-        const statikPath = path.join(buildedNodeDir, 'statik.mjs')
-        const { default: registerStatik } = await importVm(statikPath)
-        return registerStatik
-      }
+  // User's modules thath should hot reloaded during dev
+  const statikHotModule = createHotModule<{
+    default: RegisterStatik
+  }>(buildedNodeDir, 'statik', compileNodeCommonJS)
+
+  const appHotModule = createHotModule<{
+    default: AppComponent<any>
+    getStaticProps: GetStaticProps
+    getSkeletonProps: GetSkeletonProps
+  }>(buildedNodeDir, 'App', compileNodeCommonJS)
+
+  const skeletonHotModule = createHotModule<{
+    default: SkeletonComponent<any>
+  }>(buildedNodeDir, 'Skeleton', compileNodeCommonJS)
+
+  const serverCompiler = (compiler as MultiCompiler).compilers.find(
+    (c) => c.name === 'server'
+  )
+  // Refresh hot modules when compiler emit them!
+  if (serverCompiler) {
+    const hotModules: HotModule<unknown>[] = [appHotModule, skeletonHotModule]
+    if (statikEnabled) {
+      hotModules.push(statikHotModule)
+    }
+    serverCompiler.hooks.afterDone.tap('realodServerCode', (stats) => {
+      const emittedAssets = stats.compilation.emittedAssets
+      hotModules.forEach((m) => {
+        if (emittedAssets.has(m.name)) {
+          m.refresh()
+        }
+      })
+    })
+  }
 
   // Serving Statik API
   if (statikEnabled) {
     app.use('/__pluffastatik', async (req, res) => {
       try {
         const { runStatik, configureRegisterStatik } = await getStatikRunTime()
-        const registerStatik = await getFreshRegiterStatik()
+        const { default: registerStatik } = await statikHotModule.get()
         // Configure global statik hook
         configureRegisterStatik(registerStatik)
         // Run them!
@@ -121,44 +146,6 @@ export default function createDevServer({
   }
 
   // Finally Server Rendering React App
-
-  // Get user compiled pluffa runtime
-  const getFreshRunTime = compileNodeCommonJS
-    ? async () => {
-        const appPath = path.join(buildedNodeDir, 'App.js')
-        delete require.cache[require.resolve(appPath)]
-        const {
-          default: App,
-          getStaticProps,
-          getSkeletonProps,
-        } = require(appPath)
-        const skeletonPath = path.join(buildedNodeDir, 'Skeleton.js')
-        delete require.cache[require.resolve(skeletonPath)]
-        const { default: Skeleton } = require(skeletonPath)
-        return {
-          App,
-          Skeleton,
-          getStaticProps,
-          getSkeletonProps,
-        }
-      }
-    : async () => {
-        const appPath = path.join(buildedNodeDir, 'App.mjs')
-        const {
-          default: App,
-          getStaticProps,
-          getSkeletonProps,
-        } = await importVm(appPath)
-        const skeletonPath = path.join(buildedNodeDir, 'Skeleton.mjs')
-        const { default: Skeleton } = await importVm(skeletonPath)
-        return {
-          App,
-          Skeleton,
-          getStaticProps,
-          getSkeletonProps,
-        }
-      }
-
   app.use(async (req, res) => {
     const { devMiddleware } = res.locals.webpack
     const entrypoints = getFlatEntrypointsFromWebPackStats(
@@ -168,11 +155,16 @@ export default function createDevServer({
     try {
       if (statikEnabled) {
         const { configureRegisterStatik } = await getStatikRunTime()
-        const registerStatik = await getFreshRegiterStatik()
+        const { default: registerStatik } = await statikHotModule.get()
         configureRegisterStatik(registerStatik)
       }
-      const { App, Skeleton, getStaticProps, getSkeletonProps } =
-        await getFreshRunTime()
+      const {
+        default: App,
+        getStaticProps,
+        getSkeletonProps,
+      } = await appHotModule.get()
+      const { default: Skeleton } = await skeletonHotModule.get()
+
       const html = await render(
         {
           App,
