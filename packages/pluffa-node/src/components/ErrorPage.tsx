@@ -1,3 +1,5 @@
+import Convert from 'ansi-to-html'
+
 export default function ErrorPage({
   title,
   error,
@@ -5,6 +7,12 @@ export default function ErrorPage({
   title: string
   error: Error
 }) {
+  const convert = new Convert({
+    newline: true,
+    escapeXML: true,
+  })
+  const errorHtml = convert.toHtml(String(error))
+  const stackHtml = convert.toHtml(error.stack || '')
   return (
     <html>
       <head>
@@ -28,8 +36,9 @@ export default function ErrorPage({
       <body>
         <h1>Pluffa.js 💔</h1>
         <h2>{title}</h2>
-        <h3>{String(error)}</h3>
-        <pre>{error.stack}</pre>
+        <div dangerouslySetInnerHTML={{ __html: errorHtml }} />
+        <br />
+        <div dangerouslySetInnerHTML={{ __html: stackHtml }} />
       </body>
     </html>
   )
