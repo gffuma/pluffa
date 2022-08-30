@@ -1,16 +1,18 @@
 import './App.css'
 import { Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Pokedex from './Pokedex'
-import Pokemon from './Pokemon'
+import { PageRoutes } from './lib'
+// import { Routes, Route, useRoutes } from 'react-router-dom'
+// import Pokedex from './Pokedex'
+// import Pokemon from './Pokemon'
 
 export default function App() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
+      <PageRoutes />
+      {/* <Routes>
         <Route path="/" element={<Pokedex />} />
         <Route path="/pokemon/:name" element={<Pokemon />} />
-      </Routes>
+      </Routes> */}
     </Suspense>
   )
 }

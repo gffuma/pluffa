@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
-import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { PagesManager, PagesManagerProvider, BrowserRouter } from './lib'
+import { routes } from './routes'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,14 +19,20 @@ const queryClient = new QueryClient({
   },
 })
 
+const manager = new PagesManager(routes, {
+  queryClient,
+})
+
 hydrate(queryClient, (window as any).__INITIAL_DATA__)
 delete (window as any).__INITIAL_DATA__
 
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <PagesManagerProvider manager={manager}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </PagesManagerProvider>
   </QueryClientProvider>
 )
