@@ -16,7 +16,7 @@ import {
   GetSkeletonProps,
   GetStaticProps,
 } from '@pluffa/node-render'
-import { Compiler, MultiCompiler } from 'webpack'
+import { Compiler, MultiCompiler, MultiStats } from 'webpack'
 import ErrorPage from './components/ErrorPage.js'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 import { createHotModule, HotModule } from './hotModule.js'
@@ -148,10 +148,8 @@ export default function createDevServer({
   // Finally Server Rendering React App
   app.use(async (req, res) => {
     const { devMiddleware } = res.locals.webpack
-    const entrypoints = getFlatEntrypointsFromWebPackStats(
-      devMiddleware.stats.toJson(),
-      'client'
-    )
+    const multiStats = devMiddleware.stats as MultiStats
+    const entrypoints = getFlatEntrypointsFromWebPackStats(multiStats, 'client')
     try {
       if (statikEnabled) {
         const { configureRegisterStatik } = await getStatikRunTime()

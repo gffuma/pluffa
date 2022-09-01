@@ -72,17 +72,18 @@ export default async function buildForWorker({
       process.exit(1)
       return
     }
-    const info = stats!.toJson()
     if (stats!.hasErrors()) {
       console.log('Build failed.')
-      info.errors!.forEach((e) => console.error(e))
+      for (const s of stats!.stats) {
+        s.compilation.getErrors().forEach((e) => console.error(e))
+      }
       process.exit(1)
     } else {
       // Renema output
       await fs.rename(libOutPath, buildOutPath)
 
       // Inject entry points in worker bundle
-      const entrypoints = getFlatEntrypointsFromWebPackStats(info, 'client')
+      const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
       await fs.appendFile(
         path.resolve(buildOutPath, 'runtime/worker.js'),
         `\nvar PLUFFA_BUNDLE_ENTRYPOINTS = ${JSON.stringify(entrypoints)};`,

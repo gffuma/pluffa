@@ -76,13 +76,13 @@ export default function build({
       process.exit(1)
       return
     }
-    const info = stats!.toJson()
     if (stats!.hasErrors()) {
-      console.log('Build failed.')
-      info.errors!.forEach((e) => console.error(e))
+      for (const s of stats!.stats) {
+        s.compilation.getErrors().forEach((e) => console.error(e))
+      }
       process.exit(1)
     } else {
-      const entrypoints = getFlatEntrypointsFromWebPackStats(info, 'client')
+      const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
       await fs.writeFile(
         path.join(process.cwd(), '.pluffa/client', 'manifest.json'),
         JSON.stringify({ entrypoints }, null, 2)
