@@ -7,7 +7,6 @@
     "module": "ES2020",
     "target": "es2020",
     "moduleResolution": "node",
-
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,

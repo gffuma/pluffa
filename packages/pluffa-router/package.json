@@ -1,0 +1,59 @@
+{
+  "name": "@pluffa/router",
+  "type": "module",
+  "description": "Pluffa router",
+  "version": "0.0.1",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "require": "./dist/client.cjs",
+      "import": "./dist/client.js"
+    },
+    "./server": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/server.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts"
+      ],
+      "client": [
+        "./dist/client.d.ts"
+      ],
+      "server": [
+        "./dist/server.d.ts"
+      ]
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "static site"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "dependencies": {
+    "react-router": "^6.3.0",
+    "react-router-dom": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

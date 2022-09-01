@@ -1,14 +1,12 @@
-import { useQuery } from 'react-query'
-import { Link, useParams } from 'react-router-dom'
-import request from 'superagent'
+import { Link, useParams } from '@pluffa/router'
+import { usePokemon } from './hooks'
 
 export default function Pokemon() {
   const { name } = useParams()
-  const { data: pokemon } = useQuery(['pokemon', name], () =>
-    request
-      .get(`https://pokeapi.co/api/v2/pokemon/${name}/`)
-      .then((r) => r.body)
-  )
+  const { data: pokemon } = usePokemon(name!)
+  usePokemon('bulbasaur')
+  usePokemon('rattata')
+  usePokemon('pidgeotto')
   return (
     <div className="pokemon">
       <h2>

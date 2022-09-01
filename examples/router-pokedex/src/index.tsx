@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
-import { BrowserRouter } from 'react-router-dom'
+import { RouterManager, ClientRouter } from '@pluffa/router/client'
 import App from './App'
+import { routes } from './routes'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,14 +19,18 @@ const queryClient = new QueryClient({
   },
 })
 
+const routerManager = new RouterManager(routes, {
+  queryClient,
+})
+
 hydrate(queryClient, (window as any).__INITIAL_DATA__)
 delete (window as any).__INITIAL_DATA__
 
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
+    <ClientRouter manager={routerManager} prefetchLink='intent'>
       <App />
-    </BrowserRouter>
+    </ClientRouter>
   </QueryClientProvider>
 )

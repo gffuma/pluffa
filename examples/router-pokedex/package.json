@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "pluffa start",
+    "dev": "pluffa dev",
+    "build": "pluffa build",
+    "staticize": "pluffa staticize"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-query": "^3.35.0",
+    "react-router-dom": "^6.2.1",
+    "pluffa": "latest",
+    "@pluffa/router": "latest",
+    "superagent": "^7.1.1"
+  },
+  "pluffa": {
+    "clientEntry": "./src/index.tsx",
+    "serverComponent": "./src/StaticApp.tsx",
+    "skeletonComponent": "./src/Skeleton.tsx"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.1",
+    "@types/superagent": "^4.1.15"
+  }
+}

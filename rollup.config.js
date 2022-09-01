@@ -226,6 +226,31 @@ function pluffa() {
   }))
 }
 
+function pluffaRouter() {
+  const baseDir = './packages/pluffa-router'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.ts`,
+      client: `${baseDir}/src/client.tsx`,
+      server: `${baseDir}/src/server.tsx`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        include: ['history'],
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
 export default [
   ...createPluffaApp(),
   ...pluffaNodeRender(),
@@ -236,5 +261,6 @@ export default [
   ...pluffaCrawl(),
   ...pluffaNode(),
   ...pluffaCloudflareWorkers(),
+  ...pluffaRouter(),
   ...pluffa(),
 ]

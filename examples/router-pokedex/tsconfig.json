@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "declaration": false,
-    "lib": ["es2020"],
+    "jsx": "react-jsx",
+    "lib": ["es2020", "dom"],
+    "allowJs": false,
+    "noEmit": true,
     "module": "ES2020",
     "target": "es2020",
     "moduleResolution": "node",
@@ -11,7 +12,7 @@
     "strictFunctionTypes": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"],
