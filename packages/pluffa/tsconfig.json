@@ -15,6 +15,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "types", "bootstrap.cjs"],
+  "include": ["src/**/*", "bootstrap.cjs"],
   "exclude": ["node_modules"],
 }
