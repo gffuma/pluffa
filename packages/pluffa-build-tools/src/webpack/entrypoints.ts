@@ -10,8 +10,8 @@ export function getFlatEntrypointsFromWebPackStats(
   }
   const flatty: Record<string, string[]> = {}
   for (const chunk of deStats.compilation.chunks) {
+    if (!chunk.name) continue
     for (const file of chunk.files) {
-      if (!chunk.name) continue
       if (flatty[chunk.name] === undefined) {
         flatty[chunk.name] = []
       }
