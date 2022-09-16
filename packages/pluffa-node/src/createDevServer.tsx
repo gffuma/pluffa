@@ -1,6 +1,6 @@
 import sourceMap from 'source-map-support'
 import chalk from 'chalk'
-import { Express } from 'express'
+import { Express, Response } from 'express'
 import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
@@ -9,19 +9,27 @@ import {
   createBaseDevServer,
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
-import {
-  render,
-  AppComponent,
-  SkeletonComponent,
-  GetSkeletonProps,
-  GetStaticProps,
-} from '@pluffa/node-render'
+import type { AppComponent, SkeletonComponent } from '@pluffa/ssr'
+import { renderExpressResponse, GetServerData } from '@pluffa/node-render'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
 import ErrorPage from './components/ErrorPage.js'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 import { createHotModule, HotModule } from './hotModule.js'
 
 const require = createRequire(import.meta.url)
+
+function handleFatalSSRError(error: any, res: Response) {
+  console.error(chalk.red('Fatal server error'))
+  console.error(error)
+  const html = renderToString(
+    <ErrorPage title="Fatal server error" error={error as any} />
+  )
+  if (!res.headersSent) {
+    res.status(500)
+  }
+  res.write(`<!DOCTYPE html>${html}`)
+  res.end()
+}
 
 export interface CreateDevServerOptions {
   compiler: Compiler | MultiCompiler
@@ -65,12 +73,11 @@ export default function createDevServer({
 
   const appHotModule = createHotModule<{
     default: AppComponent<any>
-    getStaticProps: GetStaticProps
-    getSkeletonProps: GetSkeletonProps
+    getServerData?: GetServerData
   }>(buildedNodeDir, 'App', compileNodeCommonJS)
 
   const skeletonHotModule = createHotModule<{
-    default: SkeletonComponent<any>
+    default: SkeletonComponent
   }>(buildedNodeDir, 'Skeleton', compileNodeCommonJS)
 
   const serverCompiler = (compiler as MultiCompiler).compilers.find(
@@ -156,34 +163,25 @@ export default function createDevServer({
         const { default: registerStatik } = await statikHotModule.get()
         configureRegisterStatik(registerStatik)
       }
-      const {
-        default: App,
-        getStaticProps,
-        getSkeletonProps,
-      } = await appHotModule.get()
+      const { default: App, getServerData } = await appHotModule.get()
       const { default: Skeleton } = await skeletonHotModule.get()
-
-      const html = await render(
-        {
-          App,
-          getStaticProps,
-          getSkeletonProps,
-          Skeleton,
-          onError: (renderingError) => {
-            console.log(chalk.red('Error during server rendering'))
-            console.log(renderingError)
-          },
+      await renderExpressResponse(req, res, {
+        App,
+        Skeleton,
+        getServerData,
+        entrypoints,
+        onError: (error) => {
+          console.log(chalk.red('Error during server rendering'))
+          console.log(error)
         },
-        { url: req.url, entrypoints }
-      )
-      res.send(`<!DOCTYPE html>${html}`)
+        onFatalError: (error) => {
+          // Unrecoverable fatal error during rendering
+          handleFatalSSRError(error, res)
+        },
+      })
     } catch (error) {
-      console.error(chalk.red('Fatal error while rendering'))
-      console.error(error)
-      const html = renderToString(
-        <ErrorPage title="Fatal error while rendering" error={error as any} />
-      )
-      res.status(500).send(`<!DOCTYPE html>${html}`)
+      // Compilation error or run time error before rendering
+      handleFatalSSRError(error, res)
     }
   })
   return app

@@ -3,6 +3,7 @@
   "type": "module",
   "description": "Pluffa on Node.js",
   "version": "0.5.1",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/index.cjs",

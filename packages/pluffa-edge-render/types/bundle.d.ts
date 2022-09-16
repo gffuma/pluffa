@@ -1,0 +1,1 @@
+declare const PLUFFA_BUNDLE_ENTRYPOINTS: Recors<string, string[]>

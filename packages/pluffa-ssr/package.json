@@ -1,18 +1,26 @@
 {
-  "name": "@pluffa/edge-render",
+  "name": "@pluffa/ssr",
   "type": "module",
-  "description": "Pluffa render runtime for edge platforms",
-  "version": "0.1.0",
+  "description": "Pluffa common ssr stuff",
+  "version": "0.0.1",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
+    },
+    "./skeleton": {
+      "require": "./dist/skeleton.cjs",
+      "import": "./dist/skeleton.js"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
         "./dist/index.d.ts"
+      ],
+      "skeleton": [
+        "./dist/client.d.ts"
       ]
     }
   },
@@ -25,20 +33,17 @@
   "repository": "gffuma/pluffa",
   "keywords": [
     "react",
-    "static site"
+    "ssr"
   ],
   "engines": {
     "node": ">=16.7"
   },
-  "dependencies": {
-    "@pluffa/ssr": "^0.0.1"
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6"
   },
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6"
   }
 }

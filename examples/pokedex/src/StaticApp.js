@@ -1,5 +1,5 @@
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { StaticRouter } from 'react-router-dom/server.js'
+import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
 
 export default function StaticApp({ queryClient, url }) {
@@ -12,32 +12,29 @@ export default function StaticApp({ queryClient, url }) {
   )
 }
 
-export const getStaticProps = () => {
+export const getServerData = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        cacheTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
+        refetchOnMount: false,
+        staleTime: Infinity,
+        retry: false,
+        suspense: true,
+      },
+    },
+  })
   return {
     props: {
-      queryClient: new QueryClient({
-        defaultOptions: {
-          queries: {
-            cacheTime: Infinity,
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: false,
-            refetchInterval: false,
-            refetchIntervalInBackground: false,
-            refetchOnMount: false,
-            staleTime: Infinity,
-            retry: false,
-            suspense: true,
-          },
-        },
-      }),
+      queryClient,
     },
-  }
-}
-
-export const getSkeletonProps = (staticProps, { queryClient }) => {
-  return {
-    props: {
-      initialData: dehydrate(queryClient),
-    },
+    injectBeforeBodyClose: () =>
+      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+        dehydrate(queryClient)
+      )};</script>`,
   }
 }

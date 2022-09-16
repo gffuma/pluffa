@@ -25,11 +25,34 @@ function createPluffaApp() {
   }))
 }
 
+function pluffaSSR() {
+  const baseDir = './packages/pluffa-ssr'
+  return ['esm', 'cjs'].map((format) => ({
+    input: {
+      index: `${baseDir}/src/index.ts`,
+      skeleton: `${baseDir}/src/skeleton.tsx`,
+    },
+    output: {
+      dir: `${baseDir}/dist`,
+      format,
+      entryFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      chunkFileNames: `[name].${format === 'cjs' ? format : 'js'}`,
+      exports: 'named',
+    },
+    plugins: [
+      externals({
+        packagePath: `${baseDir}/package.json`,
+      }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+    ],
+  }))
+}
+
 function pluffaNodeRender() {
   const baseDir = './packages/pluffa-node-render'
   return ['esm', 'cjs'].map((format) => ({
     input: {
-      index: `${baseDir}/src/index.tsx`,
+      index: `${baseDir}/src/index.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,
@@ -253,6 +276,7 @@ function pluffaRouter() {
 
 export default [
   ...createPluffaApp(),
+  ...pluffaSSR(),
   ...pluffaNodeRender(),
   ...pluffaEdgeRender(),
   ...pluffaBuildTools(),
@@ -261,6 +285,6 @@ export default [
   ...pluffaCrawl(),
   ...pluffaNode(),
   ...pluffaCloudflareWorkers(),
-  ...pluffaRouter(),
+  // ...pluffaRouter(),
   ...pluffa(),
 ]
