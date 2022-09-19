@@ -67,15 +67,38 @@ export function render(
     )
   }
 
+  let didError = false
+  let didShellError = false
+  let didStreamPrematureClosed = false
   let writableWrapper: Writable = writable
   if (transfomers.length > 0) {
     writableWrapper = compose(...transfomers, writable)
+    writableWrapper.on('error', (error: any) => {
+      // NOTE: compose is thinked to consume all the stream
+      // so when wrap write stream if an user close the connection
+      // this error will be raised ... if not handled make all app to crash
+      // unhandled error ...
+      // so simply keep trak of them and stop writing to stream
+      if (error.code === 'ERR_STREAM_PREMATURE_CLOSE') {
+        didStreamPrematureClosed = true
+        return
+      }
+      console.error('Error in writable stream')
+      console.error(error)
+    })
   }
-  let didError = false
-  let didShellError = false
   const reactStream = renderToPipeableStream(children, {
     ...reactRenderOptions,
+    onShellReady() {
+      if (didStreamPrematureClosed) {
+        return
+      }
+      reactRenderOptions?.onShellReady?.()
+    },
     onAllReady() {
+      if (didStreamPrematureClosed) {
+        return
+      }
       reactRenderOptions.onAllReady?.()
       if (didError && stopOnError) {
         return
@@ -105,6 +128,9 @@ export function render(
       }
     },
     onShellError(error) {
+      if (didStreamPrematureClosed) {
+        return
+      }
       reactRenderOptions.onShellError?.(error)
       didShellError = true
       if (!getClientRenderFallback && onFatalError) {
@@ -112,6 +138,9 @@ export function render(
       }
     },
     onError(error) {
+      if (didStreamPrematureClosed) {
+        return
+      }
       didError = true
       reactRenderOptions.onError?.(error)
     },
