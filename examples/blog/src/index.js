@@ -1,6 +1,7 @@
 import { hydrateRoot } from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import App from './App'
 
 const queryClient = new QueryClient({
@@ -23,9 +24,11 @@ delete window.__INITIAL_DATA__
 
 hydrateRoot(
   document.getElementById('root'),
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </HelmetProvider>
 )

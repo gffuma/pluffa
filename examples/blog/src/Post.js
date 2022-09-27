@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import statik from '@pluffa/statik'
@@ -11,7 +11,7 @@ export default function Post() {
 
   return (
     <div>
-      <Helmet defer={false}>
+      <Helmet>
         <title>{`De Blog | ${post.title}`}</title>
       </Helmet>
       <Link to="/">Back</Link>

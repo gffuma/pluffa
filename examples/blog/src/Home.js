@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import { useQuery } from 'react-query'
 import jolteon from './jolteon.jpg'
 import { ReactComponent as Rocket } from './rocket.svg'
@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div>
-      <Helmet defer={false}>
+      <Helmet>
         <title>De Blog</title>
       </Helmet>
       <h1>An ugly Blog!</h1>

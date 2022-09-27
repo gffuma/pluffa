@@ -1,6 +1,6 @@
 {
   "clientEntry": "./src/index.js",
-  "serverComponent": "./src/StaticApp.js",
+  "serverComponent": "./src/Server.js",
   "skeletonComponent": "./src/Skeleton.js",
   "registerStatik": "./src/registerStatik.js",
   "urls": ["/", "/secret"]
