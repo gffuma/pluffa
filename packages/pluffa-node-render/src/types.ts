@@ -1,4 +1,4 @@
-import { AppProps } from '@pluffa/ssr/*'
+import { AppProps } from '@pluffa/ssr'
 import { RenderToPipeableStreamOptions } from 'react-dom/server'
 
 export interface ServerData<Props>
@@ -14,3 +14,5 @@ export interface ServerData<Props>
 export type GetServerData<Props = any> = (
   props: AppProps
 ) => ServerData<Props> | Promise<ServerData<Props>>
+
+export { AppProps }

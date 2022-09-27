@@ -266,7 +266,7 @@ function pluffaRouter() {
     },
     plugins: [
       externals({
-        include: ['history'],
+        include: ['@remix-run/router'],
         packagePath: `${baseDir}/package.json`,
       }),
       typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
@@ -285,6 +285,6 @@ export default [
   ...pluffaCrawl(),
   ...pluffaNode(),
   ...pluffaCloudflareWorkers(),
-  // ...pluffaRouter(),
+  ...pluffaRouter(),
   ...pluffa(),
 ]

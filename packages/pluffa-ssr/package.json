@@ -20,7 +20,7 @@
         "./dist/index.d.ts"
       ],
       "skeleton": [
-        "./dist/client.d.ts"
+        "./dist/skeleton.d.ts"
       ]
     }
   },

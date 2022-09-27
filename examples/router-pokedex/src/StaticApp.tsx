@@ -1,4 +1,4 @@
-import { AppProps, GetStaticProps, GetSkeletonProps } from '@pluffa/node-render'
+import { GetServerData, AppProps } from '@pluffa/node-render'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { ServerRouter, RouterManager } from '@pluffa/router/server'
 import App from './App'
@@ -21,7 +21,7 @@ export default function StaticApp({
   )
 }
 
-export const getStaticProps: GetStaticProps = async ({ url }) => {
+export const getServerData: GetServerData = async ({ url }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -43,15 +43,9 @@ export const getStaticProps: GetStaticProps = async ({ url }) => {
       routerManager,
       queryClient,
     },
-  }
-}
-
-export const getSkeletonProps: GetSkeletonProps<{
-  queryClient: QueryClient
-}> = (appProps, { queryClient }) => {
-  return {
-    props: {
-      initialData: dehydrate(queryClient),
-    },
+    injectBeforeBodyClose: () =>
+      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+        dehydrate(queryClient)
+      )};</script>`,
   }
 }

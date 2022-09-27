@@ -1,4 +1,4 @@
-import { BrowserHistory, createBrowserHistory } from 'history'
+import { BrowserHistory, createBrowserHistory } from '@remix-run/router'
 import {
   useContext,
   useLayoutEffect,
@@ -17,7 +17,7 @@ function BrowserRouter({
 }: BrowserRouterProps) {
   const historyRef = useRef<BrowserHistory>()
   if (historyRef.current == null) {
-    historyRef.current = createBrowserHistory({ window })
+    historyRef.current = createBrowserHistory({ window, v5Compat: true })
   }
 
   const history = historyRef.current
