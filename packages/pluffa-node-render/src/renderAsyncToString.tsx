@@ -45,6 +45,7 @@ export async function renderAsyncToString<Props>({
         bootstrapScriptContent: serverData?.bootstrapScriptContent,
         injectBeforeHeadClose: serverData?.injectBeforeHeadClose,
         injectBeforeBodyClose: serverData?.injectBeforeBodyClose,
+        streamTransformers: serverData?.streamTransformers,
         onAllReady() {
           out.on('finish', async () => {
             resolve(out.getContentsAsString() || '')

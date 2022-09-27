@@ -46,6 +46,7 @@ export async function renderExpressResponse<Props>(
       bootstrapScriptContent: serverData?.bootstrapScriptContent,
       injectBeforeHeadClose: serverData?.injectBeforeHeadClose,
       injectBeforeBodyClose: serverData?.injectBeforeBodyClose,
+      streamTransformers: serverData?.streamTransformers,
       getClientRenderFallback() {
         return (
           <SSRProvider

@@ -1,32 +1,20 @@
-import createEmotionServer from '@emotion/server/create-instance'
+import { Root, Scripts, Styles } from '@pluffa/ssr/skeleton'
 
-export default function Skeleton({ appHtml, entrypoints, cache }) {
-  const { extractCriticalToChunks, constructStyleTagsFromChunks } =
-    createEmotionServer(cache)
-  const chunks = extractCriticalToChunks(appHtml)
-  const styles = constructStyleTagsFromChunks(chunks)
-  const headContent = `
-    <meta charSet="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/favicon.ico">
-    ${styles}
-  `
+export default function Skeleton() {
   return (
     <html>
-      <head dangerouslySetInnerHTML={{ __html: headContent }} />
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <Styles />
+      </head>
       <body>
-        <div
-          id="root"
-          dangerouslySetInnerHTML={{
-            __html: appHtml,
-          }}
-        />
+        <div id="root">
+          <Root />
+        </div>
+        <Scripts />
       </body>
-      {entrypoints.main
-        .filter((e) => e.endsWith('.js'))
-        .map((e) => (
-          <script key={e} src={`/${e}`} />
-        ))}
     </html>
   )
 }

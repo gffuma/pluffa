@@ -1,4 +1,5 @@
 import { AppProps } from '@pluffa/ssr'
+import type { Transform } from 'node:stream'
 import { RenderToPipeableStreamOptions } from 'react-dom/server'
 
 export interface ServerData<Props>
@@ -7,6 +8,7 @@ export interface ServerData<Props>
     'bootstrapScripts' | 'bootstrapModules' | 'bootstrapScriptContent'
   > {
   props: Props
+  streamTransformers?: Transform[]
   injectBeforeBodyClose?: () => string
   injectBeforeHeadClose?: () => string
 }

@@ -27,6 +27,7 @@ export interface RenderOptions extends RenderToPipeableStreamOptions {
   getClientRenderFallback?: () => ReactElement
   injectBeforeBodyClose?: () => string
   injectBeforeHeadClose?: () => string
+  streamTransformers?: Transform[]
 }
 
 export function render(
@@ -38,10 +39,11 @@ export function render(
     onFatalError,
     stopOnError,
     getClientRenderFallback,
+    streamTransformers = [],
     ...reactRenderOptions
   }: RenderOptions = {}
 ) {
-  const transfomers: Transform[] = []
+  const transfomers: Transform[] = [...streamTransformers]
 
   if (injectBeforeBodyClose) {
     transfomers.push(
