@@ -5,7 +5,6 @@ const BASE_LINKS = ['pluffa', '@pluffa/ssr']
 const BASE_CROSS_LINKS = ['react', 'react-dom']
 
 async function main() {
-  console.log(process.argv)
   const exampleName = process.argv[3]
   if (!exampleName) {
     console.log('Missing example name')
