@@ -2,7 +2,7 @@
   "name": "@pluffa/router",
   "type": "module",
   "description": "Pluffa router",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "sideEffects": false,
   "exports": {
     ".": {

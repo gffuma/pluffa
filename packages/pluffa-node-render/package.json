@@ -2,7 +2,7 @@
   "name": "@pluffa/node-render",
   "type": "module",
   "description": "Pluffa render runtime for Node.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "sideEffects": false,
   "exports": {
     ".": {
