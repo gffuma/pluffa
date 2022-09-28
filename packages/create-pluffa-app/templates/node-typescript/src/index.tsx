@@ -1,6 +1,5 @@
 import './index.css'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import App from './App'
 
-const hydrateRoot = (ReactDOM as any).hydrateRoot
-hydrateRoot(document.getElementById('root'), <App />)
+ReactDOM.hydrateRoot(document.getElementById('root')!, <App />)
