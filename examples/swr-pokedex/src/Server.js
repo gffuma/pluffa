@@ -1,9 +1,12 @@
 import { SWRConfig } from 'swr'
 import { StaticRouter } from 'react-router-dom/server'
+import { useSSRUrl, useSSRData } from '@pluffa/ssr'
 import App from './App'
 import fetcher from './fetcher'
 
-export default function StaticApp({ cache, url }) {
+export default function Server() {
+  const url = useSSRUrl()
+  const { cache } = useSSRData()
   return (
     <SWRConfig
       value={{
@@ -28,18 +31,15 @@ export default function StaticApp({ cache, url }) {
   )
 }
 
-export const getStaticProps = () => {
+export const getServerData = () => {
+  const cache = new Map()
   return {
-    props: {
-      cache: new Map(),
+    data: {
+      cache,
     },
-  }
-}
-
-export const getSkeletonProps = (staticProps, { cache }) => {
-  return {
-    props: {
-      initialData: Array.from(cache.entries()),
-    },
+    injectBeforeBodyClose: () =>
+      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+        Array.from(cache.entries())
+      )};</script>`,
   }
 }

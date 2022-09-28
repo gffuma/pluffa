@@ -12,11 +12,7 @@
     "react-query": "^3.35.0",
     "react-router-dom": "^6.2.1",
     "pluffa": "latest",
+    "@pluffa/node": "latest",
     "superagent": "^7.1.1"
-  },
-  "pluffa": {
-    "clientEntry": "./src/index.js",
-    "serverComponent": "./src/StaticApp.js",
-    "skeletonComponent": "./src/Skeleton.js"
   }
 }

@@ -8,9 +8,9 @@ import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
-import { render } from '@pluffa/node-render'
+import { renderAsyncToString } from '@pluffa/node-render'
 import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
-import { RegisterStatik } from '@pluffa/statik/runtime'
+import type { RegisterStatik } from '@pluffa/statik/runtime'
 
 const ncp = util.promisify(ncpCB)
 
@@ -220,12 +220,10 @@ export default async function staticize({
     }
   }
 
-  const appPath = path.join(buildNodePath, `App.${buildImportExt}`)
-  const {
-    default: App,
-    getSkeletonProps,
-    getStaticProps,
-  } = await import(appPath).catch(handleImportError).then(uniformExport)
+  const serverPath = path.join(buildNodePath, `Server.${buildImportExt}`)
+  const { default: Server, getServerData } = await import(serverPath)
+    .catch(handleImportError)
+    .then(uniformExport)
 
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
   const { default: Skeleton } = await import(skeletonPath)
@@ -236,30 +234,24 @@ export default async function staticize({
     exitOnError,
     crawEnabled,
     async renderURL(url) {
-      let RenderApp = App
+      let RenderServer = Server
       let crawlSess: CrawlSession
       if (crawEnabled) {
         crawlSess = createCrawlSession()
-        RenderApp = (props: Record<string, any>) => (
+        RenderServer = () => (
           <CrawlContext.Provider value={crawlSess}>
-            <App {...props} />
+            <Server />
           </CrawlContext.Provider>
         )
       }
-      let html = await render(
-        {
-          App: RenderApp,
-          getSkeletonProps,
-          getStaticProps,
-          Skeleton,
-          throwOnError: true,
-        },
-        {
-          url,
-          entrypoints: manifest.entrypoints,
-        }
-      )
-      html = `<!DOCTYPE html>${html}`
+      const entrypoints = manifest.entrypoints
+      const html = await renderAsyncToString({
+        Server: RenderServer,
+        getServerData,
+        Skeleton,
+        url,
+        entrypoints,
+      })
       let urls: string[] = []
       if (crawEnabled) {
         urls = await crawlSess!.rewind()

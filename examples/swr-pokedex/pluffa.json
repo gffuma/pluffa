@@ -1,0 +1,6 @@
+{
+  "crawlConcurrency": 1,
+  "clientEntry": "./src/index.js",
+  "serverComponent": "./src/Server.js",
+  "skeletonComponent": "./src/Skeleton.js"
+}

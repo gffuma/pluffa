@@ -29,7 +29,7 @@ delete (window as any).__INITIAL_DATA__
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
   <QueryClientProvider client={queryClient}>
-    <ClientRouter manager={routerManager} prefetchLink='intent'>
+    <ClientRouter manager={routerManager} prefetchLink='never'>
       <App />
     </ClientRouter>
   </QueryClientProvider>

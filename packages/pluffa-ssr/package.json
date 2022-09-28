@@ -1,0 +1,49 @@
+{
+  "name": "@pluffa/ssr",
+  "type": "module",
+  "description": "Pluffa common ssr stuff",
+  "version": "0.0.1",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./skeleton": {
+      "require": "./dist/skeleton.cjs",
+      "import": "./dist/skeleton.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts"
+      ],
+      "skeleton": [
+        "./dist/skeleton.d.ts"
+      ]
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Giovanni Fumagalli",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": "gffuma/pluffa",
+  "keywords": [
+    "react",
+    "ssr"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

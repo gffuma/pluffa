@@ -1,0 +1,9 @@
+{
+  "clientEntry": {
+    "main": "./src/index.js",
+    "admin": "./src/admin.js"
+  },
+  "serverComponent": "./src/Server.js",
+  "skeletonComponent": "./src/Skeleton.js",
+  "urls": ["/", "/admin"]
+}

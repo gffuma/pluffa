@@ -3,8 +3,8 @@ import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import sourceMap from 'source-map-support'
 import fs from 'fs/promises'
 import path from 'path'
-import { render } from '@pluffa/node-render'
-import express, { Express } from 'express'
+import express, { Express, Response } from 'express'
+import { renderExpressResponse } from '@pluffa/node-render'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 
 export interface CreateProdServerOptions {
@@ -15,6 +15,17 @@ export interface CreateProdServerOptions {
   createServer?: () => Express
   statikDataDir: string | false
   proxyUrl?: string
+}
+
+function handleFatalSSRError(error: any, res: Response) {
+  console.error(chalk.red('Fatal server error'))
+  console.error(error)
+  if (!res.headersSent) {
+    res.status(500)
+  }
+  const html = `<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>`
+  res.write(html)
+  res.end()
 }
 
 function createDefaultServer() {
@@ -78,14 +89,13 @@ export default async function createProdServer({
   // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
 
-  const appPath = path.join(buildNodePath, `App.${buildImportExt}`)
+  // Import user compiled Server file
+  const serverPath = path.join(buildNodePath, `Server.${buildImportExt}`)
+  const { default: Server, getServerData } = await import(serverPath)
+    .catch(handleImportError)
+    .then(uniformExport)
 
-  const {
-    default: App,
-    getSkeletonProps,
-    getStaticProps,
-  } = await import(appPath).catch(handleImportError).then(uniformExport)
-
+  // Import user compiled Skeleton file
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
   const { default: Skeleton } = await import(skeletonPath)
     .catch(handleImportError)
@@ -171,28 +181,23 @@ export default async function createProdServer({
 
   app.use(async (req, res) => {
     try {
-      const html = await render(
-        {
-          App,
-          getStaticProps,
-          getSkeletonProps,
-          Skeleton,
-          onError: (renderingError) => {
-            console.log(chalk.red('Error during server rendering'))
-            console.log(renderingError)
-          },
+      await renderExpressResponse(req, res, {
+        Server,
+        Skeleton,
+        getServerData,
+        entrypoints: manifest.entrypoints,
+        onError: (renderingError) => {
+          console.log(chalk.red('Error during server rendering'))
+          console.log(renderingError)
         },
-        { url: req.url, entrypoints: manifest.entrypoints }
-      )
-      res.send(`<!DOCTYPE html>${html}`)
+        onFatalError(error) {
+          handleFatalSSRError(error, res)
+        },
+      })
     } catch (error) {
       console.error(chalk.red('Fatal error while rendering'))
       console.error(error)
-      res
-        .status(500)
-        .send(
-          `<!DOCTYPE html><html><body><h1>500 Internal Server Error</h1></body></html>`
-        )
+      handleFatalSSRError(error, res)
     }
   })
 

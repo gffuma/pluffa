@@ -1,17 +1,16 @@
-import { AppProps, GetStaticProps, GetSkeletonProps } from '@pluffa/node-render'
+import { GetServerData } from '@pluffa/node-render'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
+import { useSSRData, useSSRUrl } from '@pluffa/ssr'
 import { ServerRouter, RouterManager } from '@pluffa/router/server'
 import App from './App'
 import { routes } from './routes'
 
-export default function StaticApp({
-  routerManager,
-  queryClient,
-  url,
-}: AppProps & {
-  routerManager: RouterManager
-  queryClient: QueryClient
-}) {
+export default function Server() {
+  const url = useSSRUrl()
+  const { queryClient, routerManager } = useSSRData<{
+    queryClient: QueryClient
+    routerManager: RouterManager
+  }>()
   return (
     <QueryClientProvider client={queryClient}>
       <ServerRouter location={url} manager={routerManager}>
@@ -21,7 +20,7 @@ export default function StaticApp({
   )
 }
 
-export const getStaticProps: GetStaticProps = async ({ url }) => {
+export const getServerData: GetServerData = async ({ url }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -39,19 +38,13 @@ export const getStaticProps: GetStaticProps = async ({ url }) => {
   const routerManager = new RouterManager(routes, { queryClient })
   await routerManager.prefetchUrl(url)
   return {
-    props: {
+    data: {
       routerManager,
       queryClient,
     },
-  }
-}
-
-export const getSkeletonProps: GetSkeletonProps<{
-  queryClient: QueryClient
-}> = (appProps, { queryClient }) => {
-  return {
-    props: {
-      initialData: dehydrate(queryClient),
-    },
+    injectBeforeBodyClose: () =>
+      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+        dehydrate(queryClient)
+      )};</script>`,
   }
 }

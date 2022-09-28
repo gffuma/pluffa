@@ -1,8 +1,8 @@
-import { render } from '@pluffa/edge-render'
+import { renderToEdgeResponse } from '@pluffa/edge-render'
 import { Router } from 'itty-router'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
-import StaticApp, { getStaticProps } from './StaticApp'
 import Skeleton from './Skeleton'
+import Server, { getServerData } from './Server'
 
 const router = Router()
 
@@ -24,23 +24,11 @@ router.get('/static/*', async (_, event) => {
   }
 })
 
-router.all('*', async (req) => {
-  const urlParsed = new URL(req.url)
-  const html = await render(
-    {
-      App: StaticApp,
-      Skeleton,
-      getStaticProps,
-    },
-    {
-      entrypoints: PLUFFA_BUNDLE_ENTRYPOINTS,
-      url: urlParsed.pathname,
-    }
-  )
-  return new Response(html, {
-    headers: {
-      'content-type': 'text/html;charset=UTF-8',
-    },
+router.all('*', async (request) => {
+  return renderToEdgeResponse(request, {
+    Skeleton,
+    Server,
+    getServerData,
   })
 })
 

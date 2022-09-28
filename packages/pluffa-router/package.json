@@ -2,7 +2,8 @@
   "name": "@pluffa/router",
   "type": "module",
   "description": "Pluffa router",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -45,8 +46,8 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "react-router": "^6.3.0",
-    "react-router-dom": "^6.3.0"
+    "react-router": "^6.4.1",
+    "react-router-dom": "^6.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.15",

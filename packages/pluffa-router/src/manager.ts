@@ -3,6 +3,7 @@ import { matchRoutes, RouteMatch, RouteObject } from 'react-router-dom'
 
 export interface PageRouteObject<TProps = any> extends RouteObject {
   prefetchPage?(props: TProps, match: PageRouteMatch): any
+  children?: PageRouteObject[]
 }
 
 export type PrefetchHandler<T = any> = (props: T, match: PageRouteMatch) => any

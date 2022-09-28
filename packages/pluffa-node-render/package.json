@@ -2,7 +2,8 @@
   "name": "@pluffa/node-render",
   "type": "module",
   "description": "Pluffa render runtime for Node.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -25,12 +26,13 @@
   "repository": "gffuma/pluffa",
   "keywords": [
     "react",
-    "static site"
+    "ssr"
   ],
   "engines": {
     "node": ">=16.7"
   },
   "dependencies": {
+    "@pluffa/ssr": "^0.0.1",
     "stream-buffers": "^3.0.2"
   },
   "peerDependencies": {
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
-    "@types/stream-buffers": "^3.0.4"
+    "@types/stream-buffers": "^3.0.4",
+    "@types/express": "^4.17.13"
   }
 }

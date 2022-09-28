@@ -1,0 +1,5 @@
+{
+  "workerEntry": "./src/worker.js",
+  "clientEntry": "./src/index.js",
+  "runtime": "cloudflare-workers"
+}

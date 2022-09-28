@@ -10,17 +10,5 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "pluffa": "latest"
-  },
-  "pluffa": {
-    "clientEntry": {
-      "main": "./src/index.js",
-      "admin": "./src/admin.js"
-    },
-    "serverComponent": "./src/StatikApp.js",
-    "skeletonComponent": "./src/Skeleton.js",
-    "urls": [
-      "/",
-      "/admin"
-    ]
   }
 }
