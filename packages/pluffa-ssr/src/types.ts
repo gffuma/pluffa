@@ -1,20 +1,12 @@
 import { ComponentType } from 'react'
 
-export interface AppProps {
-  url: string
-}
+export type ServerComponent = ComponentType<{}>
 
-export type AppComponent<Props> = ComponentType<AppProps & Props>
+export type SkeletonComponent = ComponentType<{}>
 
-export interface SkeletonProps {
-  entrypoints: Record<string, string[]>
-}
-
-export type SkeletonComponent = ComponentType<SkeletonProps>
-
-export interface SSRContextType<Props> {
-  App?: AppComponent<Props>
-  props?: Props
+export interface SSRContextType<Data> {
+  Server?: ServerComponent
+  data?: Data
   url: string
   entrypoints: Record<string, string[]>
 }

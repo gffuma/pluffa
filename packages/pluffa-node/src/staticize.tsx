@@ -220,8 +220,8 @@ export default async function staticize({
     }
   }
 
-  const appPath = path.join(buildNodePath, `App.${buildImportExt}`)
-  const { default: App, getServerData } = await import(appPath)
+  const serverPath = path.join(buildNodePath, `Server.${buildImportExt}`)
+  const { default: Server, getServerData } = await import(serverPath)
     .catch(handleImportError)
     .then(uniformExport)
 
@@ -234,19 +234,19 @@ export default async function staticize({
     exitOnError,
     crawEnabled,
     async renderURL(url) {
-      let RenderApp = App
+      let RenderServer = Server
       let crawlSess: CrawlSession
       if (crawEnabled) {
         crawlSess = createCrawlSession()
-        RenderApp = (props: Record<string, any>) => (
+        RenderServer = () => (
           <CrawlContext.Provider value={crawlSess}>
-            <App {...props} />
+            <Server />
           </CrawlContext.Provider>
         )
       }
       const entrypoints = manifest.entrypoints
       const html = await renderAsyncToString({
-        App: RenderApp,
+        Server: RenderServer,
         getServerData,
         Skeleton,
         url,

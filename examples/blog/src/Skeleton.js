@@ -1,8 +1,6 @@
 import { Scripts, Root, Styles } from '@pluffa/ssr/skeleton'
-// import { Helmet } from 'react-helmet'
 
-export default function Skeleton({ appHtml, initialData, entrypoints }) {
-  // const helmet = Helmet.renderStatic()
+export default function Skeleton() {
   return (
     <html>
       <head>
@@ -10,9 +8,6 @@ export default function Skeleton({ appHtml, initialData, entrypoints }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <Styles />
-        {/* {helmet.title.toComponent()}
-        {helmet.meta.toComponent()}
-        {helmet.link.toComponent()} */}
       </head>
       <body>
         <div id="root">

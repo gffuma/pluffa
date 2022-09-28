@@ -1,8 +1,12 @@
+import { GetServerData } from '@pluffa/node-render'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
+import { useSSRUrl, useSSRData } from '@pluffa/ssr'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
 
-export default function StaticApp({ queryClient, url }) {
+export default function Server() {
+  const url = useSSRUrl()
+  const { queryClient } = useSSRData()
   return (
     <QueryClientProvider client={queryClient}>
       <StaticRouter location={url}>
@@ -12,7 +16,7 @@ export default function StaticApp({ queryClient, url }) {
   )
 }
 
-export const getServerData = () => {
+export const getServerData: GetServerData = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -23,13 +27,12 @@ export const getServerData = () => {
         refetchIntervalInBackground: false,
         refetchOnMount: false,
         staleTime: Infinity,
-        retry: false,
         suspense: true,
       },
     },
   })
   return {
-    props: {
+    data: {
       queryClient,
     },
     injectBeforeBodyClose: () =>

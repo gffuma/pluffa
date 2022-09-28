@@ -3,8 +3,8 @@ import { useSSRContext } from './server'
 
 export function Root() {
   const ctx = useSSRContext()
-  if (ctx && ctx.App) {
-    return createElement(ctx.App, { url: ctx.url, ...ctx.props })
+  if (ctx && ctx.Server) {
+    return createElement(ctx.Server)
   }
   return null
 }

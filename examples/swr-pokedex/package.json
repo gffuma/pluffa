@@ -11,13 +11,8 @@
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.2.1",
     "pluffa": "latest",
+    "@pluffa/node": "latest",
     "superagent": "^7.1.1",
     "swr": "^1.3.0"
-  },
-  "pluffa": {
-    "crawlConcurrency": 1,
-    "clientEntry": "./src/index.js",
-    "serverComponent": "./src/StaticApp.js",
-    "skeletonComponent": "./src/Skeleton.js"
   }
 }

@@ -1,0 +1,5 @@
+{
+  "clientEntry": "./src/index.tsx",
+  "serverComponent": "./src/Server.tsx",
+  "skeletonComponent": "./src/Skeleton.tsx"
+}

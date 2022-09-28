@@ -1,44 +1,43 @@
 import { RenderToReadableStreamOptions } from 'react-dom/server'
-import {
-  AppComponent,
-  AppProps,
-  SkeletonComponent,
-  SSRProvider,
-} from '@pluffa/ssr'
+import { ServerComponent, SkeletonComponent, SSRProvider } from '@pluffa/ssr'
 import { render } from './render'
 
-export interface ServerData<Props>
+export interface ServerData<Data>
   extends Pick<
     RenderToReadableStreamOptions,
     'bootstrapScripts' | 'bootstrapModules' | 'bootstrapScriptContent'
   > {
-  props: Props
+  data: Data
   injectBeforeBodyClose?: () => string
   injectBeforeHeadClose?: () => string
 }
 
-export type GetServerData<Props = any> = (
-  props: AppProps
-) => ServerData<Props> | Promise<ServerData<Props>>
+export interface GetServerDataConfig {
+  url: string
+}
 
-export interface RenderToEdgeResponseOptions<Props>
+export type GetServerData<Data = any> = (
+  config: GetServerDataConfig
+) => ServerData<Data> | Promise<ServerData<Data>>
+
+export interface RenderToEdgeResponseOptions<Data>
   extends Omit<
     RenderToReadableStreamOptions,
     'bootstrapScripts' | 'bootstrapModules' | 'bootstrapScriptContent'
   > {
-  App: AppComponent<Props>
-  getServerData: GetServerData<Props>
   Skeleton: SkeletonComponent
+  Server: ServerComponent
+  getServerData?: GetServerData<Data>
 }
 
-export async function renderToEdgeResponse<Props>(
+export async function renderToEdgeResponse<Data = any>(
   req: Request,
   {
-    App,
+    Server,
     getServerData,
     Skeleton,
     ...reactRenderOptions
-  }: RenderToEdgeResponseOptions<Props>
+  }: RenderToEdgeResponseOptions<Data>
 ) {
   const urlParsed = new URL(req.url)
   const url = urlParsed.pathname
@@ -54,13 +53,13 @@ export async function renderToEdgeResponse<Props>(
   const stream = await render(
     <SSRProvider
       value={{
-        App,
-        props: serverData?.props,
+        Server,
+        data: serverData?.data,
         url: url,
         entrypoints,
       }}
     >
-      <Skeleton entrypoints={entrypoints} />
+      <Skeleton />
     </SSRProvider>,
     {
       ...reactRenderOptions,
@@ -77,7 +76,7 @@ export async function renderToEdgeResponse<Props>(
               entrypoints,
             }}
           >
-            <Skeleton entrypoints={entrypoints} />
+            <Skeleton />
           </SSRProvider>
         )
       },

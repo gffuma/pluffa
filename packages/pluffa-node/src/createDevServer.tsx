@@ -9,7 +9,7 @@ import {
   createBaseDevServer,
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
-import type { AppComponent, SkeletonComponent } from '@pluffa/ssr'
+import type { ServerComponent, SkeletonComponent } from '@pluffa/ssr'
 import { renderExpressResponse, GetServerData } from '@pluffa/node-render'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
 import ErrorPage from './components/ErrorPage.js'
@@ -71,10 +71,10 @@ export default function createDevServer({
     default: RegisterStatik
   }>(buildedNodeDir, 'statik', compileNodeCommonJS)
 
-  const appHotModule = createHotModule<{
-    default: AppComponent<any>
+  const serverHotModule = createHotModule<{
+    default: ServerComponent
     getServerData?: GetServerData
-  }>(buildedNodeDir, 'App', compileNodeCommonJS)
+  }>(buildedNodeDir, 'Server', compileNodeCommonJS)
 
   const skeletonHotModule = createHotModule<{
     default: SkeletonComponent
@@ -85,7 +85,10 @@ export default function createDevServer({
   )
   // Refresh hot modules when compiler emit them!
   if (serverCompiler) {
-    const hotModules: HotModule<unknown>[] = [appHotModule, skeletonHotModule]
+    const hotModules: HotModule<unknown>[] = [
+      serverHotModule,
+      skeletonHotModule,
+    ]
     if (statikEnabled) {
       hotModules.push(statikHotModule)
     }
@@ -163,10 +166,10 @@ export default function createDevServer({
         const { default: registerStatik } = await statikHotModule.get()
         configureRegisterStatik(registerStatik)
       }
-      const { default: App, getServerData } = await appHotModule.get()
+      const { default: Server, getServerData } = await serverHotModule.get()
       const { default: Skeleton } = await skeletonHotModule.get()
       await renderExpressResponse(req, res, {
-        App,
+        Server,
         Skeleton,
         getServerData,
         entrypoints,

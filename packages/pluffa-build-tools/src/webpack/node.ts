@@ -103,7 +103,7 @@ export function getWebPackNodeConfig({
   useSwc,
 }: GetWebPackNodeConfigOptions): Configuration {
   const entry: EntryObject = {
-    App: serverComponent,
+    Server: serverComponent,
     Skeleton: skeletonComponent,
   }
   if (registerStatik) {

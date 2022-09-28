@@ -1,27 +1,21 @@
-import { GetServerData, AppProps } from '@pluffa/node-render'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { ServerRouter, RouterManager } from '@pluffa/router/server'
+import { StaticRouter } from 'react-router-dom/server'
+import { useSSRData, useSSRUrl } from '@pluffa/ssr'
 import App from './App'
-import { routes } from './routes'
 
-export default function StaticApp({
-  routerManager,
-  queryClient,
-  url,
-}: AppProps & {
-  routerManager: RouterManager
-  queryClient: QueryClient
-}) {
+export default function Server() {
+  const url = useSSRUrl()
+  const { queryClient } = useSSRData()
   return (
     <QueryClientProvider client={queryClient}>
-      <ServerRouter location={url} manager={routerManager}>
+      <StaticRouter location={url}>
         <App />
-      </ServerRouter>
+      </StaticRouter>
     </QueryClientProvider>
   )
 }
 
-export const getServerData: GetServerData = async ({ url }) => {
+export const getServerData = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -32,15 +26,13 @@ export const getServerData: GetServerData = async ({ url }) => {
         refetchIntervalInBackground: false,
         refetchOnMount: false,
         staleTime: Infinity,
+        retry: false,
         suspense: true,
       },
     },
   })
-  const routerManager = new RouterManager(routes, { queryClient })
-  await routerManager.prefetchUrl(url)
   return {
-    props: {
-      routerManager,
+    data: {
       queryClient,
     },
     injectBeforeBodyClose: () =>

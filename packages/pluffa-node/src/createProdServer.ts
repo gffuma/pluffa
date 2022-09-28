@@ -89,12 +89,13 @@ export default async function createProdServer({
   // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
 
-  const appPath = path.join(buildNodePath, `App.${buildImportExt}`)
-
-  const { default: App, getServerData } = await import(appPath)
+  // Import user compiled Server file
+  const serverPath = path.join(buildNodePath, `Server.${buildImportExt}`)
+  const { default: Server, getServerData } = await import(serverPath)
     .catch(handleImportError)
     .then(uniformExport)
 
+  // Import user compiled Skeleton file
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
   const { default: Skeleton } = await import(skeletonPath)
     .catch(handleImportError)
@@ -181,7 +182,7 @@ export default async function createProdServer({
   app.use(async (req, res) => {
     try {
       await renderExpressResponse(req, res, {
-        App,
+        Server,
         Skeleton,
         getServerData,
         entrypoints: manifest.entrypoints,

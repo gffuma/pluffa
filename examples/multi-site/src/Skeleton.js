@@ -1,30 +1,22 @@
-export default function Skeleton({ appHtml, entrypoints, url }) {
-  const app = url.startsWith('/admin') ? 'admin' : 'main'
+import { Root, Scripts, Styles } from '@pluffa/ssr/skeleton'
+import { useSSRData } from '@pluffa/ssr'
+
+export default function Skeleton() {
+  const { appType } = useSSRData()
   return (
     <html>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="/favicon.ico" />
-        {entrypoints[app]
-          .filter((e) => e.endsWith('.css'))
-          .map((e) => (
-            <link key={e} href={`/${e}`} rel="stylesheet" />
-          ))}
+        <Styles entry={appType} />
       </head>
       <body>
-        <div
-          id="root"
-          dangerouslySetInnerHTML={{
-            __html: appHtml,
-          }}
-        />
+        <div id="root">
+          <Root />
+        </div>
       </body>
-      {entrypoints[app]
-        .filter((e) => e.endsWith('.js'))
-        .map((e) => (
-          <script key={e} src={`/${e}`} />
-        ))}
+      <Scripts entry={appType} />
     </html>
   )
 }

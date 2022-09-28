@@ -1,25 +1,26 @@
+import { GetServerData } from '@pluffa/node-render'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { useSSRData, useSSRUrl } from '@pluffa/ssr'
-import { HelmetProvider } from 'react-helmet-async'
-import { StaticRouter } from 'react-router-dom/server'
+import { ServerRouter, RouterManager } from '@pluffa/router/server'
 import App from './App'
+import { routes } from './routes'
 
 export default function Server() {
-  const { queryClient, helmetContext } = useSSRData()
   const url = useSSRUrl()
+  const { queryClient, routerManager } = useSSRData<{
+    queryClient: QueryClient
+    routerManager: RouterManager
+  }>()
   return (
-    <HelmetProvider context={helmetContext}>
-      <QueryClientProvider client={queryClient}>
-        <StaticRouter location={url}>
-          <App />
-        </StaticRouter>
-      </QueryClientProvider>
-    </HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <ServerRouter location={url} manager={routerManager}>
+        <App />
+      </ServerRouter>
+    </QueryClientProvider>
   )
 }
 
-export const getServerData = () => {
-  const helmetContext = {}
+export const getServerData: GetServerData = async ({ url }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -34,15 +35,13 @@ export const getServerData = () => {
       },
     },
   })
+  const routerManager = new RouterManager(routes, { queryClient })
+  await routerManager.prefetchUrl(url)
   return {
     data: {
-      helmetContext,
+      routerManager,
       queryClient,
     },
-    injectBeforeHeadClose: () =>
-      ['title', 'meta', 'link']
-        .map((k) => helmetContext.helmet[k].toString())
-        .join(''),
     injectBeforeBodyClose: () =>
       `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
         dehydrate(queryClient)

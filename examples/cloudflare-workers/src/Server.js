@@ -1,7 +1,9 @@
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
+import { useSSRData } from '@pluffa/ssr'
 import App from './App'
 
-export default function StaticApp({ queryClient }) {
+export default function Server() {
+  const { queryClient } = useSSRData()
   return (
     <QueryClientProvider client={queryClient}>
       <App />
@@ -26,7 +28,7 @@ export const getServerData = () => {
     },
   })
   return {
-    props: {
+    data: {
       queryClient,
     },
     injectBeforeBodyClose: () =>

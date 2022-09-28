@@ -2,8 +2,20 @@ import { ReactNode, useContext } from 'react'
 import { SSRContext } from './context'
 import { SSRContextType } from './types'
 
-export function useSSRContext() {
+export function useSSRContext<Data = any>(): SSRContextType<Data> {
   return useContext(SSRContext)
+}
+
+export function useSSRUrl() {
+  return useSSRContext().url
+}
+
+export function useSSRData<Data = any>(): Data {
+  return useSSRContext<Data>().data!
+}
+
+export function useSSRBundleEntrypoints() {
+  return useSSRContext().entrypoints
 }
 
 export function SSRProvider({

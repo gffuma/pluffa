@@ -12,12 +12,8 @@
     "react-query": "^3.35.0",
     "react-router-dom": "^6.2.1",
     "pluffa": "latest",
+    "@pluffa/node": "latest",
     "superagent": "^7.1.1"
-  },
-  "pluffa": {
-    "clientEntry": "./src/index.tsx",
-    "serverComponent": "./src/StaticApp.tsx",
-    "skeletonComponent": "./src/Skeleton.tsx"
   },
   "devDependencies": {
     "@types/react": "^18.0.5",

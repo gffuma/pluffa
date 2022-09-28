@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express'
-import { SSRProvider, AppComponent, SkeletonComponent } from '@pluffa/ssr'
+import { SSRProvider, ServerComponent, SkeletonComponent } from '@pluffa/ssr'
 import { render } from './render'
 import type { GetServerData, ServerData } from './types'
 
-export interface ExpressSSRConfig<Props> {
-  App: AppComponent<Props>
-  getServerData?: GetServerData<Props>
+export interface ExpressSSRConfig<Data> {
   Skeleton: SkeletonComponent
+  Server: ServerComponent
+  getServerData?: GetServerData<Data>
   entrypoints: Record<string, string[]>
   onFatalError?: (error: unknown) => void
   onError?: (error: unknown) => void
@@ -16,8 +16,8 @@ export async function renderExpressResponse<Props>(
   req: Request,
   res: Response,
   {
-    App,
     Skeleton,
+    Server,
     getServerData,
     entrypoints,
     onError,
@@ -31,13 +31,13 @@ export async function renderExpressResponse<Props>(
   render(
     <SSRProvider
       value={{
-        App,
-        props: serverData?.props,
+        Server,
+        data: serverData?.data,
         url: req.url,
         entrypoints,
       }}
     >
-      <Skeleton entrypoints={entrypoints} />
+      <Skeleton />
     </SSRProvider>,
     res,
     {
@@ -55,7 +55,7 @@ export async function renderExpressResponse<Props>(
               entrypoints,
             }}
           >
-            <Skeleton entrypoints={entrypoints} />
+            <Skeleton />
           </SSRProvider>
         )
       },
