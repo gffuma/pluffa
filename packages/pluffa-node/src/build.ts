@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
-import webpack, { Configuration } from 'webpack'
+import webpack, { Configuration, MultiStats } from 'webpack'
 import rimraf from 'rimraf'
 import {
   getFlatEntrypointsFromWebPackStats,
@@ -67,26 +67,29 @@ export default function build({
     }),
   ])
 
-  compiler.run(async (err, stats) => {
-    if (err) {
-      console.error(err.stack || err)
-      if ((err as any).details) {
-        console.error((err as any).details)
+  return new Promise<MultiStats>((resolve) => {
+    compiler.run(async (err, stats) => {
+      if (err) {
+        console.error(err.stack || err)
+        if ((err as any).details) {
+          console.error((err as any).details)
+        }
+        process.exit(1)
+        return
       }
-      process.exit(1)
-      return
-    }
-    if (stats!.hasErrors()) {
-      for (const s of stats!.stats) {
-        s.compilation.getErrors().forEach((e) => console.error(e))
+      if (stats!.hasErrors()) {
+        for (const s of stats!.stats) {
+          s.compilation.getErrors().forEach((e) => console.error(e))
+        }
+        process.exit(1)
+      } else {
+        const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
+        await fs.writeFile(
+          path.join(process.cwd(), '.pluffa/client', 'manifest.json'),
+          JSON.stringify({ entrypoints }, null, 2)
+        )
+        resolve(stats!)
       }
-      process.exit(1)
-    } else {
-      const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
-      await fs.writeFile(
-        path.join(process.cwd(), '.pluffa/client', 'manifest.json'),
-        JSON.stringify({ entrypoints }, null, 2)
-      )
-    }
+    })
   })
 }

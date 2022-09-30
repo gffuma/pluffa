@@ -1,195 +1,21 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "anyOf": [
-        {
-            "properties": {
-                "clientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "clientSourceMap": {
-                    "type": "boolean"
-                },
-                "crawlConcurrency": {
-                    "type": "number"
-                },
-                "crawlEnabled": {
-                    "type": "boolean"
-                },
-                "exitStaticizeOnError": {
-                    "type": "boolean"
-                },
-                "experimentalUseSwc": {
-                    "type": "boolean"
-                },
-                "nodeModule": {
-                    "enum": [
-                        "commonjs",
-                        "esm"
-                    ],
-                    "type": "string"
-                },
-                "outputDir": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "number"
-                },
-                "productionClientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "productionClientSourceMap": {
-                    "type": "boolean"
-                },
-                "productionProxy": {
-                    "type": "string"
-                },
-                "productionServePublicAssets": {
-                    "type": "boolean"
-                },
-                "productionServeStaticAssets": {
-                    "type": "boolean"
-                },
-                "proxy": {
-                    "type": "string"
-                },
-                "publicDir": {
-                    "type": "string"
-                },
-                "registerStatik": {
-                    "type": "string"
-                },
-                "runtime": {
-                    "enum": [
-                        "node"
-                    ],
-                    "type": "string"
-                },
-                "serverComponent": {
-                    "type": "string"
-                },
-                "skeletonComponent": {
-                    "type": "string"
-                },
-                "statikDataDir": {
-                    "anyOf": [
-                        {
-                            "enum": [
-                                false
-                            ],
-                            "type": "boolean"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "urls": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
+    "properties": {
+        "nodeModule": {
+            "description": "The compilation format of node code.",
+            "enum": [
+                "commonjs",
+                "esm"
+            ],
+            "type": "string"
         },
-        {
-            "properties": {
-                "clientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "clientSourceMap": {
-                    "type": "boolean"
-                },
-                "experimentalUseSwc": {
-                    "type": "boolean"
-                },
-                "miniflareConfig": {
-                    "$ref": "#/definitions/Record<string,any>"
-                },
-                "outputDir": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "number"
-                },
-                "productionClientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "productionClientSourceMap": {
-                    "type": "boolean"
-                },
-                "publicDir": {
-                    "type": "string"
-                },
-                "runtime": {
-                    "enum": [
-                        "cloudflare-workers"
-                    ],
-                    "type": "string"
-                },
-                "workerEntry": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+        "runtime": {
+            "enum": [
+                "node"
+            ],
+            "type": "string"
         }
-    ],
-    "definitions": {
-        "Record<string,any>": {
-            "type": "object"
-        }
-    }
+    },
+    "type": "object"
 }
 

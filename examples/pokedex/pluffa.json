@@ -1,5 +1,6 @@
 {
   "clientEntry": "./src/index.js",
   "serverComponent": "./src/Server.js",
-  "skeletonComponent": "./src/Skeleton.js"
+  "skeletonComponent": "./src/Skeleton.js",
+  "buildOutput": "standalone"
 }

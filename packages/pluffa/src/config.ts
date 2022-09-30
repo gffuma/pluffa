@@ -105,3 +105,50 @@ export async function getUserConfig(): Promise<Config> {
 
   return cfg as Config
 }
+
+const PLUFFA_RUNTIMES = ['node', 'cloudflare-workers'] as const
+
+interface MinimalConfig {
+  runtime: typeof PLUFFA_RUNTIMES[number]
+  [key: string]: any
+}
+
+export async function getUserRawConfig(): Promise<MinimalConfig> {
+  const pkg = await getUserPkg()
+  let cfg: MinimalConfig = pkg.pluffa
+  if (!cfg) {
+    try {
+      cfg = await getUserJsonCfg()
+    } catch (_) {}
+  }
+
+  if (!cfg) {
+    console.log()
+    console.log(
+      chalk.red(
+        'Pluffa.js configuration error.' +
+          '\nTo configure Pluffa.js you need one ot theese options:\n' +
+          '\n- A "pluffa" key in your package.json' +
+          '\n- A pluffa.json file in your directory'
+      )
+    )
+    process.exit(1)
+  }
+  // Default runtime is NodeJS
+  cfg.runtime = cfg.runtime ?? 'node'
+
+  if (!PLUFFA_RUNTIMES.includes(cfg.runtime)) {
+    console.log(
+      chalk.red(
+        'Pluffa.js config error. ' +
+          `Invalid runtime "${cfg.runtime}".\n` +
+          'Check your configuration.\n'
+      )
+    )
+    process.exit(1)
+  }
+
+  ensureRuntimePkgsInstalled(cfg.runtime)
+
+  return cfg
+}

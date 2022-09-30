@@ -3,7 +3,7 @@ import { Command } from 'commander'
 import { printLogo } from './logo.js'
 import chalk from 'chalk'
 import { readLibPkgSync, shouldUseTypescript } from './utils.js'
-import { getUserConfig } from './config.js'
+import { getUserConfig, getUserRawConfig } from './config.js'
 
 const pkg = readLibPkgSync()
 
@@ -39,37 +39,48 @@ program.command('dev').action(async () => {
 
 program.command('build').action(async () => {
   printLogo()
-  const config = await getUserConfig()
+  const config = await getUserRawConfig()
   const useTypescript = shouldUseTypescript()
   process.env.NODE_ENV = 'production'
-  if (config.runtime === 'cloudflare-workers') {
-    const { buildForWorker } = await import('@pluffa/cloudflare-workers')
-    console.log()
-    console.log('Creating an optimized build...')
-    console.log()
-    buildForWorker({
-      ...config,
-      clientEntry: config.productionClientEntry ?? config.clientEntry,
-      clientSourceMapEnabled:
-        config.productionClientSourceMap ?? config.clientSourceMap,
+  console.log()
+  console.log('Creating an optimized build...')
+  console.log()
+  if (config.runtime === 'node') {
+    const { runBuildCommand } = await import('@pluffa/node')
+    runBuildCommand(config, {
       useTypescript,
-      useSwc: config.experimentalUseSwc,
-    })
-  } else {
-    const { build } = await import('@pluffa/node')
-    console.log()
-    console.log('Creating an optimized build...')
-    console.log()
-    build({
-      ...config,
-      clientEntry: config.productionClientEntry ?? config.clientEntry,
-      clientSourceMapEnabled:
-        config.productionClientSourceMap ?? config.clientSourceMap,
-      compileNodeCommonJS: config.nodeModule === 'commonjs',
-      useTypescript,
-      useSwc: config.experimentalUseSwc,
     })
   }
+  // const config = await getUserConfig()
+  // if (config.runtime === 'cloudflare-workers') {
+  //   const { buildForWorker } = await import('@pluffa/cloudflare-workers')
+  //   console.log()
+  //   console.log('Creating an optimized build...')
+  //   console.log()
+  //   buildForWorker({
+  //     ...config,
+  //     clientEntry: config.productionClientEntry ?? config.clientEntry,
+  //     clientSourceMapEnabled:
+  //       config.productionClientSourceMap ?? config.clientSourceMap,
+  //     useTypescript,
+  //     useSwc: config.experimentalUseSwc,
+  //   })
+  // } else {
+  //   const { runBuildCommand } = await import('@pluffa/node')
+  //   console.log()
+  //   console.log('Creating an optimized build...')
+  //   console.log()
+  //   runBuildCommand(config)
+  //   // build({
+  //   //   ...config,
+  //   //   clientEntry: config.productionClientEntry ?? config.clientEntry,
+  //   //   clientSourceMapEnabled:
+  //   //     config.productionClientSourceMap ?? config.clientSourceMap,
+  //   //   compileNodeCommonJS: config.nodeModule === 'commonjs',
+  //   //   useTypescript,
+  //   //   useSwc: config.experimentalUseSwc,
+  //   // })
+  // }
 })
 
 program

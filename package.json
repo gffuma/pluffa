@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf ./packages/**/dist && rollup -c",
     "build:watch": "rimraf ./packages/**/dist && rollup -c -w",
-    "schema": "typescript-json-schema -o schema.json ./packages/pluffa/src/types.ts Config",
+    "schema": "typescript-json-schema -o schema.json ./schema.ts Config",
     "example": "./scripts/linkexample.js"
   },
   "devDependencies": {

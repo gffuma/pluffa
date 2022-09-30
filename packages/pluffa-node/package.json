@@ -8,12 +8,19 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "require": "./dist/runtime.cjs",
+      "import": "./dist/runtime.js"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
         "./dist/index.d.ts"
+      ],
+      "runtime": [
+        "./dist/runtime.d.ts"
       ]
     }
   },
@@ -35,10 +42,12 @@
     "@pluffa/env": "^0.2.0",
     "@pluffa/node-render": "^0.2.0",
     "@pluffa/statik": "^0.2.0",
+    "@vercel/nft": "^0.22.1",
     "ansi-to-html": "^0.7.2",
     "chalk": "^5.0.1",
     "express": "^4.18.1",
     "http-proxy-middleware": "^2.0.3",
+    "import-meta-resolve": "^2.1.0",
     "mkdirp": "^1.0.4",
     "ncp": "^2.0.0",
     "node-html-parser": "^5.3.3",
