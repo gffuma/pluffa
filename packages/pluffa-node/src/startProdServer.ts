@@ -10,6 +10,7 @@ export interface StartProdServerOptions {
   proxy?: string
   publicDir: string | false
   port: number
+  buildDir?: string
 }
 
 export default async function startProdServer({
@@ -20,6 +21,7 @@ export default async function startProdServer({
   proxy: proxyUrl,
   port,
   publicDir,
+  buildDir,
 }: StartProdServerOptions) {
   const isProd = true
   setUpEnv({ isProd })
@@ -31,6 +33,7 @@ export default async function startProdServer({
     compileNodeCommonJS,
     statikEnabled,
     publicDir,
+    buildDir,
   })
 
   app.listen(port, () => {

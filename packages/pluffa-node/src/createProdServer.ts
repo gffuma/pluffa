@@ -15,6 +15,7 @@ export interface CreateProdServerOptions {
   createServer?: () => Express
   statikDataDir: string | false
   proxyUrl?: string
+  buildDir?: string
 }
 
 function handleFatalSSRError(error: any, res: Response) {
@@ -64,6 +65,7 @@ export default async function createProdServer({
   statikEnabled = false,
   serveStaticAssets = true,
   compileNodeCommonJS,
+  buildDir: overrideBuildDir,
 }: CreateProdServerOptions): Promise<Express> {
   sourceMap.install()
 
@@ -74,8 +76,9 @@ export default async function createProdServer({
     app.use(express.static(path.resolve(process.cwd(), publicDir)))
   }
 
-  const buildNodePath = path.resolve(process.cwd(), '.pluffa/node')
-  const buildClientPath = path.resolve(process.cwd(), '.pluffa/client')
+  const buildDir = overrideBuildDir ?? path.resolve(process.cwd(), '.pluffa')
+  const buildNodePath = path.join(buildDir, 'node')
+  const buildClientPath = path.join(buildDir, 'client')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
   if (serveStaticAssets) {

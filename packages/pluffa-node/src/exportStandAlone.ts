@@ -9,8 +9,10 @@ import { Module, MultiStats, Stats } from 'webpack'
 import type { StartProdServerOptions } from './startProdServer'
 import { NodeConfig } from './types'
 import rimrafCB from 'rimraf'
+import ncpCB from 'ncp'
 
 const rimraf = promisify(rimrafCB)
+const ncp = promisify(ncpCB)
 
 const require = createRequire(import.meta.url)
 
@@ -36,6 +38,43 @@ function getExternalImports(stats: Stats) {
   }
 
   return externals
+}
+
+function getExternalFiles(stats: Stats) {
+  // Find externa ES:. import { find } from 'lodash' ... in server code ...
+  // using compilation stats
+  const externalsLibs = getExternalImports(stats)
+
+  // Resolve external library to correct path ESM vs CommonJS
+  const externalsFiles = new Set<string>()
+  const sourceNodeModulesPath = path.join(process.cwd(), 'node_modules')
+
+  for (const [ext, type] of externalsLibs.entries()) {
+    if (type === 'module') {
+      const url = moduleResolve(
+        ext,
+        new URL(`file://${sourceNodeModulesPath}`),
+        new Set(['node', 'import']),
+        true
+      )
+      externalsFiles.add(fileURLToPath(url))
+    } else {
+      const file = require.resolve(ext, {
+        paths: [sourceNodeModulesPath],
+      })
+      externalsFiles.add(file)
+    }
+  }
+
+  const nodeRunTimeUrl = moduleResolve(
+    '@pluffa/node/runtime',
+    new URL(`file://${sourceNodeModulesPath}`),
+    new Set(['node', 'import']),
+    true
+  )
+  const nodeRunTimeFile = fileURLToPath(nodeRunTimeUrl)
+  externalsFiles.add(nodeRunTimeFile)
+  return Array.from(externalsFiles)
 }
 
 type TreeMap = Map<string, TreeMap>
@@ -83,56 +122,10 @@ export async function copyNodeModules(to: string, nodeModules: string[]) {
   await Promise.all(flatCopy.map((d) => fs.cp(d.from, path.join(to, d.to))))
 }
 
-export async function exportStandAlone(
-  multiStats: MultiStats,
-  config: NodeConfig
+async function createServerRutimeBootstrapFile(
+  config: NodeConfig,
+  baseDir: string
 ) {
-  const stats = multiStats.stats.find((s) => s.compilation.name === 'server')!
-
-  // Find externa ES:. import { find } from 'lodash' ... in server code ...
-  // using compilation stats
-  const externalsLibs = getExternalImports(stats)
-
-  // Resolve external library to correct path ESM vs CommonJS
-  const externalsFiles = new Set<string>()
-  const sourceNodeModulesPath = path.join(process.cwd(), 'node_modules')
-
-  for (const [ext, type] of externalsLibs.entries()) {
-    if (type === 'module') {
-      const url = moduleResolve(
-        ext,
-        new URL(`file://${sourceNodeModulesPath}`),
-        new Set(['node', 'import']),
-        true
-      )
-      externalsFiles.add(fileURLToPath(url))
-    } else {
-      const file = require.resolve(ext, {
-        paths: [sourceNodeModulesPath],
-      })
-      externalsFiles.add(file)
-    }
-  }
-
-  const nodeRunTimeUrl = moduleResolve(
-    '@pluffa/node/runtime',
-    new URL(`file://${sourceNodeModulesPath}`),
-    new Set(['node', 'import']),
-    true
-  )
-  const nodeRunTimeFile = fileURLToPath(nodeRunTimeUrl)
-  externalsFiles.add(nodeRunTimeFile)
-
-  // ... Now find all related shit!
-  const { fileList } = await nodeFileTrace(Array.from(externalsFiles))
-
-  const standAloneDir = path.join(process.cwd(), '.pluffa/standalone')
-
-  await rimraf(standAloneDir)
-  await fs.mkdir(standAloneDir)
-
-  await copyNodeModules(standAloneDir, Array.from(fileList))
-
   // FIXME: Unify this part .....
   const serverProdOptions: StartProdServerOptions = {
     statikDataDir: config.statikDataDir,
@@ -146,18 +139,62 @@ export async function exportStandAlone(
 
   let runTimeTemplateJS: string
   if (config.nodeModule === 'commonjs') {
-    runTimeTemplateJS = `const { startProdServer } = require('@pluffa/node/runtime');`
+    runTimeTemplateJS =
+      "const { startProdServer } = require('@pluffa/node/runtime');"
+    runTimeTemplateJS += '\n' + "const path = require('path');"
   } else {
-    runTimeTemplateJS = `import { startProdServer } from '@pluffa/node/runtime';`
+    runTimeTemplateJS =
+      "import { startProdServer } from '@pluffa/node/runtime';"
+    runTimeTemplateJS += '\n' + "import path from 'path';"
+    runTimeTemplateJS += '\n' + "import { fileURLToPath } from 'url';"
+  }
+  if (config.nodeModule === 'commonjs') {
+    runTimeTemplateJS += '\n' + 'const __standalonedir = __dirname;'
+  } else {
+    runTimeTemplateJS +=
+      '\n' +
+      `const __standalonedir = path.dirname(fileURLToPath(import.meta.url));`
   }
   runTimeTemplateJS +=
-    '\n' + `startProdServer(${JSON.stringify(serverProdOptions)});`
+    '\n' + `const __config = ${JSON.stringify(serverProdOptions)};`
+  runTimeTemplateJS +=
+    '\n' + `__config.buildDir = path.join(__standalonedir, 'build');`
+  runTimeTemplateJS += '\n' + `startProdServer(__config);`
 
   await fs.writeFile(
-    path.join(
-      process.cwd(),
-      `.pluffa/standalone/server.${config.nodeModule === 'esm' ? 'm' : ''}js`
-    ),
+    path.join(baseDir, `server.${config.nodeModule === 'esm' ? 'm' : ''}js`),
     runTimeTemplateJS
   )
+}
+
+export async function exportStandAlone(
+  multiStats: MultiStats,
+  config: NodeConfig
+) {
+  const stats = multiStats.stats.find((s) => s.compilation.name === 'server')!
+
+  // Get all external files from compilation stats
+  const externalsFiles = getExternalFiles(stats)
+
+  // ... Now find all related shit!
+  const { fileList } = await nodeFileTrace(externalsFiles)
+
+  // Create Base dir structure
+  const standAloneDir = path.join(process.cwd(), '.pluffa/standalone')
+  const standAloneBuildedDir = path.join(standAloneDir, 'build')
+
+  const nodeBuildedDir = path.join(process.cwd(), '.pluffa/node')
+  const clientBuildedDir = path.join(process.cwd(), '.pluffa/client')
+
+  await rimraf(standAloneDir)
+  await fs.mkdir(standAloneDir)
+  await fs.mkdir(standAloneBuildedDir)
+  await ncp(nodeBuildedDir, path.join(standAloneBuildedDir, 'node'))
+  await ncp(clientBuildedDir, path.join(standAloneBuildedDir, 'client'))
+
+  // Copy all fucking node_modules tree ... in i think lol optmized way..
+  await copyNodeModules(standAloneDir, Array.from(fileList))
+
+  // Finally create the bootstra standalone file!
+  await createServerRutimeBootstrapFile(config, standAloneDir)
 }
