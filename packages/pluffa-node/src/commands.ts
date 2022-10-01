@@ -60,7 +60,6 @@ export async function runBuildCommand(
   rawConfig: Record<string, any>,
   { useTypescript }: CommandOptions
 ) {
-  console.log('RUNNING BOY')
   const config = validateConfig(rawConfig)
   const stats = await build({
     ...config,
@@ -72,7 +71,7 @@ export async function runBuildCommand(
     useSwc: config.experimentalUseSwc,
   })
   if (config.buildOutput === 'standalone') {
-    console.log('__START_STAND_ALONE__')
+    console.log('Exporting standalone version...')
     await exportStandAlone(stats, config)
   }
 }

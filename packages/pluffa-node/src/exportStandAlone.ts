@@ -9,11 +9,8 @@ import { Module, MultiStats, Stats } from 'webpack'
 import type { StartProdServerOptions } from './startProdServer'
 import { NodeConfig } from './types'
 import rimrafCB from 'rimraf'
-import ncpCB from 'ncp'
-import mkdirp from 'mkdirp'
 
 const rimraf = promisify(rimrafCB)
-const ncp = promisify(ncpCB)
 
 const require = createRequire(import.meta.url)
 
@@ -39,6 +36,51 @@ function getExternalImports(stats: Stats) {
   }
 
   return externals
+}
+
+type TreeMap = Map<string, TreeMap>
+
+export async function copyNodeModules(to: string, nodeModules: string[]) {
+  const tree: TreeMap = new Map()
+  const flatCopy: { from: string; to: string }[] = []
+
+  nodeModules.forEach((m) => {
+    const i = m.indexOf(`node_modules${path.sep}`)
+    if (i !== -1) {
+      let normalized = m.slice(i)
+      if (path.parse(normalized).ext) {
+        flatCopy.push({ from: m, to: normalized })
+        normalized = path.dirname(normalized)
+      }
+
+      let iterTree: TreeMap = tree
+      normalized.split(path.sep).forEach((segment, i) => {
+        if (i === 0) {
+          return
+        }
+        if (!iterTree.has(segment)) {
+          iterTree.set(segment, new Map())
+        }
+        iterTree = iterTree.get(segment)!
+      })
+    }
+  })
+
+  const nodeModulesTo = path.join(to, 'node_modules')
+  await fs.mkdir(nodeModulesTo)
+
+  async function createDirTree(tree: TreeMap, pk?: string) {
+    const keys = Array.from(tree.keys())
+    const dirs = keys.map((k) => (pk ? path.join(pk, k) : k))
+
+    await Promise.all(dirs.map((d) => fs.mkdir(path.join(nodeModulesTo, d))))
+
+    await Promise.all(
+      keys.map((k) => createDirTree(tree.get(k)!, pk ? path.join(pk, k) : k))
+    )
+  }
+  await createDirTree(tree)
+  await Promise.all(flatCopy.map((d) => fs.cp(d.from, path.join(to, d.to))))
 }
 
 export async function exportStandAlone(
@@ -84,6 +126,13 @@ export async function exportStandAlone(
   // ... Now find all related shit!
   const { fileList } = await nodeFileTrace(Array.from(externalsFiles))
 
+  const standAloneDir = path.join(process.cwd(), '.pluffa/standalone')
+
+  await rimraf(standAloneDir)
+  await fs.mkdir(standAloneDir)
+
+  await copyNodeModules(standAloneDir, Array.from(fileList))
+
   // FIXME: Unify this part .....
   const serverProdOptions: StartProdServerOptions = {
     statikDataDir: config.statikDataDir,
@@ -94,10 +143,6 @@ export async function exportStandAlone(
     proxy: config.productionProxy,
     serveStaticAssets: config.productionServeStaticAssets,
   }
-
-  const standAloneDir = path.join(process.cwd(), '.pluffa/standalone')
-  await rimraf(standAloneDir)
-  await mkdirp(standAloneDir)
 
   let runTimeTemplateJS: string
   if (config.nodeModule === 'commonjs') {
