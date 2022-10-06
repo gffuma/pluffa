@@ -22,7 +22,7 @@ export async function renderAsyncToString<Data = any>({
 
   let serverData: ServerData<any> | undefined
   if (getServerData) {
-    serverData = await getServerData({ url })
+    serverData = await getServerData({ url, entrypoints })
   }
 
   return new Promise<string>((resolve, reject) => {

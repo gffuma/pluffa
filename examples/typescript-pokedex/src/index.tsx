@@ -1,3 +1,4 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
@@ -23,9 +24,11 @@ delete (window as any).__INITIAL_DATA__
 
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </React.StrictMode>
 )

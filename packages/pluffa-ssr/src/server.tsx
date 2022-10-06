@@ -17,6 +17,25 @@ export function useSSRData<Data = any>(): Data {
 export function useSSRBundleEntrypoints() {
   return useSSRContext().entrypoints
 }
+export function getScripts(
+  entrypoints: Record<string, string[]>,
+  entry = 'main'
+) {
+  return entrypoints[entry]
+    .filter((e) => e.endsWith('.js'))
+    .map((e) => `<script src="/${e}"></script>`)
+    .join('')
+}
+
+export function getStyles(
+  entrypoints: Record<string, string[]>,
+  entry = 'main'
+) {
+  return entrypoints[entry]
+    .filter((e) => e.endsWith('.css'))
+    .map((e) => `<link href="/${e} rel="stylesheet" />`)
+    .join('')
+}
 
 export function SSRProvider({
   value,

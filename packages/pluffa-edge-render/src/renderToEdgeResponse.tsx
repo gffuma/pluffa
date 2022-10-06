@@ -14,6 +14,7 @@ export interface ServerData<Data>
 
 export interface GetServerDataConfig {
   url: string
+  entrypoints: Record<string, string[]>
 }
 
 export type GetServerData<Data = any> = (
@@ -42,13 +43,14 @@ export async function renderToEdgeResponse<Data = any>(
   const urlParsed = new URL(req.url)
   const url = urlParsed.pathname
 
-  let serverData: ServerData<any> | undefined
-  if (getServerData) {
-    serverData = await getServerData({ url: url })
-  }
   // TODO: Maybe for other runtimes this don't exists ....
   // for now keep here maybe make more configurable ...
   const entrypoints = PLUFFA_BUNDLE_ENTRYPOINTS
+
+  let serverData: ServerData<any> | undefined
+  if (getServerData) {
+    serverData = await getServerData({ url, entrypoints })
+  }
 
   const stream = await render(
     <SSRProvider

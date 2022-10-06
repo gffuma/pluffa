@@ -26,7 +26,7 @@ export async function renderExpressResponse<Props>(
 ) {
   let serverData: ServerData<any> | undefined
   if (getServerData) {
-    serverData = await getServerData({ url: req.url })
+    serverData = await getServerData({ url: req.url, entrypoints })
   }
   render(
     <SSRProvider

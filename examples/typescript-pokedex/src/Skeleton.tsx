@@ -1,4 +1,4 @@
-import { Styles, Root, Scripts } from '@pluffa/ssr/skeleton'
+import { Styles, Root } from '@pluffa/ssr/skeleton'
 
 export default function Skeleton() {
   return (
@@ -14,7 +14,6 @@ export default function Skeleton() {
           <Root />
         </div>
       </body>
-      <Scripts async />
     </html>
   )
 }
