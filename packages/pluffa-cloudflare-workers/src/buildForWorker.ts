@@ -92,7 +92,6 @@ export default async function buildForWorker({
       )
 
       // Copy public stuff
-      console.log('@@@', publicDir)
       if (publicDir !== false) {
         try {
           const publicPath = path.resolve(process.cwd(), publicDir)

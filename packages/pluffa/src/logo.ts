@@ -1,5 +1,10 @@
 import chalk from 'chalk'
-import { readLibPkgSync, repeatString } from './utils'
+
+function repeatString(n: number, str: string) {
+  return Array.apply(null, { length: n } as any)
+    .map((_) => str)
+    .join('')
+}
 
 export const logo = String.raw`
                         .---.
@@ -16,12 +21,11 @@ _________   _...._      |   |
                               '-'  '--'   |_|      |_|    '--'  '"
 `
 
-export function printLogo() {
-  const pkg = readLibPkgSync()
+export function printLogo(version: string) {
   console.log(chalk.magenta(logo))
   console.log()
   console.log(
-    repeatString(30, ' ') + chalk.greenBright(`Pluffa.js (${pkg.version})`)
+    repeatString(30, ' ') + chalk.greenBright(`Pluffa.js (${version})`)
   )
   console.log(
     repeatString(30, ' ') +

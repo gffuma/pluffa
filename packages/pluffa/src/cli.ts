@@ -16,10 +16,10 @@ const program = new Command()
   .description(pkg.description)
 
 program.command('dev').action(async () => {
-  printLogo()
-  const config = await getUserRawConfig()
-  const useTypescript = shouldUseTypescript()
+  printLogo(pkg.version)
   process.env.NODE_ENV = 'development'
+  const config = await getUserRawConfig('dev')
+  const useTypescript = shouldUseTypescript()
   if (config.runtime === 'node') {
     const { runDevCommand } = await import('@pluffa/node')
     runDevCommand(config, {
@@ -34,9 +34,9 @@ program.command('dev').action(async () => {
 })
 
 program.command('build').action(async () => {
-  printLogo()
+  printLogo(pkg.version)
   process.env.NODE_ENV = 'production'
-  const config = await getUserRawConfig()
+  const config = await getUserRawConfig('build')
   const useTypescript = shouldUseTypescript()
   console.log()
   console.log('Creating an optimized build...')
@@ -64,8 +64,9 @@ program
   )
   .option('-u, --url [urls...]', 'urls to crawl')
   .action(async (options) => {
-    printLogo()
-    const config = await getUserRawConfig()
+    printLogo(pkg.version)
+    process.env.NODE_ENV = 'production'
+    const config = await getUserRawConfig('staticize')
     if (config.runtime !== 'node') {
       console.log(
         chalk.red(
@@ -75,7 +76,6 @@ program
       process.exit(1)
       return
     }
-    process.env.NODE_ENV = 'production'
     const { runStaticizeCommand } = await import('@pluffa/node')
     console.log()
     console.log('Exporting your build as a static website...')
@@ -90,9 +90,9 @@ program
   })
 
 program.command('start').action(async () => {
-  printLogo()
-  const config = await getUserRawConfig()
+  printLogo(pkg.version)
   process.env.NODE_ENV = 'production'
+  const config = await getUserRawConfig('start')
   if (config.runtime !== 'node') {
     console.log(
       chalk.red(

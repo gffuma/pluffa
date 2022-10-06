@@ -13,6 +13,13 @@
     "bootstrap.cjs",
     "pluffa.d.ts"
   ],
+  "typesVersions": {
+    "*": {
+      "config": [
+        "./dist/config.d.ts"
+      ]
+    }
+  },
   "types": "./pluffa.d.ts",
   "repository": "gffuma/pluffa",
   "keywords": [
