@@ -7,7 +7,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { Module, MultiStats, Stats } from 'webpack'
 import type { StartProdServerOptions } from './startProdServer'
-import { NodeConfig } from './types'
+import { NodeConfigWithDefaults } from './config'
 import rimrafCB from 'rimraf'
 import ncpCB from 'ncp'
 
@@ -123,7 +123,7 @@ export async function copyNodeModules(to: string, nodeModules: string[]) {
 }
 
 async function createServerRutimeBootstrapFile(
-  config: NodeConfig,
+  config: NodeConfigWithDefaults,
   baseDir: string
 ) {
   // TODO: Unify map user config to start config.
@@ -172,7 +172,7 @@ async function createServerRutimeBootstrapFile(
 
 export async function exportStandAlone(
   multiStats: MultiStats,
-  config: NodeConfig
+  config: NodeConfigWithDefaults
 ) {
   const stats = multiStats.stats.find((s) => s.compilation.name === 'server')!
 

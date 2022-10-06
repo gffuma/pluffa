@@ -67,3 +67,28 @@ export interface CloudFlareWorkersConfig {
    */
   experimentalUseSwc?: boolean
 }
+
+export type CloudFlareWorkersConfigDefaults = Required<
+  Pick<
+    CloudFlareWorkersConfig,
+    | 'port'
+    | 'runtime'
+    | 'outputDir'
+    | 'publicDir'
+    | 'clientSourceMap'
+    | 'experimentalUseSwc'
+  >
+>
+
+export const CloudFlareWorkersConfigDefaultsValues: CloudFlareWorkersConfigDefaults =
+  {
+    port: 7000,
+    runtime: 'cloudflare-workers',
+    outputDir: 'build',
+    publicDir: 'public',
+    clientSourceMap: true,
+    experimentalUseSwc: false,
+  }
+
+export type CloudFlareWorkersConfigWithDefaults = CloudFlareWorkersConfig &
+  CloudFlareWorkersConfigDefaults

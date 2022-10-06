@@ -1,31 +1,11 @@
 import chalk from 'chalk'
 import buildForWorker from './buildForWorker'
 import startWorkerDevServer from './startWorkerDevServer'
-import { CloudFlareWorkersConfig } from './types'
-
-export type CloudFlareWorkersConfigDefaults = Required<
-  Pick<
-    CloudFlareWorkersConfig,
-    | 'port'
-    | 'runtime'
-    | 'outputDir'
-    | 'publicDir'
-    | 'clientSourceMap'
-    | 'experimentalUseSwc'
-  >
->
-
-const ConfigDefaults: CloudFlareWorkersConfigDefaults = {
-  port: 7000,
-  runtime: 'cloudflare-workers',
-  outputDir: 'build',
-  publicDir: 'public',
-  clientSourceMap: true,
-  experimentalUseSwc: false,
-}
-
-export type CloudFlareWorkersConfigWithDefaults = CloudFlareWorkersConfig &
-  CloudFlareWorkersConfigDefaults
+import {
+  CloudFlareWorkersConfig,
+  CloudFlareWorkersConfigDefaultsValues,
+  CloudFlareWorkersConfigWithDefaults,
+} from './config'
 
 function validateConfig(
   rawConfig: Record<string, any>
@@ -45,7 +25,7 @@ function validateConfig(
   }
 
   return {
-    ...ConfigDefaults,
+    ...CloudFlareWorkersConfigDefaultsValues,
     ...rawConfig,
   } as CloudFlareWorkersConfigWithDefaults
 }

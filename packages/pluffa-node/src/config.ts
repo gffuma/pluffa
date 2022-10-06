@@ -143,3 +143,40 @@ export interface NodeConfig {
    */
   experimentalBuildOutput?: 'standalone'
 }
+
+export type NodeConfigDefaults = Required<
+  Pick<
+    NodeConfig,
+    | 'port'
+    | 'runtime'
+    | 'outputDir'
+    | 'publicDir'
+    | 'clientSourceMap'
+    | 'experimentalUseSwc'
+    | 'nodeModule'
+    | 'urls'
+    | 'crawlConcurrency'
+    | 'statikDataDir'
+    | 'exitStaticizeOnError'
+    | 'crawlEnabled'
+    | 'serveStaticAssets'
+  >
+>
+
+export const NodeConfigDefaultsValues: NodeConfigDefaults = {
+  port: 7000,
+  runtime: 'node',
+  nodeModule: 'esm',
+  outputDir: 'build',
+  publicDir: 'public',
+  urls: ['/'],
+  crawlConcurrency: 4,
+  statikDataDir: 'data',
+  exitStaticizeOnError: false,
+  crawlEnabled: true,
+  serveStaticAssets: true,
+  clientSourceMap: true,
+  experimentalUseSwc: false,
+}
+
+export type NodeConfigWithDefaults = NodeConfig & NodeConfigDefaults

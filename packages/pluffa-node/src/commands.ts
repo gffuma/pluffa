@@ -1,47 +1,14 @@
 import chalk from 'chalk'
 import build from './build'
+import {
+  NodeConfig,
+  NodeConfigDefaultsValues,
+  NodeConfigWithDefaults,
+} from './config'
 import { exportStandAlone } from './exportStandAlone'
 import startDevServer from './startDevServer'
 import startProdServer from './startProdServer'
 import staticize from './staticize'
-import { NodeConfig } from './types'
-
-export type NodeConfigDefaults = Required<
-  Pick<
-    NodeConfig,
-    | 'port'
-    | 'runtime'
-    | 'outputDir'
-    | 'publicDir'
-    | 'clientSourceMap'
-    | 'experimentalUseSwc'
-    | 'nodeModule'
-    | 'urls'
-    | 'crawlConcurrency'
-    | 'statikDataDir'
-    | 'exitStaticizeOnError'
-    | 'crawlEnabled'
-    | 'serveStaticAssets'
-  >
->
-
-const ConfigDefaults: NodeConfigDefaults = {
-  port: 7000,
-  runtime: 'node',
-  nodeModule: 'esm',
-  outputDir: 'build',
-  publicDir: 'public',
-  urls: ['/'],
-  crawlConcurrency: 4,
-  statikDataDir: 'data',
-  exitStaticizeOnError: false,
-  crawlEnabled: true,
-  serveStaticAssets: true,
-  clientSourceMap: true,
-  experimentalUseSwc: false,
-}
-
-export type NodeConfigWithDefaults = NodeConfig & NodeConfigDefaults
 
 function validateConfig(
   rawConfig: Record<string, any>
@@ -68,7 +35,7 @@ function validateConfig(
   }
 
   return {
-    ...ConfigDefaults,
+    ...NodeConfigDefaultsValues,
     ...rawConfig,
   } as NodeConfigWithDefaults
 }
