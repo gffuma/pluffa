@@ -1,4 +1,5 @@
 {
+  "runtime": "node",
   "clientEntry": {
     "main": "./src/index.js",
     "admin": "./src/admin.js"

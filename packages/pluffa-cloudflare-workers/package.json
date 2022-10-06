@@ -14,8 +14,8 @@
       "*": [
         "./dist/index.d.ts"
       ],
-      "render": [
-        "./dist/render.d.ts"
+      "types": [
+        "./dist/types.d.ts"
       ]
     }
   },

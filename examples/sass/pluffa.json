@@ -1,4 +1,5 @@
 {
+  "runtime": "node",
   "clientEntry": "./src/index.js",
   "serverComponent": "./src/App.js",
   "skeletonComponent": "./src/Skeleton.js"

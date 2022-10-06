@@ -14,6 +14,7 @@ export interface ServerData<Data = any>
 
 export interface GetServerDataConfig {
   url: string
+  // entrypoints: Record<string, string[]>
 }
 
 export type GetServerData<Data = any> = (

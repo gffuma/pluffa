@@ -1,195 +1,215 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "anyOf": [
-        {
-            "properties": {
-                "clientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "clientSourceMap": {
-                    "type": "boolean"
-                },
-                "crawlConcurrency": {
-                    "type": "number"
-                },
-                "crawlEnabled": {
-                    "type": "boolean"
-                },
-                "exitStaticizeOnError": {
-                    "type": "boolean"
-                },
-                "experimentalUseSwc": {
-                    "type": "boolean"
-                },
-                "nodeModule": {
-                    "enum": [
-                        "commonjs",
-                        "esm"
-                    ],
-                    "type": "string"
-                },
-                "outputDir": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "number"
-                },
-                "productionClientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "productionClientSourceMap": {
-                    "type": "boolean"
-                },
-                "productionProxy": {
-                    "type": "string"
-                },
-                "productionServePublicAssets": {
-                    "type": "boolean"
-                },
-                "productionServeStaticAssets": {
-                    "type": "boolean"
-                },
-                "proxy": {
-                    "type": "string"
-                },
-                "publicDir": {
-                    "type": "string"
-                },
-                "registerStatik": {
-                    "type": "string"
-                },
-                "runtime": {
-                    "enum": [
-                        "node"
-                    ],
-                    "type": "string"
-                },
-                "serverComponent": {
-                    "type": "string"
-                },
-                "skeletonComponent": {
-                    "type": "string"
-                },
-                "statikDataDir": {
-                    "anyOf": [
-                        {
-                            "enum": [
-                                false
-                            ],
-                            "type": "boolean"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "urls": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
+  "$ref": "#/definitions/Config",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CloudFlareWorkersConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "clientEntry": {
+          "anyOf": [
+            {
+              "type": "string"
             },
-            "type": "object"
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "markdownDescription": "Client entry point, use the [webpack entry format](https://webpack.js.org/concepts/#entry)."
+        },
+        "clientSourceMap": {
+          "markdownDescription": "Produce source for map for client code?\n\nDefault to `true`.",
+          "type": "boolean"
+        },
+        "experimentalUseSwc": {
+          "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
+          "type": "boolean"
+        },
+        "miniflareConfig": {
+          "markdownDescription": "Inject extra [Miniflare](https://miniflare.dev/get-started/api) configuration.\nNote this configs only effect yout dev environment.",
+          "type": "object"
+        },
+        "outputDir": {
+          "markdownDescription": "Output directory of your worker runtime code.\n\nDefault to `'build'`.",
+          "type": "string"
+        },
+        "port": {
+          "markdownDescription": "Http port of webserver.\n\nDefault to `7000`.",
+          "type": "number"
+        },
+        "publicDir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "markdownDescription": "Public direcotry used to serve public files.\nSet `false` to disable serving public files.\n\nDefault to `'public'`."
+        },
+        "runtime": {
+          "const": "cloudflare-workers",
+          "description": "Pluffa runtime.",
+          "type": "string"
+        },
+        "workerEntry": {
+          "description": "Path to to your worker file.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runtime",
+        "workerEntry",
+        "clientEntry"
+      ],
+      "type": "object"
+    },
+    "Config": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/NodeConfig"
         },
         {
-            "properties": {
-                "clientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "clientSourceMap": {
-                    "type": "boolean"
-                },
-                "experimentalUseSwc": {
-                    "type": "boolean"
-                },
-                "miniflareConfig": {
-                    "$ref": "#/definitions/Record<string,any>"
-                },
-                "outputDir": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "number"
-                },
-                "productionClientEntry": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/definitions/Record<string,any>"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "productionClientSourceMap": {
-                    "type": "boolean"
-                },
-                "publicDir": {
-                    "type": "string"
-                },
-                "runtime": {
-                    "enum": [
-                        "cloudflare-workers"
-                    ],
-                    "type": "string"
-                },
-                "workerEntry": {
-                    "type": "string"
-                }
+          "$ref": "#/definitions/CloudFlareWorkersConfig"
+        }
+      ]
+    },
+    "NodeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "clientEntry": {
+          "anyOf": [
+            {
+              "type": "string"
             },
-            "type": "object"
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "markdownDescription": "Client entry point, use the [webpack entry format](https://webpack.js.org/concepts/#entry)."
+        },
+        "clientSourceMap": {
+          "description": "Produce source for map for client code?\n\nDefault to `true`.",
+          "type": "boolean"
+        },
+        "crawlConcurrency": {
+          "markdownDescription": "Concurrency while staticize.\n\nDefault to `4`.",
+          "type": "number"
+        },
+        "crawlEnabled": {
+          "markdownDescription": "Enable crawl links when staticize?\n\nDefault to `true`.",
+          "type": "boolean"
+        },
+        "exitStaticizeOnError": {
+          "description": "Exit the staticize process when encounter an error?\n\nDefault to `false`.",
+          "type": "boolean"
+        },
+        "experimentalBuildOutput": {
+          "const": "standalone",
+          "markdownDescription": "Use `'standalone'` to export a standalone version of Pluffa Node\nutil for ship it in a container environment.",
+          "type": "string"
+        },
+        "experimentalUseSwc": {
+          "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
+          "type": "boolean"
+        },
+        "nodeModule": {
+          "enum": [
+            "commonjs",
+            "esm"
+          ],
+          "markdownDescription": "The import compilation format of NodeJS code.\n\nDefault to `'esm'`.",
+          "type": "string"
+        },
+        "outputDir": {
+          "markdownDescription": "Output direcotry of staticize command.\n\nDefault to `'build'`.",
+          "type": "string"
+        },
+        "port": {
+          "markdownDescription": "Http port of webserver.\n\nDefault to `7000`.",
+          "type": "number"
+        },
+        "proxy": {
+          "markdownDescription": "If specified Pluffa will use the given URL as proxy.\nUtil for avoiding CORS problems in development.\n\n**IMPORTANT**:\nBy default the proxy is not enabled when running the server\nin production mode by running the `start` command.\nIf you really you want to use a proxy in production mode set\n`useProxyInProd` to `true`.",
+          "type": "string"
+        },
+        "publicDir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "markdownDescription": "Public direcotry used to serve public files.\nSet `false` to disable serving public files.\n\nDefault to `'public'`."
+        },
+        "registerStatik": {
+          "description": "Path register statik file.",
+          "type": "string"
+        },
+        "runtime": {
+          "const": "node",
+          "description": "Pluffa runtime.",
+          "type": "string"
+        },
+        "serveStaticAssets": {
+          "description": "Should serve static assets on production server?\n\nDefault to `true`.",
+          "type": "boolean"
+        },
+        "serverComponent": {
+          "description": "Path to Server React Component file.",
+          "type": "string"
+        },
+        "skeletonComponent": {
+          "description": "Path to Skeleton React Component file.",
+          "type": "string"
+        },
+        "statikDataDir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ],
+          "markdownDescription": "Directory where exports the statik files when staticize.\n\nDefault to `'data'`."
+        },
+        "urls": {
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Urls to start the staticize process.\n\nDefault to: `['/']`.",
+          "type": "array"
+        },
+        "useProxyInProd": {
+          "description": "Use proxy in the production server? Default to `false`.",
+          "type": "boolean"
         }
-    ],
-    "definitions": {
-        "Record<string,any>": {
-            "type": "object"
-        }
+      },
+      "required": [
+        "runtime",
+        "clientEntry",
+        "skeletonComponent",
+        "serverComponent"
+      ],
+      "type": "object"
     }
+  }
 }
-

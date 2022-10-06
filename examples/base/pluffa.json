@@ -1,5 +1,7 @@
 {
+  "runtime": "node",
   "clientEntry": "./src/index.js",
   "skeletonComponent": "./src/Skeleton.js",
-  "serverComponent": "./src/App.js"
+  "serverComponent": "./src/App.js",
+  "experimentalUseSwc": true
 }

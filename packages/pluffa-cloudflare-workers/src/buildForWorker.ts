@@ -21,7 +21,7 @@ export interface BuildForWorkerOptions {
   workerEntry: string
   useTypescript: boolean
   outputDir: string
-  publicDir: string
+  publicDir: string | false
   useSwc?: boolean
 }
 
@@ -36,7 +36,6 @@ export default async function buildForWorker({
 }: BuildForWorkerOptions) {
   const libOutPath = path.resolve(process.cwd(), '.pluffa')
   const buildOutPath = path.resolve(process.cwd(), outputDir)
-  const publicPath = path.resolve(process.cwd(), publicDir)
 
   // Remove old stuff
   rimraf.sync(libOutPath)
@@ -93,10 +92,14 @@ export default async function buildForWorker({
       )
 
       // Copy public stuff
-      try {
-        await ncp(publicPath, path.join(buildOutPath, 'client'))
-      } catch (e) {
-        console.log(e)
+      console.log('@@@', publicDir)
+      if (publicDir !== false) {
+        try {
+          const publicPath = path.resolve(process.cwd(), publicDir)
+          await ncp(publicPath, path.join(buildOutPath, 'client'))
+        } catch (e) {
+          console.log(e)
+        }
       }
     }
   })
