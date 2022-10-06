@@ -20,7 +20,7 @@ export interface StartWorkerDevServerOptions {
 
 const MINIFLARE_PORT = 8787
 
-export default function startWokerDevServer({
+export default function startWorkerDevServer({
   clientEntry,
   workerEntry,
   useTypescript,

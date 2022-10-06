@@ -1,4 +1,5 @@
 {
+  "runtime": "node",
   "crawlConcurrency": 1,
   "clientEntry": "./src/index.js",
   "serverComponent": "./src/Server.js",

@@ -16,7 +16,7 @@ const ncp = util.promisify(ncpCB)
 
 interface ProcessContract {
   exitOnError: boolean
-  crawEnabled: boolean
+  crawlEnabled: boolean
   renderURL(url: string): Promise<[string, string[]]>
   saveFile(url: string, html: string): Promise<void>
 }
@@ -36,7 +36,7 @@ async function processURL(url: string, config: ProcessContract) {
 
   try {
     const [html, urls] = await renderURL(url)
-    if (config.crawEnabled) {
+    if (config.crawlEnabled) {
       const document = parseHTML(html)
       document
         .getElementsByTagName('a')
@@ -141,15 +141,15 @@ export default async function staticize({
   crawlConcurrency,
   statikDataDir,
   statikEnabled = false,
-  crawEnabled = true,
+  crawlEnabled = true,
   exitOnError = false,
 }: {
   outputDir: string
-  publicDir: string
+  publicDir: string | false
   compileNodeCommonJS: boolean
   urls: string[]
   crawlConcurrency: number
-  crawEnabled: boolean
+  crawlEnabled: boolean
   statikEnabled: boolean
   statikDataDir: string | false
   exitOnError: boolean
@@ -157,7 +157,6 @@ export default async function staticize({
   sourceMap.install()
 
   const outPath = path.resolve(process.cwd(), outputDir)
-  const publicPath = path.resolve(process.cwd(), publicDir)
   const buildClientPath = path.resolve(process.cwd(), '.pluffa/client')
   const buildNodePath = path.resolve(process.cwd(), '.pluffa/node')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
@@ -169,8 +168,11 @@ export default async function staticize({
   try {
     // Remove stale ourput
     rimraf.sync(outPath)
-    // Copy public
-    await ncp(publicPath, outPath)
+    // Copy public (unless disabled)
+    if (publicDir !== false) {
+      const publicPath = path.resolve(process.cwd(), publicDir)
+      await ncp(publicPath, outPath)
+    }
     // Copy static from builded client
     await ncp(
       path.join(buildClientPath, 'static'),
@@ -232,11 +234,11 @@ export default async function staticize({
 
   const { succeded, failedUrls } = await processURLs(urls, crawlConcurrency, {
     exitOnError,
-    crawEnabled,
+    crawlEnabled,
     async renderURL(url) {
       let RenderServer = Server
       let crawlSess: CrawlSession
-      if (crawEnabled) {
+      if (crawlEnabled) {
         crawlSess = createCrawlSession()
         RenderServer = () => (
           <CrawlContext.Provider value={crawlSess}>
@@ -253,7 +255,7 @@ export default async function staticize({
         entrypoints,
       })
       let urls: string[] = []
-      if (crawEnabled) {
+      if (crawlEnabled) {
         urls = await crawlSess!.rewind()
       }
       return [html, urls]

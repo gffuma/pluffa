@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf ./packages/**/dist && rollup -c",
     "build:watch": "rimraf ./packages/**/dist && rollup -c -w",
-    "schema": "typescript-json-schema -o schema.json ./schema.ts Config",
+    "schema": "ts-json-schema-generator --validation-keywords markdownDescription -o schema.json -p ./schema.ts -t Config",
     "example": "./scripts/linkexample.js"
   },
   "devDependencies": {
@@ -17,8 +17,8 @@
     "rollup": "^2.76.0",
     "rollup-plugin-node-externals": "^4.1.1",
     "rollup-plugin-preserve-shebang": "^1.0.1",
+    "ts-json-schema-generator": "^1.1.2-next.0",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.4",
-    "typescript-json-schema": "^0.54.0"
+    "typescript": "^4.7.4"
   }
 }

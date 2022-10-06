@@ -19,6 +19,9 @@
       "*": [
         "./dist/index.d.ts"
       ],
+      "types": [
+        "./dist/types.d.ts"
+      ],
       "runtime": [
         "./dist/runtime.d.ts"
       ]

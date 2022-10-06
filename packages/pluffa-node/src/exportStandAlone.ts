@@ -126,15 +126,18 @@ async function createServerRutimeBootstrapFile(
   config: NodeConfig,
   baseDir: string
 ) {
-  // FIXME: Unify this part .....
+  // TODO: Unify map user config to start config.
   const serverProdOptions: StartProdServerOptions = {
-    statikDataDir: config.statikDataDir,
+    // SERVER
     port: config.port,
-    publicDir: config.productionServePublicAssets ? config.publicDir : false,
-    compileNodeCommonJS: config.nodeModule === 'commonjs',
+    proxy: config.useProxyInProd ? config.proxy : undefined,
+    publicDir: config.publicDir,
+    serveStaticAssets: config.serveStaticAssets,
+    // STATIK?
     statikEnabled: Boolean(config.registerStatik),
-    proxy: config.productionProxy,
-    serveStaticAssets: config.productionServeStaticAssets,
+    statikDataDir: config.statikDataDir,
+    // BUNDLING
+    compileNodeCommonJS: config.nodeModule === 'commonjs',
   }
 
   let runTimeTemplateJS: string

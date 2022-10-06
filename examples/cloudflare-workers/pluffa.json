@@ -1,5 +1,7 @@
 {
   "workerEntry": "./src/worker.js",
   "clientEntry": "./src/index.js",
-  "runtime": "cloudflare-workers"
+  "runtime": "cloudflare-workers",
+  "experimentalUseSwc": true,
+  "miniflareConfig": {}
 }

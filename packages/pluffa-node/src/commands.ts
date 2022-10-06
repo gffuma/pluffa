@@ -1,9 +1,31 @@
 import chalk from 'chalk'
 import build from './build'
 import { exportStandAlone } from './exportStandAlone'
+import startDevServer from './startDevServer'
+import startProdServer from './startProdServer'
+import staticize from './staticize'
 import { NodeConfig } from './types'
 
-const ConfigDefaults: Partial<NodeConfig> = {
+export type NodeConfigDefaults = Required<
+  Pick<
+    NodeConfig,
+    | 'port'
+    | 'runtime'
+    | 'outputDir'
+    | 'publicDir'
+    | 'clientSourceMap'
+    | 'experimentalUseSwc'
+    | 'nodeModule'
+    | 'urls'
+    | 'crawlConcurrency'
+    | 'statikDataDir'
+    | 'exitStaticizeOnError'
+    | 'crawlEnabled'
+    | 'serveStaticAssets'
+  >
+>
+
+const ConfigDefaults: NodeConfigDefaults = {
   port: 7000,
   runtime: 'node',
   nodeModule: 'esm',
@@ -14,13 +36,16 @@ const ConfigDefaults: Partial<NodeConfig> = {
   statikDataDir: 'data',
   exitStaticizeOnError: false,
   crawlEnabled: true,
-  productionServePublicAssets: true,
-  productionServeStaticAssets: true,
+  serveStaticAssets: true,
   clientSourceMap: true,
   experimentalUseSwc: false,
 }
 
-function validateConfig(rawConfig: Record<string, any>): NodeConfig {
+export type NodeConfigWithDefaults = NodeConfig & NodeConfigDefaults
+
+function validateConfig(
+  rawConfig: Record<string, any>
+): NodeConfigWithDefaults {
   if (
     !(
       rawConfig.clientEntry &&
@@ -45,37 +70,89 @@ function validateConfig(rawConfig: Record<string, any>): NodeConfig {
   return {
     ...ConfigDefaults,
     ...rawConfig,
-  } as NodeConfig
+  } as NodeConfigWithDefaults
 }
 
-export interface CommandOptions {
+export interface EnvBuildCommandOptions {
   useTypescript: boolean
 }
 
-export async function runDevCommand(rawConfig: Record<string, any>) {}
+export async function runDevCommand(
+  rawConfig: Partial<NodeConfig>,
+  { useTypescript }: EnvBuildCommandOptions
+) {
+  const config = validateConfig(rawConfig)
+  startDevServer({
+    // MAIN
+    serverComponent: config.serverComponent,
+    skeletonComponent: config.skeletonComponent,
+    clientEntry: config.clientEntry,
+    // SERVER
+    port: config.port,
+    proxy: config.proxy,
+    publicDir: config.publicDir,
+    // STATIK?
+    registerStatik: config.registerStatik,
+    // BUNDLING
+    useTypescript,
+    clientSourceMapEnabled: config.clientSourceMap,
+    compileNodeCommonJS: config.nodeModule === 'commonjs',
+    useSwc: config.experimentalUseSwc,
+  })
+}
 
-export async function runStartCommand(rawConfig: Record<string, any>) {}
+export async function runStartCommand(rawConfig: Partial<NodeConfig>) {
+  const config = validateConfig(rawConfig)
+  await startProdServer({
+    // SERVER
+    port: config.port,
+    proxy: config.useProxyInProd ? config.proxy : undefined,
+    publicDir: config.publicDir,
+    serveStaticAssets: config.serveStaticAssets,
+    // STATIK?
+    statikEnabled: Boolean(config.registerStatik),
+    statikDataDir: config.statikDataDir,
+    // BUNDLING
+    compileNodeCommonJS: config.nodeModule === 'commonjs',
+  })
+}
 
 export async function runBuildCommand(
-  rawConfig: Record<string, any>,
-  { useTypescript }: CommandOptions
+  rawConfig: Partial<NodeConfig>,
+  { useTypescript }: EnvBuildCommandOptions
 ) {
   const config = validateConfig(rawConfig)
   const stats = await build({
-    ...config,
-    clientEntry: config.productionClientEntry ?? config.clientEntry,
-    clientSourceMapEnabled:
-      config.productionClientSourceMap ?? config.clientSourceMap,
+    // MAIN
+    serverComponent: config.serverComponent,
+    skeletonComponent: config.skeletonComponent,
+    clientEntry: config.clientEntry,
+    // STATIK?
+    registerStatik: config.registerStatik,
+    statikDataDir: config.statikDataDir,
     compileNodeCommonJS: config.nodeModule === 'commonjs',
+    // BUNDLING
     useTypescript,
+    clientSourceMapEnabled: config.clientSourceMap,
     useSwc: config.experimentalUseSwc,
   })
-  if (config.buildOutput === 'standalone') {
+  if (config.experimentalBuildOutput === 'standalone') {
     console.log('Exporting standalone version...')
     await exportStandAlone(stats, config)
   }
 }
 
-export async function runStaticizeCommand(rawConfig: Record<string, any>) {
+export async function runStaticizeCommand(rawConfig: Partial<NodeConfig>) {
   const config = validateConfig(rawConfig)
+  await staticize({
+    crawlConcurrency: config.crawlConcurrency,
+    publicDir: config.publicDir,
+    statikDataDir: config.statikDataDir,
+    crawlEnabled: config.crawlEnabled,
+    statikEnabled: Boolean(config.registerStatik),
+    urls: config.urls,
+    exitOnError: config.exitStaticizeOnError,
+    compileNodeCommonJS: config.nodeModule === 'commonjs',
+    outputDir: config.outputDir,
+  })
 }

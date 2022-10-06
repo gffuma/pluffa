@@ -3,34 +3,16 @@
 type Entry = string | string[] | Record<string, any>
 
 export interface NodeConfig {
+  /**
+   * Pluffa runtime.
+   */
   runtime: 'node'
   /**
+   * @markdownDescription
+   *
    * Client entry point, use the [webpack entry format](https://webpack.js.org/concepts/#entry).
    */
   clientEntry: Entry
-  /**
-   * Optional client entry point to use in production instead of `clientEntry`
-   * option, use the [webpack entry format](https://webpack.js.org/concepts/#entry).
-   */
-  productionClientEntry?: Entry
-  /**
-   * The import compilation format of NodeJS code.
-   *
-   * Default to `'esm'`.
-   */
-  nodeModule: 'commonjs' | 'esm'
-  /**
-   * Produce source for map for client code?
-   *
-   * Default to `true`.
-   */
-  clientSourceMap: boolean
-  /**
-   * Produce source map for for client code in production?
-   *
-   * Override of `clientSourceMap`.
-   */
-  productionClientSourceMap?: boolean
   /**
    * Path to Skeleton React Component file.
    */
@@ -40,86 +22,124 @@ export interface NodeConfig {
    */
   serverComponent: string
   /**
+   * @markdownDescription
+   *
+   * The import compilation format of NodeJS code.
+   *
+   * Default to `'esm'`.
+   */
+  nodeModule?: 'commonjs' | 'esm'
+  /**
+   * Produce source for map for client code?
+   *
+   * Default to `true`.
+   */
+  clientSourceMap?: boolean
+  /**
+   * @markdownDescription
+   *
    * Http port of webserver.
    *
    * Default to `7000`.
    */
-  port: number
+  port?: number
   /**
+   * @markdownDescription
+   *
    * Output direcotry of staticize command.
    *
    * Default to `'build'`.
    */
-  outputDir: string
+  outputDir?: string
   /**
-   * Public direcotry use to serve public files.
+   * @markdownDescription
+   *
+   * Public direcotry used to serve public files.
+   * Set `false` to disable serving public files.
    *
    * Default to `'public'`.
    */
-  publicDir: string
+  publicDir?: string | false
   /**
+   * Should serve static assets on production server?
+   *
+   * Default to `true`.
+   */
+  serveStaticAssets?: boolean
+  /**
+   * @markdownDescription
+   *
    * Urls to start the staticize process.
    *
    * Default to: `['/']`.
    */
-  urls: string[]
+  urls?: string[]
   /**
    * Exit the staticize process when encounter an error?
    *
    * Default to `false`.
    */
-  exitStaticizeOnError: boolean
+  exitStaticizeOnError?: boolean
   /**
+   * @markdownDescription
+   *
    * Concurrency while staticize.
    *
    * Default to `4`.
    */
-  crawlConcurrency: number
+  crawlConcurrency?: number
   /**
+   * @markdownDescription
+   *
    * Enable crawl links when staticize?
    *
    * Default to `true`.
    */
-  crawlEnabled: boolean
+  crawlEnabled?: boolean
   /**
    * Path register statik file.
    */
   registerStatik?: string
   /**
+   * @markdownDescription
+   *
    * Directory where exports the statik files when staticize.
    *
    * Default to `'data'`.
    */
-  statikDataDir: string | false
+  statikDataDir?: string | false
   /**
-   * Url of proxy.
+   * @markdownDescription
+   *
+   * If specified Pluffa will use the given URL as proxy.
+   * Util for avoiding CORS problems in development.
+   *
+   * **IMPORTANT**:
+   * By default the proxy is not enabled when running the server
+   * in production mode by running the `start` command.
+   * If you really you want to use a proxy in production mode set
+   * `useProxyInProd` to `true`.
    */
   proxy?: string
   /**
-   * Url of proxy to use in production.
-   *
-   * NOTE: Default proxy IS DISABLE IN PRODUCTION.
+   * Use proxy in the production server?
+   * Default to `false`.
    */
-  productionProxy?: string
+  useProxyInProd?: boolean
   /**
-   * Should serve static assets in production?
+   * @markdownDescription
    *
-   * Default to `true`.
-   */
-  productionServeStaticAssets?: boolean
-  /**
-   * Should serve public assets in production?
-   *
-   * Defaults to `true`.
-   */
-  productionServePublicAssets?: boolean
-  /**
    * Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed
    * up code compilation.
    *
    * Default to `false`.
    */
   experimentalUseSwc?: boolean
-
-  buildOutput?: 'standalone'
+  /**
+   * @markdownDescription
+   *
+   * Use `'standalone'` to export a standalone version of Pluffa Node
+   * util for ship it in a container environment.
+   */
+  experimentalBuildOutput?: 'standalone'
 }
