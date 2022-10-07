@@ -2,7 +2,7 @@
   "name": "@pluffa/node",
   "type": "module",
   "description": "Pluffa on Node.js",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "sideEffects": false,
   "exports": {
     ".": {
