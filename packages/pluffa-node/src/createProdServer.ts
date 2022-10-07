@@ -31,6 +31,8 @@ function handleFatalSSRError(error: any, res: Response) {
 
 function createDefaultServer() {
   const app = express()
+  // You see that?
+  app.disable('x-powered-by')
   app.use(express.json())
   return app
 }
@@ -82,7 +84,16 @@ export default async function createProdServer({
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
   if (serveStaticAssets) {
-    app.use('/static', express.static(path.resolve(buildClientPath, 'static')))
+    app.use(
+      '/static',
+      // BURST CACHE
+      // All assets containts hash so is safe to set immutable cache that
+      // never expires
+      express.static(path.resolve(buildClientPath, 'static'), {
+        immutable: true,
+        maxAge: '1y',
+      })
+    )
   }
 
   // NOTE: Ok, this should be do better but for now as workaround
