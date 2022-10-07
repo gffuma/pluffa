@@ -80,13 +80,23 @@ program
     console.log()
     console.log('Exporting your build as a static website...')
     console.log()
-    await runStaticizeCommand({
-      ...config,
-      // When --no-crawl is specified disable crawl otherwise let config enable/disable crawl
-      crawlEnabled: options.crawl === false ? false : config.crawlEnabled,
-      urls: options.url ?? config.urls,
-      outputDir: options.output ?? config.outputDir,
-    })
+
+    // NOTE: NOT 100% Good cause at this point
+    // config is an unknown but keep this for backward compact...
+
+    // When --no-crawl is specified disable crawl otherwise let config enable/disable crawl
+    if (options.crawl === false) {
+      config.crawlEnabled = false
+    }
+    // Override config urls ...
+    if (options.urls) {
+      config.urls = options.urls
+    }
+    // Override config output
+    if (options.output) {
+      config.outputDir = options.output
+    }
+    await runStaticizeCommand(config)
   })
 
 program.command('start').action(async () => {
