@@ -65,6 +65,8 @@ export async function runDevCommand(
     clientSourceMapEnabled: config.clientSourceMap,
     compileNodeCommonJS: config.nodeModule === 'commonjs',
     useSwc: config.experimentalUseSwc,
+    configureWebpackClient: config.experimentalConfigureWebpackClient,
+    configureWebpackServer: config.experimentalConfigureWebpackServer,
   })
 }
 
@@ -102,6 +104,8 @@ export async function runBuildCommand(
     useTypescript,
     clientSourceMapEnabled: config.clientSourceMap,
     useSwc: config.experimentalUseSwc,
+    configureWebpackClient: config.experimentalConfigureWebpackClient,
+    configureWebpackServer: config.experimentalConfigureWebpackServer,
   })
   if (config.experimentalBuildOutput === 'standalone') {
     console.log('Exporting standalone version...')

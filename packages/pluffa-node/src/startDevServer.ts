@@ -6,8 +6,11 @@ import {
 import createDevServer from './createDevServer.js'
 import chalk from 'chalk'
 import { setUpEnv } from '@pluffa/env'
+import { WebPackConfigMapper } from './config'
 
 type WebPackEntry = Configuration['entry']
+
+const identity = <T>(a: T) => a
 
 export interface StartDevServerOptions {
   clientEntry: WebPackEntry
@@ -21,6 +24,8 @@ export interface StartDevServerOptions {
   port: number
   useTypescript: boolean
   useSwc?: boolean
+  configureWebpackClient?: WebPackConfigMapper
+  configureWebpackServer?: WebPackConfigMapper
 }
 
 export default function startDevServer({
@@ -35,28 +40,34 @@ export default function startDevServer({
   publicDir,
   useTypescript,
   useSwc = false,
+  configureWebpackClient = identity,
+  configureWebpackServer = identity,
 }: StartDevServerOptions) {
   const isProd = false
   setUpEnv({ isProd })
 
   const compiler = webpack([
-    getWebPackClientConfig({
-      isProd,
-      useTypescript,
-      clientEntry,
-      statikDataUrl: false,
-      sourceMapEnabled: clientSourceMapEnabled,
-      useSwc,
-    }),
-    getWebPackNodeConfig({
-      isProd,
-      useTypescript,
-      compileNodeCommonJS,
-      serverComponent,
-      skeletonComponent,
-      registerStatik,
-      useSwc,
-    }),
+    configureWebpackClient(
+      getWebPackClientConfig({
+        isProd,
+        useTypescript,
+        clientEntry,
+        statikDataUrl: false,
+        sourceMapEnabled: clientSourceMapEnabled,
+        useSwc,
+      })
+    ),
+    configureWebpackServer(
+      getWebPackNodeConfig({
+        isProd,
+        useTypescript,
+        compileNodeCommonJS,
+        serverComponent,
+        skeletonComponent,
+        registerStatik,
+        useSwc,
+      })
+    ),
   ])
 
   const app = createDevServer({

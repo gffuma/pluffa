@@ -8,8 +8,11 @@ import {
   getWebPackNodeConfig,
 } from '@pluffa/build-tools'
 import { setUpEnv } from '@pluffa/env'
+import { WebPackConfigMapper } from './config'
 
 type WebPackEntry = Configuration['entry']
+
+const identity = <T>(a: T) => a
 
 export interface BuildOptions {
   clientEntry: WebPackEntry
@@ -21,6 +24,8 @@ export interface BuildOptions {
   useTypescript: boolean
   statikDataDir: string | false
   useSwc?: boolean
+  configureWebpackClient?: WebPackConfigMapper
+  configureWebpackServer?: WebPackConfigMapper
 }
 
 export default function build({
@@ -33,6 +38,8 @@ export default function build({
   statikDataDir,
   useSwc = false,
   clientSourceMapEnabled = true,
+  configureWebpackClient = identity,
+  configureWebpackServer = identity,
 }: BuildOptions) {
   rimraf.sync(path.resolve(process.cwd(), '.pluffa'))
 
@@ -48,23 +55,27 @@ export default function build({
   setUpEnv({ isProd })
 
   const compiler = webpack([
-    getWebPackClientConfig({
-      isProd,
-      useTypescript,
-      clientEntry,
-      statikDataUrl,
-      sourceMapEnabled: clientSourceMapEnabled,
-      useSwc,
-    }),
-    getWebPackNodeConfig({
-      compileNodeCommonJS,
-      isProd,
-      serverComponent,
-      skeletonComponent,
-      useTypescript,
-      registerStatik,
-      useSwc,
-    }),
+    configureWebpackClient(
+      getWebPackClientConfig({
+        isProd,
+        useTypescript,
+        clientEntry,
+        statikDataUrl,
+        sourceMapEnabled: clientSourceMapEnabled,
+        useSwc,
+      })
+    ),
+    configureWebpackServer(
+      getWebPackNodeConfig({
+        compileNodeCommonJS,
+        isProd,
+        serverComponent,
+        skeletonComponent,
+        useTypescript,
+        registerStatik,
+        useSwc,
+      })
+    ),
   ])
 
   return new Promise<MultiStats>((resolve) => {

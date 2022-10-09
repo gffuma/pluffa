@@ -1,9 +1,15 @@
 import webpack, { Configuration } from 'webpack'
 import { createProxyMiddleware } from 'http-proxy-middleware'
-import { getWebPackClientConfig, createBaseDevServer } from '@pluffa/build-tools'
+import {
+  getWebPackClientConfig,
+  createBaseDevServer,
+} from '@pluffa/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
+import { WebPackConfigMapper } from './config'
 
 type WebPackEntry = Configuration['entry']
+
+const identity = <T>(a: T) => a
 
 export interface createWorkerDevServerOptions {
   clientEntry: WebPackEntry
@@ -13,8 +19,10 @@ export interface createWorkerDevServerOptions {
   port: number
   useTypescript?: boolean
   miniflareUrl: string
-  useSwc?: boolean,
+  useSwc?: boolean
   startMiniFlare(): void
+  configureWebpackClient?: WebPackConfigMapper
+  configureWebpackWorker?: WebPackConfigMapper
 }
 
 export default function createWokerDevServer({
@@ -26,25 +34,31 @@ export default function createWokerDevServer({
   startMiniFlare,
   clientSourceMapEnabled = true,
   useSwc = false,
+  configureWebpackClient = identity,
+  configureWebpackWorker = identity,
 }: createWorkerDevServerOptions) {
   const isProd = false
 
   const compiler = webpack([
-    getWebPackClientConfig({
-      isProd,
-      clientEntry,
-      statikDataUrl: false,
-      useTypescript,
-      sourceMapEnabled: clientSourceMapEnabled,
-      useSwc,
-    }),
-    getWebPackWorkerConfig({
-      isProd,
-      useTypescript,
-      workerEntry,
-      clientEntry,
-      useSwc,
-    }),
+    configureWebpackClient(
+      getWebPackClientConfig({
+        isProd,
+        clientEntry,
+        statikDataUrl: false,
+        useTypescript,
+        sourceMapEnabled: clientSourceMapEnabled,
+        useSwc,
+      })
+    ),
+    configureWebpackWorker(
+      getWebPackWorkerConfig({
+        isProd,
+        useTypescript,
+        workerEntry,
+        clientEntry,
+        useSwc,
+      })
+    ),
   ])
 
   const app = createBaseDevServer({

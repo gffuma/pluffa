@@ -4,6 +4,7 @@ import { Configuration } from 'webpack'
 import { Log, LogLevel, Miniflare, MiniflareOptions } from 'miniflare'
 import { setUpEnv } from '@pluffa/env'
 import createWorkerDevServer from './createWorkerDevServer'
+import { WebPackConfigMapper } from './config'
 
 type WebPackEntry = Configuration['entry']
 
@@ -16,6 +17,8 @@ export interface StartWorkerDevServerOptions {
   useTypescript: boolean
   miniflareConfig?: MiniflareOptions
   useSwc?: boolean
+  configureWebpackClient?: WebPackConfigMapper
+  configureWebpackWorker?: WebPackConfigMapper
 }
 
 const MINIFLARE_PORT = 8787
@@ -29,6 +32,8 @@ export default function startWorkerDevServer({
   miniflareConfig = {},
   clientSourceMapEnabled = true,
   useSwc = false,
+  configureWebpackClient,
+  configureWebpackWorker,
 }: StartWorkerDevServerOptions) {
   setUpEnv({ isProd: false })
   const app = createWorkerDevServer({
@@ -63,6 +68,8 @@ export default function startWorkerDevServer({
       })
     },
     useTypescript,
+    configureWebpackClient,
+    configureWebpackWorker,
   })
 
   app.listen(port, () => {

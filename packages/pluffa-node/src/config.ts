@@ -1,6 +1,10 @@
+import type { Configuration } from 'webpack'
+
 // TODO: Improve note 100% correct should be a subset of webpack
 // Configuration['entry']
 type Entry = string | string[] | Record<string, any>
+
+export type WebPackConfigMapper = (input: Configuration) => Configuration
 
 export interface NodeConfig {
   /**
@@ -142,6 +146,14 @@ export interface NodeConfig {
    * util for ship it in a container environment.
    */
   experimentalBuildOutput?: 'standalone'
+  /**
+   * Map Webpack client configuration to desired configuration.
+   */
+  experimentalConfigureWebpackClient?: WebPackConfigMapper
+  /**
+   * Map Webpack server configuration to desired configuration.
+   */
+  experimentalConfigureWebpackServer?: WebPackConfigMapper
 }
 
 export type NodeConfigDefaults = Required<

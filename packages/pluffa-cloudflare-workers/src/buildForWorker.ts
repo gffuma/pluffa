@@ -10,10 +10,13 @@ import {
 } from '@pluffa/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
 import { setUpEnv } from '@pluffa/env'
+import { WebPackConfigMapper } from './config'
 
 const ncp = util.promisify(ncpCB)
 
 type WebPackEntry = Configuration['entry']
+
+const identity = <T>(a: T) => a
 
 export interface BuildForWorkerOptions {
   clientEntry: WebPackEntry
@@ -23,6 +26,8 @@ export interface BuildForWorkerOptions {
   outputDir: string
   publicDir: string | false
   useSwc?: boolean
+  configureWebpackClient?: WebPackConfigMapper
+  configureWebpackWorker?: WebPackConfigMapper
 }
 
 export default async function buildForWorker({
@@ -33,6 +38,8 @@ export default async function buildForWorker({
   publicDir,
   clientSourceMapEnabled = true,
   useSwc = false,
+  configureWebpackClient = identity,
+  configureWebpackWorker = identity,
 }: BuildForWorkerOptions) {
   const libOutPath = path.resolve(process.cwd(), '.pluffa')
   const buildOutPath = path.resolve(process.cwd(), outputDir)
@@ -45,21 +52,25 @@ export default async function buildForWorker({
   setUpEnv({ isProd })
 
   const compiler = webpack([
-    getWebPackClientConfig({
-      isProd,
-      useTypescript,
-      clientEntry,
-      statikDataUrl: false,
-      sourceMapEnabled: clientSourceMapEnabled,
-      useSwc,
-    }),
-    getWebPackWorkerConfig({
-      isProd,
-      useTypescript,
-      workerEntry,
-      clientEntry,
-      useSwc,
-    }),
+    configureWebpackClient(
+      getWebPackClientConfig({
+        isProd,
+        useTypescript,
+        clientEntry,
+        statikDataUrl: false,
+        sourceMapEnabled: clientSourceMapEnabled,
+        useSwc,
+      })
+    ),
+    configureWebpackWorker(
+      getWebPackWorkerConfig({
+        isProd,
+        useTypescript,
+        workerEntry,
+        clientEntry,
+        useSwc,
+      })
+    ),
   ])
 
   compiler.run(async (err, stats) => {

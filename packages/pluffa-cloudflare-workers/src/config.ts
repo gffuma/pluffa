@@ -1,6 +1,10 @@
+import type { Configuration } from 'webpack'
+
 // TODO: Improve note 100% correct should be a subset of webpack
 // Configuration['entry']
 type Entry = string | string[] | Record<string, any>
+
+export type WebPackConfigMapper = (input: Configuration) => Configuration
 
 export interface CloudFlareWorkersConfig {
   /**
@@ -66,6 +70,14 @@ export interface CloudFlareWorkersConfig {
    * Default to `false`.
    */
   experimentalUseSwc?: boolean
+  /**
+   * Map Webpack client configuration to desired configuration.
+   */
+  experimentalConfigureWebpackClient?: WebPackConfigMapper
+  /**
+   * Map Webpack worker configuration to desired configuration.
+   */
+  experimentalConfigureWebpackWorker?: WebPackConfigMapper
 }
 
 export type CloudFlareWorkersConfigDefaults = Required<

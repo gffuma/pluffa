@@ -6,4 +6,22 @@ interface OptionalSchemaURL {
   $schema?: string
 }
 
-export type Config = (NodeConfig | CloudFlareWorkersConfig) & OptionalSchemaURL
+// NOTE: Actually this doesn't work with shcema generator...
+// type JustNonFunctionKeys<T> = {
+//   [P in keyof T]: T[P] extends Function ? never : P
+// }[keyof T]
+// type ExcludeFunctions<T> = Pick<T, JustNonFunctionKeys<T>>
+
+export type Config = (
+  | Omit<
+      NodeConfig,
+      | 'experimentalConfigureWebpackClient'
+      | 'experimentalConfigureWebpackServer'
+    >
+  | Omit<
+      CloudFlareWorkersConfig,
+      | 'experimentalConfigureWebpackClient'
+      | 'experimentalConfigureWebpackWorker'
+    >
+) &
+  OptionalSchemaURL
