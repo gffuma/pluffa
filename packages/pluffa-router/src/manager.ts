@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 import { matchRoutes, RouteMatch, RouteObject } from 'react-router-dom'
 
-export interface PageRouteObject<TProps = any> extends RouteObject {
+export type PageRouteObject<TProps = any> = RouteObject & {
   prefetchPage?(props: TProps, match: PageRouteMatch): any
   children?: PageRouteObject[]
 }
