@@ -115,6 +115,14 @@ export function getWebPackCodeRules({
               },
             },
           },
+          // FIXME: Temp workaround for:
+          // https://github.com/swc-project/swc/issues/3365
+          env: {
+            targets: require('browserslist').loadConfig({
+              path: process.cwd(),
+              env: isProd ? 'production' : 'development',
+            }),
+          },
         },
       }
     } else {
