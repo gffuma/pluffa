@@ -14,6 +14,283 @@ There are already [Next.js](https://nextjs.org) and [Remix](https://remix.run) w
 - First you can easily add **SSR** or **SSG** to an App built with _Create React App_ with minimal effort.
 - In second place **Pluffa** is not a **Framework** is more a **Build Tool**. The spirit of Pluffa is to be a Create React App but for server side rendering, your code, your choice ... but without the overhead of configuring all the build environment.
 
+## Example
+
+An example Pokedex App with **SEO** and **SSR**/**SSG** using Pluffa with:
+
+- [react-router](https://github.com/remix-run/react-router) For routing.
+- [@tanstack/react-query](https://github.com/tanstack/query) For Suspense Data Fetching.
+- [react-helmet-async](https://www.npmjs.com/package/react-helmet-async) For SEO in Head.
+
+## `Server.tsx`
+
+```tsx
+import { useSSRUrl, useSSRData, getScripts } from '@pluffa/ssr'
+import { GetServerData } from '@pluffa/node-render'
+import {
+  dehydrate,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { HelmetData, HelmetProvider } from 'react-helmet-async'
+import { StaticRouter } from 'react-router-dom/server'
+import App from './App'
+
+export default function Server() {
+  // Get SSR Url of request
+  const url = useSSRUrl()
+  // Get data from getServerData
+  const { queryClient, helmetContext } = useSSRData()
+  // Init providers with data and use the url for SSR Rouring
+  return (
+    <HelmetProvider context={helmetContext}>
+      <QueryClientProvider client={queryClient}>
+        <StaticRouter location={url}>
+          <App />
+        </StaticRouter>
+      </QueryClientProvider>
+    </HelmetProvider>
+  )
+}
+
+export const getServerData: GetServerData = async ({
+  // Current SSR Request URL
+  url,
+  // Map of bundler entrypoints such scripts and styles
+  entrypoints,
+}) => {
+  // On every request create a fresh SSR Environment
+  // Instance any data fetching store with Suspense support
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        suspense: true,
+      },
+    },
+  })
+  // Handle all SEO Head tags during current request
+  const helmetContext = {} as HelmetData['context']
+  return {
+    // Pass to Server Component
+    data: {
+      queryClient,
+      helmetContext,
+    },
+    // Inject content into Node / Edge stream before </head> tag close
+    // Theese callbacks will be called after all Suspense boundaries finish
+    injectBeforeHeadClose: () =>
+      // Create a string using the collected result of <Helmet /> SEO rendering
+      (['title', 'meta', 'link'] as const)
+        .map((k) => helmetContext.helmet[k].toString())
+        .join(''),
+    injectBeforeBodyClose: () =>
+      // Serialize Suspense data fetching store data collected during rendering
+      // for client hydratation. This must be insered BEFORE App runtime scripts.
+      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+        dehydrate(queryClient)
+      )};</script>` +
+      // Inject client JS of your React App
+      getScripts(entrypoints),
+  }
+}
+```
+
+## `Skeleton.tsx`
+
+```tsx
+import { Styles, Root } from '@pluffa/ssr/skeleton'
+
+export default function Skeleton() {
+  return (
+    <html>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        {/* Bundled collected style tags */}
+        <Styles />
+      </head>
+      <body>
+        <div id="root">
+          {/*
+            Render the Server component, if Server component
+            generate errors don't render anything.
+            The Skeleton component is always rendered independently from Server component.
+          */}
+          <Root />
+        </div>
+      </body>
+    </html>
+  )
+}
+```
+
+## `client.tsx`
+
+```tsx
+import './index.css'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClientProvider,
+  QueryClient,
+  hydrate,
+} from '@tanstack/react-query'
+import { HelmetProvider } from 'react-helmet-async'
+
+// Create client Suspense store
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      suspense: true,
+    },
+  },
+})
+
+// Hydrate the store from SSR Data
+hydrate(queryClient, (window as any).__INITIAL_DATA__)
+// Let Garbage Collector free SSR Data
+delete (window as any).__INITIAL_DATA__
+
+// Hydrate SSR React HTML tree
+ReactDOM.hydrateRoot(
+  document.getElementById('root')!,
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </HelmetProvider>
+)
+```
+
+## `App.tsx`
+
+```tsx
+import { Suspense } from 'react'
+import { Helmet } from 'react-helmet-async'
+import { Route, Routes } from 'react-router-dom'
+import Pokedex from './Pokedex'
+import Pokemon from './Pokemon'
+
+export default function App() {
+  return (
+    <>
+      <Helmet>
+        <title>Pokedex</title>
+      </Helmet>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route index element={<Pokedex />} />
+          <Route path="/pokemon/:name" element={<Pokemon />} />
+        </Routes>
+      </Suspense>
+    </>
+  )
+}
+```
+
+## `fetch.ts`
+
+```ts
+// Create an isomorphic http client
+// You can use library such AXIOS that alredy have two different export
+// for web and node.
+// We use fetch to show an example with minimal runtime overhead.
+// ... You can also use this technique to polyfill fetch by setting global.fetch
+// in NodeJS env ...
+const fetch =
+  // Special Pluffa value populated at BUILD time
+  // So bundler can strip code in branches
+  process.env.IS_PLUFFA_SERVER
+    ? // On the server we use the undici fetch implementation
+      require('undici').fetch
+    : // On the client use built it window fetch
+      window.fetch
+export default fetch as typeof window.fetch
+```
+
+## `Pokedex.tsx`
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import fetch from './fetch'
+
+interface Pokemon {
+  name: string
+}
+interface PokemonList {
+  results: Pokemon[]
+}
+
+// Call the same api on client and server
+// with pokemons information
+export default function Pokedex() {
+  const { data } = useQuery(['pokemons'], () =>
+    fetch(`https://pokeapi.co/api/v2/pokemon`).then(
+      (r) => r.json() as Promise<PokemonList>
+    )
+  )
+  return (
+    <div>
+      <h1>Pokedex</h1>
+      {data!.results.map((pokemon) => (
+        <div key={pokemon.name}>
+          <Link to={`/pokemon/${pokemon.name}`}>
+            <h2>{pokemon.name}</h2>
+          </Link>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## `Pokemon.tsx`
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+import { Helmet } from 'react-helmet-async'
+import { Link, useParams } from 'react-router-dom'
+import fetch from './fetch'
+
+interface PokemonDetail {
+  name: string
+  sprites: {
+    back_default: string
+    front_default: string
+  }
+}
+
+// Use router params to render a speicific pokemon
+export default function Pokemon() {
+  const { name } = useParams()
+  const { data: pokemon } = useQuery(['pokemon', name], () =>
+    fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`).then(
+      (r) => r.json() as Promise<PokemonDetail>
+    )
+  )
+  return (
+    <div>
+      {/* Some SEO of our Pokemon */}
+      <Helmet>
+        <title>{`${pokemon!.name} Pokedex`}</title>
+      </Helmet>
+      <h1>{pokemon!.name}</h1>
+      <h2>
+        <Link to="/">{'<'}</Link>
+      </h2>
+      <img src={pokemon!.sprites.back_default} />
+      <br />
+      <img src={pokemon!.sprites.front_default} />
+    </div>
+  )
+}
+```
+
 ## Installation
 
 First install the main Pluffa package.
@@ -203,12 +480,15 @@ export const getServerData = async () => {
 ## Typescript
 
 ## Templates
+
 If you start from scratch with Pluffa you can create a blank App with:
 
 ```sh
 yarn create pluffa-app YourAppFolder
 ```
+
 or
+
 ```sh
 npx create-pluffa-app YourAppFolder
 ```
@@ -218,11 +498,12 @@ You can also specify a `--template` option, availables are:
 - **node**: Base SSR Pluffa node template.
 - **node-typescript**: Base SSR Pluffa node template but with TypeScript.
 
-
 ## Data Fetching
+
 ## SEO
 
 ## SSG
+
 ## Configuration
 
 <!-- - `<Styles />`: Render the styles imported in your application.
@@ -311,10 +592,65 @@ yarn dev
 ### Client Entry
 The `clientEntry` is your client entrypoint this file will be the
 
-## Configuration
 
 ## Commands
  -->
+
+## Configuration
+
+You can configure Pluffa in a lot of way:
+
+In the _package.json_ with a `"pluffa"` key.
+
+A _pluffa.json_ file. To have autocomplete in your editor you can use
+the special `"$schema"` key:
+
+```json
+{
+  "$schema": "https://cdn.giova.fun/pluffa/schema.json"
+}
+```
+
+You can also use a JavaScript file `pluffa.config.js` for CommonJS, the default
+exports is used as configuration:
+
+```js
+/**
+ * @type {import('@pluffa/node/config').NodeConfig}
+ */
+module.exports = {
+  /* Config Here */
+}
+```
+
+Or a `pluffa.config.mjs` file for ESM format:
+
+```js
+/**
+ * @type {import('@pluffa/node/config').NodeConfig}
+ */
+export default {
+  /* Config Here */
+}
+```
+
+Finally if you need to customize you Pluffa config based on wich command is runned
+you can export a function that return the configuration or a configuration Promise:
+
+```js
+/**
+ * @param {import('pluffa/config').CommandName} cmd
+ * @return {Promise<import('@pluffa/node/config').NodeConfig>}
+ */
+export default async (cmd) => {
+  return {
+    /* Config Here */
+  }
+}
+```
+
+You can check the configuration methodo picked by inspecting the Pluffa output
+in your terminal.
 
 ## LICENSE
 
