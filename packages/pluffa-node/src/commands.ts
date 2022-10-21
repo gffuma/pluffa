@@ -115,6 +115,13 @@ export async function runBuildCommand(
 
 export async function runStaticizeCommand(rawConfig: Partial<NodeConfig>) {
   const config = validateConfig(rawConfig)
+  let controller = new AbortController()
+
+  setTimeout(() => {
+    console.log('ASK ABORT!')
+    controller.abort()
+  }, 2000)
+
   await staticize({
     crawlConcurrency: config.crawlConcurrency,
     publicDir: config.publicDir,
@@ -125,5 +132,39 @@ export async function runStaticizeCommand(rawConfig: Partial<NodeConfig>) {
     exitOnError: config.exitStaticizeOnError,
     compileNodeCommonJS: config.nodeModule === 'commonjs',
     outputDir: config.outputDir,
+    signal: controller.signal
   })
+  console.log('Again...')
+  // setTimeout(() => {
+  //   console.log('ASK ABORT! @2X')
+  //   controller.abort()
+  // }, 1500)
+
+  // controller = new AbortController()
+  await staticize({
+    crawlConcurrency: config.crawlConcurrency,
+    publicDir: config.publicDir,
+    statikDataDir: config.statikDataDir,
+    crawlEnabled: config.crawlEnabled,
+    statikEnabled: Boolean(config.registerStatik),
+    urls: config.urls,
+    exitOnError: config.exitStaticizeOnError,
+    compileNodeCommonJS: config.nodeModule === 'commonjs',
+    outputDir: config.outputDir,
+    signal: controller.signal
+  })
+  // console.log('Finally...')
+  // await staticize({
+  //   crawlConcurrency: config.crawlConcurrency,
+  //   publicDir: config.publicDir,
+  //   statikDataDir: config.statikDataDir,
+  //   crawlEnabled: config.crawlEnabled,
+  //   statikEnabled: Boolean(config.registerStatik),
+  //   urls: config.urls,
+  //   exitOnError: config.exitStaticizeOnError,
+  //   compileNodeCommonJS: config.nodeModule === 'commonjs',
+  //   outputDir: config.outputDir,
+  //   signal: controller.signal
+  // })
+
 }

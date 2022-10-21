@@ -1,6 +1,6 @@
 import sourceMap from 'source-map-support'
 import chalk from 'chalk'
-import { Express, Response } from 'express'
+import { Express, Response, Router } from 'express'
 import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
@@ -80,6 +80,34 @@ export default function createDevServer({
     default: SkeletonComponent
   }>(buildedNodeDir, 'Skeleton', compileNodeCommonJS)
 
+  // const __PLUFFA_API_HMR__ = Symbol('__PLUFFA_API_HMR__')
+  let i = 0
+  function makeApiRouter() {
+    const j = ++i
+    const router = Router()
+    router.get('/', (req, res) => {
+      console.log('Handle Guakamole!', j)
+      res.send(`Guakamole! ${j}`)
+    })
+    // Object.defineProperty(router, __PLUFFA_API_HMR__, {
+    //   value: true,
+    //   configurable: false,
+    //   enumerable: false,
+    //   writable: false,
+    // })
+    return router
+  }
+  let arouter = makeApiRouter()
+
+  app.use('/api', (req, res) => {
+    console.log('R', req)
+    res.on('finish', () => {
+      res
+    })
+
+    ;(arouter as any).handle(req, res)
+  })
+
   const serverCompiler = (compiler as MultiCompiler).compilers.find(
     (c) => c.name === 'server'
   )
@@ -93,6 +121,15 @@ export default function createDevServer({
       hotModules.push(statikHotModule)
     }
     serverCompiler.hooks.afterDone.tap('realodServerCode', (stats) => {
+      arouter = makeApiRouter()
+      // for (let i = 0; i < app._router.stack.length; i++) {
+      //   const layer = app._router.stack[i]
+      //   if (layer.handle[__PLUFFA_API_HMR__] === true) {
+      //     layer.handle = makeApiRouter()
+      //     break
+      //   }
+      // }
+
       const emittedAssets = stats.compilation.emittedAssets
       hotModules.forEach((m) => {
         if (emittedAssets.has(m.name)) {

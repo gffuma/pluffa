@@ -147,4 +147,5 @@ export function render(
       reactRenderOptions.onError?.(error)
     },
   })
+  return reactStream
 }

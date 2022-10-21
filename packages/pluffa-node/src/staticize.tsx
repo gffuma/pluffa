@@ -8,7 +8,7 @@ import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
-import { renderAsyncToString } from '@pluffa/node-render'
+import { renderAsyncToString, AbortRenderingError } from '@pluffa/node-render'
 import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
 import type { RegisterStatik } from '@pluffa/statik/runtime'
 
@@ -19,6 +19,7 @@ interface ProcessContract {
   crawlEnabled: boolean
   renderURL(url: string): Promise<[string, string[]]>
   saveFile(url: string, html: string): Promise<void>
+  signal?: AbortSignal
 }
 
 function getPathFromUrl(url: string) {
@@ -32,8 +33,7 @@ function isUrlAbsolute(url: string) {
 
 async function processURL(url: string, config: ProcessContract) {
   console.log(chalk.bold.cyan(url))
-  const { renderURL, saveFile } = config
-
+  const { renderURL } = config
   try {
     const [html, urls] = await renderURL(url)
     if (config.crawlEnabled) {
@@ -49,27 +49,31 @@ async function processURL(url: string, config: ProcessContract) {
         .filter((url) => !isUrlAbsolute(url))
         .forEach((url) => urls.push(getPathFromUrl(url)))
     }
-    await saveFile(url, html)
-    return { sourceUrl: url, success: true, urls }
+    return { sourceUrl: url, html, success: true, urls }
   } catch (error) {
-    console.log(chalk.bold.red(`⚠️  ${url}`))
-    console.log(chalk.red('Error during rendering'))
-    console.error(error)
-    if (config.exitOnError) {
-      process.exit(1)
+    if (!(error instanceof AbortRenderingError)) {
+      console.log(chalk.bold.red(`⚠️  ${url}`))
+      console.log(chalk.red('Error during rendering'))
+      console.error(error)
+      if (config.exitOnError) {
+        process.exit(1)
+      }
     }
-    return { sourceUrl: url, success: false, urls: [] }
+    return { sourceUrl: url, success: false, urls: [], html: null }
   }
 }
+
+type ProcessedUrlOutput = Awaited<ReturnType<typeof processURL>>
 
 async function processURLs(
   urls: string[],
   concurrency: number,
   config: ProcessContract
 ) {
+  const { signal, saveFile } = config
   const queue = new PQueue({ concurrency })
   const uniqeUrls = new Set<string>()
-  let succeded = 0
+  const succededUrls: string[] = []
   const failedUrls: string[] = []
 
   function enqueueUrl(url: string) {
@@ -81,18 +85,11 @@ async function processURLs(
 
   queue.on(
     'completed',
-    ({
-      urls,
-      success,
-      sourceUrl,
-    }: {
-      urls: string[]
-      success: boolean
-      sourceUrl: string
-    }) => {
+    async ({ urls, success, sourceUrl, html }: ProcessedUrlOutput) => {
       urls.forEach((url) => enqueueUrl(url))
       if (success) {
-        succeded++
+        succededUrls.push(sourceUrl)
+        await saveFile(sourceUrl, html!)
       } else {
         failedUrls.push(sourceUrl)
       }
@@ -100,9 +97,28 @@ async function processURLs(
   )
 
   urls.forEach((url) => enqueueUrl(url))
-  await queue.onIdle()
+  if (signal) {
+    const abortPromise = new Promise((resolve) => {
+      signal.addEventListener(
+        'abort',
+        () => {
+          console.log('ABOORT!')
+          queue.removeAllListeners()
+          queue.clear()
+          resolve(null)
+        },
+        {
+          once: true,
+        }
+      )
+    })
+    await Promise.race([queue.onIdle(), abortPromise])
+  } else {
+    await queue.onIdle()
+  }
+
   return {
-    succeded,
+    succededUrls,
     failedUrls,
   }
 }
@@ -133,17 +149,7 @@ function handleFileNotFoundError(err: any): never {
   throw err
 }
 
-export default async function staticize({
-  outputDir,
-  publicDir,
-  compileNodeCommonJS,
-  urls,
-  crawlConcurrency,
-  statikDataDir,
-  statikEnabled = false,
-  crawlEnabled = true,
-  exitOnError = false,
-}: {
+export interface StaticizeConfig {
   outputDir: string
   publicDir: string | false
   compileNodeCommonJS: boolean
@@ -153,7 +159,21 @@ export default async function staticize({
   statikEnabled: boolean
   statikDataDir: string | false
   exitOnError: boolean
-}) {
+  signal?: AbortSignal
+}
+
+export default async function staticize({
+  outputDir,
+  publicDir,
+  compileNodeCommonJS,
+  urls,
+  crawlConcurrency,
+  statikDataDir,
+  signal,
+  statikEnabled = false,
+  crawlEnabled = true,
+  exitOnError = false,
+}: StaticizeConfig) {
   sourceMap.install()
 
   const outPath = path.resolve(process.cwd(), outputDir)
@@ -232,45 +252,51 @@ export default async function staticize({
     .catch(handleImportError)
     .then(uniformExport)
 
-  const { succeded, failedUrls } = await processURLs(urls, crawlConcurrency, {
-    exitOnError,
-    crawlEnabled,
-    async renderURL(url) {
-      let RenderServer = Server
-      let crawlSess: CrawlSession
-      if (crawlEnabled) {
-        crawlSess = createCrawlSession()
-        RenderServer = () => (
-          <CrawlContext.Provider value={crawlSess}>
-            <Server />
-          </CrawlContext.Provider>
-        )
-      }
-      const entrypoints = manifest.entrypoints
-      const html = await renderAsyncToString({
-        Server: RenderServer,
-        getServerData,
-        Skeleton,
-        url,
-        entrypoints,
-      })
-      let urls: string[] = []
-      if (crawlEnabled) {
-        urls = await crawlSess!.rewind()
-      }
-      return [html, urls]
-    },
-    async saveFile(url, html) {
-      let filePath = path.join(outputDir, url)
-      if (!filePath.endsWith('.html')) {
-        mkdirp.sync(filePath)
-        filePath = path.join(filePath, 'index.html')
-      } else {
-        mkdirp.sync(path.dirname(filePath))
-      }
-      await fs.writeFile(filePath, html)
-    },
-  })
+  const { succededUrls, failedUrls } = await processURLs(
+    urls,
+    crawlConcurrency,
+    {
+      exitOnError,
+      crawlEnabled,
+      signal,
+      async renderURL(url) {
+        let RenderServer = Server
+        let crawlSess: CrawlSession
+        if (crawlEnabled) {
+          crawlSess = createCrawlSession()
+          RenderServer = () => (
+            <CrawlContext.Provider value={crawlSess}>
+              <Server />
+            </CrawlContext.Provider>
+          )
+        }
+        const entrypoints = manifest.entrypoints
+        const html = await renderAsyncToString({
+          Server: RenderServer,
+          getServerData,
+          Skeleton,
+          url,
+          entrypoints,
+          signal,
+        })
+        let urls: string[] = []
+        if (crawlEnabled) {
+          urls = await crawlSess!.rewind()
+        }
+        return [html, urls]
+      },
+      async saveFile(url, html) {
+        let filePath = path.join(outputDir, url)
+        if (!filePath.endsWith('.html')) {
+          mkdirp.sync(filePath)
+          filePath = path.join(filePath, 'index.html')
+        } else {
+          mkdirp.sync(path.dirname(filePath))
+        }
+        await fs.writeFile(filePath, html)
+      },
+    }
+  )
   console.log()
   if (failedUrls.length === 0) {
     console.log(chalk.green('WoW all site staticized!'))
@@ -278,7 +304,7 @@ export default async function staticize({
     console.log(chalk.red('Wops! Some urls fails to staticized ....'))
   }
   console.log()
-  console.log('Success:' + '  ' + chalk.green.bold(succeded))
+  console.log('Success:' + '  ' + chalk.green.bold(succededUrls.length))
   if (failedUrls.length > 0) {
     console.log('Failed:' + '   ' + chalk.red.bold(failedUrls.length))
     console.log()

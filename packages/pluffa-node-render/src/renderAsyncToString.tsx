@@ -9,7 +9,10 @@ export interface RenderAsyncToStringConfig<Data> {
   getServerData: GetServerData<Data>
   url: string
   entrypoints: Record<string, string[]>
+  signal?: AbortSignal
 }
+
+export class AbortRenderingError extends Error {}
 
 export async function renderAsyncToString<Data = any>({
   Skeleton,
@@ -17,6 +20,7 @@ export async function renderAsyncToString<Data = any>({
   getServerData,
   url,
   entrypoints,
+  signal,
 }: RenderAsyncToStringConfig<Data>) {
   const out = new WritableStreamBuffer()
 
@@ -26,7 +30,11 @@ export async function renderAsyncToString<Data = any>({
   }
 
   return new Promise<string>((resolve, reject) => {
-    render(
+    function handleAbort() {
+      reactStream.abort()
+      reject(new AbortRenderingError())
+    }
+    const reactStream = render(
       <SSRProvider
         value={{
           Server,
@@ -47,14 +55,31 @@ export async function renderAsyncToString<Data = any>({
         injectBeforeBodyClose: serverData?.injectBeforeBodyClose,
         streamTransformers: serverData?.streamTransformers,
         onAllReady() {
+          if (signal) {
+            if (signal.aborted) {
+              return
+            } else {
+              signal.removeEventListener('abort', handleAbort)
+            }
+          }
           out.on('finish', async () => {
             resolve(out.getContentsAsString() || '')
           })
         },
         onError(error) {
+          if (signal) {
+            if (signal.aborted) {
+              return
+            } else {
+              signal.removeEventListener('abort', handleAbort)
+            }
+          }
           reject(error)
         },
       }
     )
+    if (signal) {
+      signal.addEventListener('abort', handleAbort)
+    }
   })
 }
