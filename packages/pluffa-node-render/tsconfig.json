@@ -12,6 +12,7 @@
     "strictFunctionTypes": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowJs": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*", "types"],

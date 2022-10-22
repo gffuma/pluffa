@@ -65,7 +65,7 @@ function pluffaNodeRender() {
       externals({
         packagePath: `${baseDir}/package.json`,
       }),
-      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.build.json` }),
     ],
   }))
 }
@@ -178,7 +178,7 @@ function pluffaNode() {
       externals({
         packagePath: `${baseDir}/package.json`,
       }),
-      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.build.json` }),
     ],
   }))
 }

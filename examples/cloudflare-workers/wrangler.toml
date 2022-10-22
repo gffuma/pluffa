@@ -4,6 +4,7 @@ zone_id = ""
 route = ""
 workers_dev = true
 compatibility_date = "2022-02-27"
+compatibility_flags = ["streams_enable_constructors"]
 
 [build]
 command = "yarn build"
