@@ -1,33 +1,37 @@
-import { ServerComponent, SkeletonComponent, SSRProvider } from '@pluffa/ssr'
+import {
+  ServerComponent,
+  SkeletonComponent,
+  SSRProvider,
+  BundleInformation,
+} from '@pluffa/ssr'
+import type { Request } from 'express'
 import { WritableStreamBuffer } from 'stream-buffers'
+import { RenderOptions } from './render'
 import { render } from './render'
-import { GetServerData, ServerData } from './types'
 
-export interface RenderAsyncToStringConfig<Data> {
+export interface RenderAsyncToStringConfig<Data = any>
+  extends Omit<RenderOptions, 'stopOnError'> {
   Skeleton: SkeletonComponent
   Server: ServerComponent
-  getServerData: GetServerData<Data>
-  url: string
-  entrypoints: Record<string, string[]>
+  bundle: BundleInformation
+  data?: Data
   signal?: AbortSignal
 }
 
 export class AbortRenderingError extends Error {}
 
-export async function renderAsyncToString<Data = any>({
-  Skeleton,
-  Server,
-  getServerData,
-  url,
-  entrypoints,
-  signal,
-}: RenderAsyncToStringConfig<Data>) {
+export async function renderAsyncToString<Data = any>(
+  request: Request,
+  {
+    Skeleton,
+    Server,
+    bundle,
+    data,
+    signal,
+    ...passOptions
+  }: RenderAsyncToStringConfig<Data>
+) {
   const out = new WritableStreamBuffer()
-
-  let serverData: ServerData<any> | undefined
-  if (getServerData) {
-    serverData = await getServerData({ url, entrypoints })
-  }
 
   return new Promise<string>((resolve, reject) => {
     function handleAbort() {
@@ -38,22 +42,17 @@ export async function renderAsyncToString<Data = any>({
       <SSRProvider
         value={{
           Server,
-          data: serverData?.data,
-          url,
-          entrypoints,
+          data,
+          request,
+          bundle,
         }}
       >
         <Skeleton />
       </SSRProvider>,
       out,
       {
+        ...passOptions,
         stopOnError: true,
-        bootstrapScripts: serverData?.bootstrapModules,
-        bootstrapModules: serverData?.bootstrapModules,
-        bootstrapScriptContent: serverData?.bootstrapScriptContent,
-        injectBeforeHeadClose: serverData?.injectBeforeHeadClose,
-        injectBeforeBodyClose: serverData?.injectBeforeBodyClose,
-        streamTransformers: serverData?.streamTransformers,
         onAllReady() {
           if (signal) {
             if (signal.aborted) {
@@ -62,6 +61,7 @@ export async function renderAsyncToString<Data = any>({
               signal.removeEventListener('abort', handleAbort)
             }
           }
+          passOptions.onAllReady?.()
           out.on('finish', async () => {
             resolve(out.getContentsAsString() || '')
           })
@@ -74,6 +74,7 @@ export async function renderAsyncToString<Data = any>({
               signal.removeEventListener('abort', handleAbort)
             }
           }
+          passOptions.onError?.(error)
           reject(error)
         },
       }

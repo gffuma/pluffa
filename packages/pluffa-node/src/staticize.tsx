@@ -11,6 +11,13 @@ import PQueue from 'p-queue'
 import { renderAsyncToString, AbortRenderingError } from '@pluffa/node-render'
 import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
 import type { RegisterStatik } from '@pluffa/statik/runtime'
+import type {
+  SkeletonComponent,
+  ServerComponent,
+  BundleInformation,
+} from '@pluffa/ssr'
+import type { GetServerData, ServerData } from './types'
+import createRequest from './createRequest'
 
 const ncp = util.promisify(ncpCB)
 
@@ -177,13 +184,10 @@ export default async function staticize({
   sourceMap.install()
 
   const outPath = path.resolve(process.cwd(), outputDir)
-  const buildClientPath = path.resolve(process.cwd(), '.pluffa/client')
-  const buildNodePath = path.resolve(process.cwd(), '.pluffa/node')
+  const buildPath = path.join(process.cwd(), '.pluffa')
+  const buildClientPath = path.join(buildPath, 'client')
+  const buildNodePath = path.join(buildPath, 'node')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
-
-  // NOTE: Ok, this should be do better but for now as workaround
-  // expose them as env var...
-  process.env.PLUFFA_BUILD_CLIENT_PATH = buildClientPath
 
   try {
     // Remove stale ourput
@@ -208,9 +212,10 @@ export default async function staticize({
       .readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
       .catch(handleFileNotFoundError)
   )
-
-  // NOTE: Set a flag so we can do different stuff during staticize
-  process.env.PLUFFA_RUN_STATICIZE = '1'
+  const bundle: BundleInformation = {
+    entrypoints: manifest.entrypoints,
+    buildPath,
+  }
 
   // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
@@ -243,14 +248,17 @@ export default async function staticize({
   }
 
   const serverPath = path.join(buildNodePath, `Server.${buildImportExt}`)
-  const { default: Server, getServerData } = await import(serverPath)
+  const { default: Server, getServerData } = (await import(serverPath)
     .catch(handleImportError)
-    .then(uniformExport)
+    .then(uniformExport)) as {
+    default: ServerComponent
+    getServerData?: GetServerData
+  }
 
   const skeletonPath = path.join(buildNodePath, `Skeleton.${buildImportExt}`)
-  const { default: Skeleton } = await import(skeletonPath)
+  const { default: Skeleton } = (await import(skeletonPath)
     .catch(handleImportError)
-    .then(uniformExport)
+    .then(uniformExport)) as { default: SkeletonComponent }
 
   const { succededUrls, failedUrls } = await processURLs(
     urls,
@@ -270,13 +278,19 @@ export default async function staticize({
             </CrawlContext.Provider>
           )
         }
-        const entrypoints = manifest.entrypoints
-        const html = await renderAsyncToString({
+        const request = createRequest({ url })
+        let serverData: ServerData | undefined
+        if (getServerData) {
+          serverData = await getServerData({
+            bundle,
+            request,
+          })
+        }
+        const html = await renderAsyncToString(request, {
+          ...serverData,
           Server: RenderServer,
-          getServerData,
           Skeleton,
-          url,
-          entrypoints,
+          bundle,
           signal,
         })
         let urls: string[] = []

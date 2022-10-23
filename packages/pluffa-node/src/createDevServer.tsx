@@ -1,6 +1,6 @@
 import sourceMap from 'source-map-support'
 import chalk from 'chalk'
-import { Express, Response, Router } from 'express'
+import { Express, Response } from 'express'
 import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
@@ -10,11 +10,12 @@ import {
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
 import type { ServerComponent, SkeletonComponent } from '@pluffa/ssr'
-import { renderExpressResponse, GetServerData } from '@pluffa/node-render'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
-import ErrorPage from './components/ErrorPage.js'
+import ErrorPage from './components/ErrorPage'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
-import { createHotModule, HotModule } from './hotModule.js'
+import { createHotModule, HotModule } from './hotModule'
+import type { GetServerData } from './types'
+import { handleSSR } from './handleSSR'
 
 const require = createRequire(import.meta.url)
 
@@ -80,34 +81,6 @@ export default function createDevServer({
     default: SkeletonComponent
   }>(buildedNodeDir, 'Skeleton', compileNodeCommonJS)
 
-  // const __PLUFFA_API_HMR__ = Symbol('__PLUFFA_API_HMR__')
-  let i = 0
-  function makeApiRouter() {
-    const j = ++i
-    const router = Router()
-    router.get('/', (req, res) => {
-      console.log('Handle Guakamole!', j)
-      res.send(`Guakamole! ${j}`)
-    })
-    // Object.defineProperty(router, __PLUFFA_API_HMR__, {
-    //   value: true,
-    //   configurable: false,
-    //   enumerable: false,
-    //   writable: false,
-    // })
-    return router
-  }
-  let arouter = makeApiRouter()
-
-  app.use('/api', (req, res) => {
-    console.log('R', req)
-    res.on('finish', () => {
-      res
-    })
-
-    ;(arouter as any).handle(req, res)
-  })
-
   const serverCompiler = (compiler as MultiCompiler).compilers.find(
     (c) => c.name === 'server'
   )
@@ -121,15 +94,6 @@ export default function createDevServer({
       hotModules.push(statikHotModule)
     }
     serverCompiler.hooks.afterDone.tap('realodServerCode', (stats) => {
-      arouter = makeApiRouter()
-      // for (let i = 0; i < app._router.stack.length; i++) {
-      //   const layer = app._router.stack[i]
-      //   if (layer.handle[__PLUFFA_API_HMR__] === true) {
-      //     layer.handle = makeApiRouter()
-      //     break
-      //   }
-      // }
-
       const emittedAssets = stats.compilation.emittedAssets
       hotModules.forEach((m) => {
         if (emittedAssets.has(m.name)) {
@@ -197,6 +161,7 @@ export default function createDevServer({
     const { devMiddleware } = res.locals.webpack
     const multiStats = devMiddleware.stats as MultiStats
     const entrypoints = getFlatEntrypointsFromWebPackStats(multiStats, 'client')
+    const bundle = { entrypoints }
     try {
       if (statikEnabled) {
         const { configureRegisterStatik } = await getStatikRunTime()
@@ -205,22 +170,23 @@ export default function createDevServer({
       }
       const { default: Server, getServerData } = await serverHotModule.get()
       const { default: Skeleton } = await skeletonHotModule.get()
-      await renderExpressResponse(req, res, {
-        Server,
-        Skeleton,
-        getServerData,
-        entrypoints,
-        onError: (error) => {
-          console.log(chalk.red('Error during server rendering'))
-          console.log(error)
+      await handleSSR(
+        req,
+        res,
+        {
+          Server,
+          Skeleton,
+          getServerData,
+          bundle,
         },
-        onFatalError: (error) => {
-          // Unrecoverable fatal error during rendering
-          handleFatalSSRError(error, res)
-        },
-      })
+        {
+          handleFatalSSRError,
+        }
+      )
     } catch (error) {
       // Compilation error or run time error before rendering
+      console.error(chalk.red('Uncaught Exception when handle ssr request'))
+      console.error(error)
       handleFatalSSRError(error, res)
     }
   })

@@ -4,8 +4,10 @@ import sourceMap from 'source-map-support'
 import fs from 'fs/promises'
 import path from 'path'
 import express, { Express, Response } from 'express'
-import { renderExpressResponse } from '@pluffa/node-render'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
+import type { GetServerData } from './types'
+import { handleSSR } from './handleSSR'
+import type { BundleInformation } from '@pluffa/ssr'
 
 export interface CreateProdServerOptions {
   publicDir: string | false
@@ -78,9 +80,9 @@ export default async function createProdServer({
     app.use(express.static(path.resolve(process.cwd(), publicDir)))
   }
 
-  const buildDir = overrideBuildDir ?? path.resolve(process.cwd(), '.pluffa')
-  const buildNodePath = path.join(buildDir, 'node')
-  const buildClientPath = path.join(buildDir, 'client')
+  const buildPath = overrideBuildDir ?? path.resolve(process.cwd(), '.pluffa')
+  const buildNodePath = path.join(buildPath, 'node')
+  const buildClientPath = path.join(buildPath, 'client')
   const buildImportExt = `${compileNodeCommonJS ? '' : 'm'}js`
 
   if (serveStaticAssets) {
@@ -95,10 +97,6 @@ export default async function createProdServer({
       })
     )
   }
-
-  // NOTE: Ok, this should be do better but for now as workaround
-  // expose them as env var...
-  process.env.PLUFFA_BUILD_CLIENT_PATH = buildClientPath
 
   // Unifrom ESM vs CommonJS
   const uniformExport = (o: any) => (compileNodeCommonJS ? o.default : o)
@@ -121,6 +119,10 @@ export default async function createProdServer({
       .readFile(path.join(buildClientPath, 'manifest.json'), 'utf-8')
       .catch(handleFileNotFoundError)
   )
+  const bundle: BundleInformation = {
+    entrypoints: manifest.entrypoints,
+    buildPath,
+  }
 
   // NOTE: We Inject the current user code for registerStatik
   // to inject into the correct version CommonJS vs ESM
@@ -195,21 +197,22 @@ export default async function createProdServer({
 
   app.use(async (req, res) => {
     try {
-      await renderExpressResponse(req, res, {
-        Server,
-        Skeleton,
-        getServerData,
-        entrypoints: manifest.entrypoints,
-        onError: (renderingError) => {
-          console.log(chalk.red('Error during server rendering'))
-          console.log(renderingError)
+      handleSSR(
+        req,
+        res,
+        {
+          Server,
+          Skeleton,
+          bundle,
+          getServerData,
         },
-        onFatalError(error) {
-          handleFatalSSRError(error, res)
-        },
-      })
+        {
+          handleFatalSSRError,
+        }
+      )
     } catch (error) {
-      console.error(chalk.red('Fatal error while rendering'))
+      // Compilation error or run time error before rendering
+      console.error(chalk.red('Uncaught Exception when handle ssr request'))
       console.error(error)
       handleFatalSSRError(error, res)
     }

@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { useSSRContext } from './server'
+import { useSSRBundleInfo, useSSRContext } from './server'
 
 export function Root() {
   const ctx = useSSRContext()
@@ -18,10 +18,10 @@ export type ScriptsProps = { entry?: string } & Omit<
 >
 
 export function Scripts({ entry = 'main', ...props }: ScriptsProps) {
-  const ctx = useSSRContext()
+  const bundle = useSSRBundleInfo()
   return (
     <>
-      {ctx.entrypoints[entry]
+      {bundle.entrypoints[entry]
         .filter((e) => e.endsWith('.js'))
         .map((e) => (
           <script key={e} src={`/${e}`} {...props} />
@@ -39,10 +39,10 @@ export type StylesProps = { entry?: string } & Omit<
 >
 
 export function Styles({ entry = 'main', ...props }: StylesProps) {
-  const ctx = useSSRContext()
+  const bundle = useSSRBundleInfo()
   return (
     <>
-      {ctx.entrypoints[entry]
+      {bundle.entrypoints[entry]
         .filter((e) => e.endsWith('.css'))
         .map((e) => (
           <link key={e} href={`/${e}`} {...props} rel="stylesheet" />

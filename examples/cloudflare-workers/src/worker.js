@@ -25,10 +25,11 @@ router.get('/static/*', async (_, event) => {
 })
 
 router.all('*', async (request) => {
+  const serverData = getServerData()
   return renderToEdgeResponse(request, {
     Skeleton,
     Server,
-    getServerData,
+    ...serverData,
   })
 })
 

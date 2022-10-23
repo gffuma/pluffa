@@ -2,7 +2,7 @@ import MockRes from 'mock-res'
 import { useSSRData } from '@pluffa/ssr'
 import { Root } from '@pluffa/ssr/skeleton'
 import { Request } from 'express'
-import { renderExpressResponse } from '../renderExpressResponse'
+import { renderToNodeResponse } from '../renderToNodeResponse'
 
 export interface Resource<T> {
   read(): T
@@ -48,10 +48,12 @@ it('should render Skeleton and Server', async () => {
   function Server() {
     return <div>Hello World!</div>
   }
-  await renderExpressResponse(req, res, {
+  await renderToNodeResponse(req, res, {
     Skeleton,
     Server,
-    entrypoints: {},
+    bundle: {
+      entrypoints: {},
+    },
   })
   await new Promise((r) => res.on('finish', r))
   const html = res._getString()
@@ -81,10 +83,12 @@ it('should render Server with suspense', async () => {
       </div>
     )
   }
-  await renderExpressResponse(req, res, {
+  await renderToNodeResponse(req, res, {
     Skeleton,
     Server,
-    entrypoints: {},
+    bundle: {
+      entrypoints: {},
+    },
   })
   resolve!('Async')
   await new Promise((r) => res.on('finish', r))
@@ -94,7 +98,7 @@ it('should render Server with suspense', async () => {
   )
 })
 
-it('should provide data from getServerData to Server component', async () => {
+it('should provide data from to Server component', async () => {
   const req = {
     url: '/',
   } as Request
@@ -114,16 +118,14 @@ it('should provide data from getServerData to Server component', async () => {
       </div>
     )
   }
-  await renderExpressResponse(req, res, {
+  await renderToNodeResponse(req, res, {
     Skeleton,
     Server,
-    entrypoints: {},
-    getServerData: async () => {
-      return {
-        data: {
-          foo: 'Fuzzy',
-        },
-      }
+    bundle: {
+      entrypoints: {},
+    },
+    data: {
+      foo: 'Fuzzy',
     },
   })
   await new Promise((r) => res.on('finish', r))
@@ -153,16 +155,13 @@ it('should inject content before head close', async () => {
     return <div>Hello World!</div>
   }
 
-  await renderExpressResponse(req, res as any, {
+  await renderToNodeResponse(req, res, {
     Skeleton,
     Server,
-    entrypoints: {},
-    getServerData: () => {
-      return {
-        data: {},
-        injectBeforeHeadClose: () => '<title>Hello</title>',
-      }
+    bundle: {
+      entrypoints: {},
     },
+    injectBeforeHeadClose: () => '<title>Hello</title>',
   })
 
   await new Promise((r) => res.on('finish', r))
@@ -191,16 +190,13 @@ it('should inject content before body close', async () => {
     return <div>Hello World!</div>
   }
 
-  await renderExpressResponse(req, res as any, {
+  await renderToNodeResponse(req, res, {
     Skeleton,
     Server,
-    entrypoints: {},
-    getServerData: () => {
-      return {
-        data: {},
-        injectBeforeBodyClose: () => '<script>alert(99);</script>',
-      }
+    bundle: {
+      entrypoints: {},
     },
+    injectBeforeBodyClose: () => '<script>alert(99);</script>',
   })
 
   await new Promise((r) => res.on('finish', r))
@@ -210,49 +206,47 @@ it('should inject content before body close', async () => {
   )
 })
 
-// it('should handle error', async () => {
-//   const req = {
-//     url: '/',
-//   } as Request
-//   const res = new MockRes()
+// // it('should handle error', async () => {
+// //   const req = {
+// //     url: '/',
+// //   } as Request
+// //   const res = new MockRes()
 
-//   function Skeleton() {
-//     return (
-//       <html>
-//         <body>
-//           <Root />
-//         </body>
-//       </html>
-//     )
-//   }
-//   function Boom() {
-//     throw new Error('BooM')
-//     return null
-//   }
-//   function Server() {
-//     return (
-//       <div>
-//         <h1>Boom?</h1>
-//         <p>
-//           <Suspense fallback={<div>X</div>}>
-//             <Boom />
-//           </Suspense>
-//         </p>
-//       </div>
-//     )
-//   }
+// //   function Skeleton() {
+// //     return (
+// //       <html>
+// //         <body>
+// //           <Root />
+// //         </body>
+// //       </html>
+// //     )
+// //   }
+// //   function Boom() {
+// //     throw new Error('BooM')
+// //     return null
+// //   }
+// //   function Server() {
+// //     return (
+// //       <div>
+// //         <h1>Boom?</h1>
+// //         <p>
+// //           <Suspense fallback={<div>X</div>}>
+// //             <Boom />
+// //           </Suspense>
+// //         </p>
+// //       </div>
+// //     )
+// //   }
 
-//   await renderExpressResponse(req, res as any, {
-//     Skeleton,
-//     Server,
-//     entrypoints: {},
-//   })
+// //   await renderExpressResponse(req, res as any, {
+// //     Skeleton,
+// //     Server,
+// //     entrypoints: {},
+// //   })
 
-//   await new Promise((r) => res.on('finish', r))
-//   const html = res._getString()
-//   expect(html).toBe(
-//     '<!DOCTYPE html><html><body><div>Hello World!</div><script>alert(99);</script></body></html>'
-//   )
-// })
-
-
+// //   await new Promise((r) => res.on('finish', r))
+// //   const html = res._getString()
+// //   expect(html).toBe(
+// //     '<!DOCTYPE html><html><body><div>Hello World!</div><script>alert(99);</script></body></html>'
+// //   )
+// // })

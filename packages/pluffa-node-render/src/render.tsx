@@ -7,20 +7,6 @@ import {
 import { compose, Writable, Transform } from 'stream'
 import { createHtmlInjectTransformer } from './nodeStreamsUtils'
 
-function wrapInjectorWithErrorHandler(
-  injector: () => string,
-  erorrHandler: (err: unknown) => void
-) {
-  return () => {
-    try {
-      return injector()
-    } catch (err) {
-      erorrHandler(err)
-      return ''
-    }
-  }
-}
-
 export interface RenderOptions extends RenderToPipeableStreamOptions {
   stopOnError?: boolean
   onFatalError?: (error: unknown) => void
@@ -47,25 +33,13 @@ export function render(
 
   if (injectBeforeBodyClose) {
     transfomers.push(
-      createHtmlInjectTransformer(
-        '</body>',
-        wrapInjectorWithErrorHandler(injectBeforeBodyClose, (err) => {
-          console.error('Error when calling injectBeforeBodyClose()')
-          console.error(err)
-        })
-      )
+      createHtmlInjectTransformer('</body>', injectBeforeBodyClose)
     )
   }
 
   if (injectBeforeHeadClose) {
     transfomers.push(
-      createHtmlInjectTransformer(
-        '</head>',
-        wrapInjectorWithErrorHandler(injectBeforeHeadClose, (err) => {
-          console.error('Error when calling injectBeforeHeadClose()')
-          console.error(err)
-        })
-      )
+      createHtmlInjectTransformer('</head>', injectBeforeHeadClose)
     )
   }
 

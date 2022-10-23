@@ -1,25 +1,25 @@
-import { GetServerData } from '@pluffa/node-render'
+import { StrictMode } from 'react'
+import type { GetServerData } from '@pluffa/node'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useSSRUrl, useSSRData, getScripts } from '@pluffa/ssr'
+import { useSSRRequest, useSSRData, getScripts } from '@pluffa/ssr'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
-import React from 'react'
 
 export default function Server() {
-  const url = useSSRUrl()
+  const { url } = useSSRRequest()
   const { queryClient } = useSSRData()
   return (
-    <React.StrictMode>
+    <StrictMode>
       <QueryClientProvider client={queryClient}>
         <StaticRouter location={url}>
           <App />
         </StaticRouter>
       </QueryClientProvider>
-    </React.StrictMode>
+    </StrictMode>
   )
 }
 
-export const getServerData: GetServerData = ({ entrypoints }) => {
+export const getServerData: GetServerData = ({ bundle }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -31,6 +31,7 @@ export const getServerData: GetServerData = ({ entrypoints }) => {
         refetchOnMount: false,
         staleTime: Infinity,
         suspense: true,
+        retry: false,
       },
     },
   })
@@ -41,6 +42,6 @@ export const getServerData: GetServerData = ({ entrypoints }) => {
     injectBeforeBodyClose: () =>
       `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
         dehydrate(queryClient)
-      )};</script>` + getScripts(entrypoints),
+      )};</script>` + getScripts(bundle.entrypoints),
   }
 }

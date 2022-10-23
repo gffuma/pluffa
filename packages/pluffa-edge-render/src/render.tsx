@@ -12,20 +12,6 @@ export interface RenderOptions extends RenderToReadableStreamOptions {
   getClientRenderFallback?: () => ReactElement
 }
 
-function wrapInjectorWithErrorHandler(
-  injector: () => string,
-  erorrHandler: (err: unknown) => void
-) {
-  return () => {
-    try {
-      return injector()
-    } catch (err) {
-      erorrHandler(err)
-      return ''
-    }
-  }
-}
-
 export async function render(
   children: ReactNode,
   {
@@ -39,24 +25,12 @@ export async function render(
     let out = stream
     if (injectBeforeBodyClose) {
       out = out.pipeThrough(
-        createHtmlInjectTransformer(
-          '</body>',
-          wrapInjectorWithErrorHandler(injectBeforeBodyClose, (err) => {
-            console.error('Error when calling injectBeforeBodyClose()')
-            console.error(err)
-          })
-        )
+        createHtmlInjectTransformer('</body>', injectBeforeBodyClose)
       )
     }
     if (injectBeforeHeadClose) {
       out = out.pipeThrough(
-        createHtmlInjectTransformer(
-          '</head>',
-          wrapInjectorWithErrorHandler(injectBeforeHeadClose, (err) => {
-            console.error('Error when calling injectBeforeHeadClose()')
-            console.error(err)
-          })
-        )
+        createHtmlInjectTransformer('</head>', injectBeforeHeadClose)
       )
     }
     return out

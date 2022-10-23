@@ -1,21 +1,24 @@
 import { ReactNode, useContext } from 'react'
 import { SSRContext } from './context'
-import { SSRContextType } from './types'
+import { SSRContextType, BaseRequest } from './types'
 
-export function useSSRContext<Data = any>(): SSRContextType<Data> {
+export function useSSRContext<
+  Request extends BaseRequest = BaseRequest,
+  Data = any
+>(): SSRContextType<Request, Data> {
   return useContext(SSRContext)
 }
 
-export function useSSRUrl() {
-  return useSSRContext().url
+export function useSSRRequest<Request extends BaseRequest = BaseRequest>() {
+  return useSSRContext<Request, any>().request
 }
 
 export function useSSRData<Data = any>(): Data {
-  return useSSRContext<Data>().data!
+  return useSSRContext<BaseRequest, Data>().data!
 }
 
-export function useSSRBundleEntrypoints() {
-  return useSSRContext().entrypoints
+export function useSSRBundleInfo() {
+  return useSSRContext().bundle
 }
 export function getScripts(
   entrypoints: Record<string, string[]>,
@@ -37,11 +40,11 @@ export function getStyles(
     .join('')
 }
 
-export function SSRProvider({
+export function SSRProvider<TRequest extends BaseRequest, Data>({
   value,
   children,
 }: {
-  value: SSRContextType<any>
+  value: SSRContextType<TRequest, Data>
   children: ReactNode
 }) {
   return <SSRContext.Provider value={value}>{children}</SSRContext.Provider>
