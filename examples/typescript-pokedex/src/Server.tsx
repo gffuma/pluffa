@@ -19,7 +19,7 @@ export default function Server() {
   )
 }
 
-export const getServerData: GetServerData = ({ bundle }) => {
+export const getServerData: GetServerData = ({ bundle, request }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -35,13 +35,31 @@ export const getServerData: GetServerData = ({ bundle }) => {
       },
     },
   })
-  return {
-    data: {
-      queryClient,
-    },
-    injectBeforeBodyClose: () =>
-      `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
-        dehydrate(queryClient)
-      )};</script>` + getScripts(bundle.entrypoints),
+
+  const mode = request.query['ssr'] === 'seo' ? 'seo' : 'streaming'
+  const data = {
+    queryClient,
+  }
+  const getInitialDataJS = () =>
+    `window.__INITIAL_DATA__ = ${JSON.stringify(dehydrate(queryClient))};`
+  if (mode === 'streaming') {
+    return {
+      mode,
+      data,
+      bootstrapScripts: bundle.entrypoints.main.filter((e) =>
+        e.endsWith('.js')
+      ),
+      injectBeforeEveryScript: () =>
+        `<script>${getInitialDataJS()}window.__HYDRATE__ && window.__HYDRATE__();</script>`,
+    }
+  } else {
+    return {
+      mode,
+      data,
+      injectBeforeBodyClose: () =>
+        `<script>${getInitialDataJS()}</script>${getScripts(
+          bundle.entrypoints
+        )}`,
+    }
   }
 }

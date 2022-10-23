@@ -12,6 +12,8 @@ export interface ServerData<Data = any>
     | 'injectBeforeBodyClose'
     | 'injectBeforeHeadClose'
     | 'injectOnEnd'
+    | 'injectBeforeEveryScript'
+    | 'mode'
   > {
   data: Data
 }

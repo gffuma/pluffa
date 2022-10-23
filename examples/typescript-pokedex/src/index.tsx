@@ -19,9 +19,14 @@ const queryClient = new QueryClient({
   },
 })
 
-hydrate(queryClient, (window as any).__INITIAL_DATA__)
-delete (window as any).__INITIAL_DATA__
+;(window as any).__HYDRATE__ = () => {
+  if ((window as any).__INITIAL_DATA__) {
+    hydrate(queryClient, (window as any).__INITIAL_DATA__)
+    delete (window as any).__INITIAL_DATA__
+  }
+}
 
+;(window as any).__HYDRATE__()
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
   <React.StrictMode>

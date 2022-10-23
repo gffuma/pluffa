@@ -10,7 +10,7 @@ import { RenderOptions } from './render'
 import { render } from './render'
 
 export interface RenderAsyncToStringConfig<Data = any>
-  extends Omit<RenderOptions, 'stopOnError'> {
+  extends Omit<RenderOptions, 'stopOnError' | 'ssrMode'> {
   Skeleton: SkeletonComponent
   Server: ServerComponent
   bundle: BundleInformation
@@ -53,6 +53,7 @@ export async function renderAsyncToString<Data = any>(
       {
         ...passOptions,
         stopOnError: true,
+        ssrMode: 'seo',
         onAllReady() {
           if (signal) {
             if (signal.aborted) {
