@@ -1,6 +1,6 @@
 import { Transform } from 'stream'
 
-export function createHtmlInjectTransformer(
+export function createTagHtmlInjectTransformer(
   token: string,
   inject: () => string
 ) {
@@ -21,6 +21,17 @@ export function createHtmlInjectTransformer(
           return
         }
       }
+      callback(null, chunk)
+    },
+  })
+}
+
+export function createEndHtmlInjectTransformer(inject: () => string) {
+  return new Transform({
+    flush(callback) {
+      callback(null, Buffer.from(inject(), 'utf-8'))
+    },
+    transform(chunk: Buffer, encoding, callback) {
       callback(null, chunk)
     },
   })

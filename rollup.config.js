@@ -176,6 +176,7 @@ function pluffaNode() {
     },
     plugins: [
       externals({
+        include: ['type-is', 'accepts', 'range-parser'],
         packagePath: `${baseDir}/package.json`,
       }),
       typescript({ tsconfig: `${baseDir}/tsconfig.build.json` }),

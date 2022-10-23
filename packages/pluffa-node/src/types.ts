@@ -11,6 +11,7 @@ export interface ServerData<Data = any>
     | 'streamTransformers'
     | 'injectBeforeBodyClose'
     | 'injectBeforeHeadClose'
+    | 'injectOnEnd'
   > {
   data: Data
 }

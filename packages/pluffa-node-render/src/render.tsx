@@ -5,7 +5,10 @@ import {
   renderToString,
 } from 'react-dom/server'
 import { compose, Writable, Transform } from 'stream'
-import { createHtmlInjectTransformer } from './nodeStreamsUtils'
+import {
+  createEndHtmlInjectTransformer,
+  createTagHtmlInjectTransformer,
+} from './nodeStreamsUtils'
 
 export interface RenderOptions extends RenderToPipeableStreamOptions {
   stopOnError?: boolean
@@ -13,6 +16,7 @@ export interface RenderOptions extends RenderToPipeableStreamOptions {
   getClientRenderFallback?: () => ReactElement
   injectBeforeBodyClose?: () => string
   injectBeforeHeadClose?: () => string
+  injectOnEnd?: () => string
   streamTransformers?: Transform[]
 }
 
@@ -22,6 +26,7 @@ export function render(
   {
     injectBeforeBodyClose,
     injectBeforeHeadClose,
+    injectOnEnd,
     onFatalError,
     stopOnError,
     getClientRenderFallback,
@@ -33,13 +38,19 @@ export function render(
 
   if (injectBeforeBodyClose) {
     transfomers.push(
-      createHtmlInjectTransformer('</body>', injectBeforeBodyClose)
+      createTagHtmlInjectTransformer('</body>', injectBeforeBodyClose)
     )
   }
 
   if (injectBeforeHeadClose) {
     transfomers.push(
-      createHtmlInjectTransformer('</head>', injectBeforeHeadClose)
+      createTagHtmlInjectTransformer('</head>', injectBeforeHeadClose)
+    )
+  }
+
+  if (injectOnEnd) {
+    transfomers.push(
+      createEndHtmlInjectTransformer(injectOnEnd)
     )
   }
 
