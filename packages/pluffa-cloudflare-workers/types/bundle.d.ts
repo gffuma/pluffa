@@ -1,0 +1,1 @@
+declare const PLUFFA_BUNDLE_ENTRYPOINTS: Record<string, string[]>

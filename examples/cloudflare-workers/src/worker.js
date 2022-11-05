@@ -1,4 +1,4 @@
-import { renderToEdgeResponse } from '@pluffa/edge-render'
+import { createSSRHandler } from '@pluffa/cloudflare-workers/runtime'
 import { Router } from 'itty-router'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 import Skeleton from './Skeleton'
@@ -24,14 +24,25 @@ router.get('/static/*', async (_, event) => {
   }
 })
 
-router.all('*', async (request) => {
-  const serverData = getServerData()
-  return renderToEdgeResponse(request, {
-    Skeleton,
+// router.all('*', async (request) => {
+//   const serverData = getServerData()
+//   return renderToEdgeResponse(request, {
+//     Skeleton,
+//     Server,
+//     ...serverData,
+//   })
+// })
+// router.get('/x/fns/*', () => createStatikHandler(router.handle))
+// statik('/recipes')
+
+router.all(
+  '*',
+  createSSRHandler({
     Server,
-    ...serverData,
+    Skeleton,
+    getServerData,
   })
-})
+)
 
 addEventListener('fetch', async (event) => {
   event.respondWith(router.handle(event.request, event))

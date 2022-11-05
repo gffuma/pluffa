@@ -7,17 +7,17 @@ export function stringToStream(str: string) {
   })
 }
 
-export function createHtmlInjectTransformer(
+export function createTagHtmlInjectTransformer(
   token: string,
+  oneTime: boolean,
   inject: () => string
 ) {
   let injected = false
 
   return new TransformStream({
     transform(chunk, controller) {
-      if (!injected) {
+      if (!oneTime || !injected) {
         const content = new TextDecoder().decode(chunk)
-
         let index
         if ((index = content.indexOf(token)) !== -1) {
           const newContent =
@@ -29,6 +29,17 @@ export function createHtmlInjectTransformer(
           return
         }
       }
+      controller.enqueue(chunk)
+    },
+  })
+}
+
+export function createEndHtmlInjectTransformer(inject: () => string) {
+  return new TransformStream({
+    flush(controller) {
+      controller.enqueue(new TextEncoder().encode(inject()))
+    },
+    transform(chunk, controller) {
       controller.enqueue(chunk)
     },
   })

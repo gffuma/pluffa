@@ -1,20 +1,20 @@
 import { ReactNode, useContext } from 'react'
 import { SSRContext } from './context'
-import { SSRContextType, BaseRequest } from './types'
+import { SSRContextType } from './types'
 
-export function useSSRContext<
-  Request extends BaseRequest = BaseRequest,
-  Data = any
->(): SSRContextType<Request, Data> {
+export function useSSRContext<TRequest = any, Data = any>(): SSRContextType<
+  TRequest,
+  Data
+> {
   return useContext(SSRContext)
 }
 
-export function useSSRRequest<Request extends BaseRequest = BaseRequest>() {
-  return useSSRContext<Request, any>().request
+export function useSSRRequest<TRequest>() {
+  return useSSRContext<TRequest>().request
 }
 
 export function useSSRData<Data = any>(): Data {
-  return useSSRContext<BaseRequest, Data>().data!
+  return useSSRContext<any, Data>().data!
 }
 
 export function useSSRBundleInfo() {
@@ -40,7 +40,7 @@ export function getStyles(
     .join('')
 }
 
-export function SSRProvider<TRequest extends BaseRequest, Data>({
+export function SSRProvider<TRequest, Data>({
   value,
   children,
 }: {

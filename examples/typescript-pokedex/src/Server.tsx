@@ -36,7 +36,7 @@ export const getServerData: GetServerData = ({ bundle, request }) => {
     },
   })
 
-  const mode = request.query['ssr'] === 'seo' ? 'seo' : 'streaming'
+  const mode = request.getOriginal().query['ssr'] === 'seo' ? 'seo' : 'streaming'
   const data = {
     queryClient,
   }

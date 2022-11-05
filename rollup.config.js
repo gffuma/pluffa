@@ -211,6 +211,7 @@ function pluffaCloudflareWorkers() {
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
+      runtime: `${baseDir}/src/runtime.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,

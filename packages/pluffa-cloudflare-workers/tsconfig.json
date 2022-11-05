@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "declaration": true,
     "jsx": "react-jsx",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2020"],
     "module": "ES2020",
     "target": "es2020",
     "moduleResolution": "node",
@@ -12,8 +12,9 @@
     "strictFunctionTypes": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"],
+  "include": ["src/**/*", "./types"],
+  "exclude": ["node_modules"]
 }

@@ -1,5 +1,4 @@
-import type { Request } from 'express'
-import type { RenderOptions } from '@pluffa/node-render'
+import type { RenderOptions } from '@pluffa/edge-render'
 import type {
   BundleInformation,
   InstructResponse,
@@ -12,7 +11,6 @@ export interface ServerData<Data = any>
     | 'bootstrapScripts'
     | 'bootstrapModules'
     | 'bootstrapScriptContent'
-    | 'streamTransformers'
     | 'injectBeforeBodyClose'
     | 'injectBeforeHeadClose'
     | 'injectOnEnd'
@@ -25,8 +23,8 @@ export interface ServerData<Data = any>
 
 export interface GetServerDataConfig {
   bundle: BundleInformation
-  request: RequestWrapper<Request>
   response: InstructResponse
+  request: RequestWrapper<Request>
 }
 
 export type GetServerData<Data = any> = (

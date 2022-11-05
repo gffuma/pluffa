@@ -1,5 +1,5 @@
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useSSRData } from '@pluffa/ssr'
+import { useSSRData, getScripts } from '@pluffa/ssr'
 import App from './App'
 
 export default function Server() {
@@ -11,7 +11,8 @@ export default function Server() {
   )
 }
 
-export const getServerData = () => {
+export const getServerData = ({ bundle, response, request }) => {
+  // console.log('URL', request.url)
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -27,13 +28,24 @@ export const getServerData = () => {
       },
     },
   })
+  // console.log(request.headers)
+  // console.log('X', crypto.randomUUID())
+  // response.setHeader('X-GIOVA', 'Awesome!')
+  // response.setHeader('Set-Cookie', 'giova=23;rinne=9;')
   return {
     data: {
       queryClient,
     },
-    injectBeforeBodyClose: () =>
+    mode: 'streaming',
+    bootstrapScripts: bundle.entrypoints['main'].filter((s) => s.endsWith('.js')),
+    // injectOnEnd: () => getScripts(bundle.entrypoints),
+    injectBeforeEveryScript: () =>
       `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
         dehydrate(queryClient)
       )};</script>`,
+    // injectBeforeBodyClose: () =>
+    //   `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
+    //     dehydrate(queryClient)
+    //   )};</script>`,
   }
 }

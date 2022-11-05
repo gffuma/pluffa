@@ -9,17 +9,30 @@ export interface BundleInformation {
   buildPath?: string
 }
 
-// Common request interface
-// evry runtime can implement more specific request
-// Eg:. Node use express Request, CF os CF Request ecc
-// This interface is the barebone version of request...
-export interface BaseRequest {
+// Wrap request to have a common surface of common Apis
+// between runtimes ... You can call getOriginal() to access
+// the low level request object in current runtime
+export interface RequestWrapper<TRequest, TBody = any> {
   url: string
+  method: string
+  headers: Record<string, any>
+  body: TBody
+  getOriginal(): TRequest
 }
 
-export interface SSRContextType<TRequest extends BaseRequest, Data> {
+// Instruct the response in all envs...
+// TODO: Maybe make more compilant \w standatds
+export interface InstructResponse {
+  status(code: number): void
+  setHeader(name: string, value: string): void
+  getHeader(name: string): void
+  // TODO: Support cookie???
+}
+
+export interface SSRContextType<TRequest, Data = any> {
   bundle: BundleInformation
-  request: TRequest
+  request: RequestWrapper<TRequest>
   Server?: ServerComponent
   data?: Data
+  response?: InstructResponse
 }

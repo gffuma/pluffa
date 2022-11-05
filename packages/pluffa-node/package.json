@@ -44,6 +44,7 @@
     "@pluffa/crawl": "^0.2.0",
     "@pluffa/env": "^0.2.0",
     "@pluffa/node-render": "^0.3.0",
+    "@pluffa/ssr": "^0.1.0",
     "@pluffa/statik": "^0.2.0",
     "@vercel/nft": "^0.22.1",
     "ansi-to-html": "^0.7.2",

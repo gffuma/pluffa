@@ -8,16 +8,25 @@ import mkdirp from 'mkdirp'
 import rimraf from 'rimraf'
 import chalk from 'chalk'
 import PQueue from 'p-queue'
-import { renderAsyncToString, AbortRenderingError } from '@pluffa/node-render'
+import {
+  renderAsyncToString,
+  AbortRenderingError,
+  RenderOptions,
+} from '@pluffa/node-render'
 import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
 import type { RegisterStatik } from '@pluffa/statik/runtime'
-import type {
+import {
   SkeletonComponent,
   ServerComponent,
   BundleInformation,
+  InstructResponse,
+  SSRProvider,
+  SSRContextType,
 } from '@pluffa/ssr'
 import type { GetServerData, ServerData } from './types'
 import createRequest from './createRequest'
+import { NodeRequestWrapper } from './httpWrappers'
+import { Request } from 'express'
 
 const ncp = util.promisify(ncpCB)
 
@@ -156,6 +165,37 @@ function handleFileNotFoundError(err: any): never {
   throw err
 }
 
+// TODO: Implement better ... and move ...
+class InstructStaticizeResponse implements InstructResponse {
+  _status: number
+  _headers: Record<string, string>
+
+  constructor() {
+    this._status = 200
+    this._headers = {}
+  }
+
+  status(code: number) {
+    this._status = code
+  }
+
+  getStatus() {
+    return this._status
+  }
+
+  getHeaders() {
+    return this._headers
+  }
+
+  setHeader(name: string, value: string) {
+    this._headers[name] = value
+  }
+
+  getHeader(name: string) {
+    return this._headers[name]
+  }
+}
+
 export interface StaticizeConfig {
   outputDir: string
   publicDir: string | false
@@ -268,31 +308,49 @@ export default async function staticize({
       crawlEnabled,
       signal,
       async renderURL(url) {
-        let RenderServer = Server
+        let WrappedServer = Server
         let crawlSess: CrawlSession
         if (crawlEnabled) {
           crawlSess = createCrawlSession()
-          RenderServer = () => (
+          WrappedServer = () => (
             <CrawlContext.Provider value={crawlSess}>
               <Server />
             </CrawlContext.Provider>
           )
         }
-        const request = createRequest({ url })
-        let serverData: ServerData | undefined
+        const request = new NodeRequestWrapper(createRequest({ url }))
+        const response = new InstructStaticizeResponse()
+        const ssrCtx: SSRContextType<Request> = {
+          bundle,
+          request,
+          response,
+        }
+        let providedRenderOptions: RenderOptions | undefined
         if (getServerData) {
-          serverData = await getServerData({
+          const { data, ...passDownRenderOptions } = await getServerData({
             bundle,
             request,
+            response,
           })
+          ssrCtx.data = data
+          providedRenderOptions = passDownRenderOptions
         }
-        const html = await renderAsyncToString(request, {
-          ...serverData,
-          Server: RenderServer,
-          Skeleton,
-          bundle,
-          signal,
-        })
+        const html = await renderAsyncToString(
+          <SSRProvider
+            value={{
+              ...ssrCtx,
+              Server: WrappedServer,
+            }}
+          >
+            <Skeleton />
+          </SSRProvider>,
+          {
+            ...providedRenderOptions,
+            stopOnError: true,
+            mode: 'seo',
+          },
+          signal
+        )
         let urls: string[] = []
         if (crawlEnabled) {
           urls = await crawlSess!.rewind()
