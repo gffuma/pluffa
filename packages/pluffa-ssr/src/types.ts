@@ -15,7 +15,8 @@ export interface BundleInformation {
 export interface RequestWrapper<TRequest, TBody = any> {
   url: string
   method: string
-  headers: Record<string, any>
+  headers: Record<string, string>
+  cookies: Record<string, string>
   body: TBody
   getOriginal(): TRequest
 }

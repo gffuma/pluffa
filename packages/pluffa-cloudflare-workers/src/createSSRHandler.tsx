@@ -1,4 +1,5 @@
 import { render, RenderOptions } from '@pluffa/edge-render'
+import cookie from 'cookie'
 import {
   BundleInformation,
   ServerComponent,
@@ -42,15 +43,17 @@ class InstructResponseCFResponse implements InstructResponse {
 
 class EdgeRequestWrapper implements RequestWrapper<Request> {
   _request: Request
-  _headers: Record<string, any>
+  _headers: Record<string, string>
   _body: any
   _url: string
+  _cookies: Record<string, string>
 
   constructor(request: Request) {
     this._request = request
     this._headers = Object.fromEntries(request.headers)
     const url = new URL(request.url)
     this._url = url.pathname + url.search
+    this._cookies = cookie.parse(this._headers['cookie'] || '')
     // TODO: This sucks...
     this._body = null
   }
@@ -66,6 +69,10 @@ class EdgeRequestWrapper implements RequestWrapper<Request> {
 
   get headers() {
     return this._headers
+  }
+
+  get cookies() {
+    return this._cookies
   }
 
   get method() {

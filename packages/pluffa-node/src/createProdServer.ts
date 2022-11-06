@@ -4,6 +4,7 @@ import sourceMap from 'source-map-support'
 import fs from 'fs/promises'
 import path from 'path'
 import express, { Express, Response } from 'express'
+import cookieParser from 'cookie-parser'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
 import type { GetServerData } from './types'
 import { handleSSR } from './handleSSR'
@@ -36,6 +37,7 @@ function createDefaultServer() {
   // You see that?
   app.disable('x-powered-by')
   app.use(express.json())
+  app.use(cookieParser())
   return app
 }
 

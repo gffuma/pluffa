@@ -5,17 +5,17 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 import { Compiler, MultiCompiler } from 'webpack'
 
 export interface CreateBaseDevServerOptions {
+  app?: Express,
   compiler: Compiler | MultiCompiler
   publicDir: string | false
 }
 
 export default function createBaseDevServer({
+  app: baseApp,
   compiler,
   publicDir,
 }: CreateBaseDevServerOptions): Express {
-  const app = express()
-
-  app.use(express.json())
+  const app = baseApp ?? express()
 
   if (publicDir) {
     app.use(express.static(path.resolve(process.cwd(), publicDir)))

@@ -1,6 +1,7 @@
 import sourceMap from 'source-map-support'
 import chalk from 'chalk'
-import { Express, Response } from 'express'
+import cookieParser from 'cookie-parser'
+import express, { Express, Response } from 'express'
 import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
@@ -40,6 +41,13 @@ export interface CreateDevServerOptions {
   proxyUrl?: string
 }
 
+function createBaseExpressApp() {
+  const app = express()
+  app.use(express.json())
+  app.use(cookieParser())
+  return app
+}
+
 export default function createDevServer({
   compiler,
   publicDir,
@@ -50,6 +58,7 @@ export default function createDevServer({
   sourceMap.install({ emptyCacheBetweenOperations: true })
 
   const app = createBaseDevServer({
+    app: createBaseExpressApp(),
     compiler,
     publicDir,
   })

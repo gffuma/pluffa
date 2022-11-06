@@ -43,7 +43,11 @@ export class NodeRequestWrapper implements RequestWrapper<Request> {
   }
 
   get headers() {
-    return this._request.headers
+    return this._request.headers as Record<string, string>
+  }
+
+  get cookies() {
+    return this._request.cookies
   }
 
   get method() {
