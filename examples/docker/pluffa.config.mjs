@@ -9,6 +9,6 @@ export default async (cmd) => {
     skeletonComponent: './src/Skeleton.js',
     serverComponent: './src/App.js',
     experimentalBuildOutput: 'standalone',
-    experimentalUseSwc: true,
+    useSwc: true,
   }
 }

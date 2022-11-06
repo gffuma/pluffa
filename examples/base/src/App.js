@@ -1,7 +1,16 @@
+import { useEffect } from 'react'
 import './App.css'
 import logo from './logo.svg'
+// import { babu } from 'babu'
 
 export default function App() {
+  // useEffect(() => {
+  //   async function callBabu() {
+  //     const b = await babu()
+  //     console.log('__BABU__', b)
+  //   }
+  //   callBabu()
+  // }, [])
   return (
     <div className="App">
       <header className="App-header">

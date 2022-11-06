@@ -31,6 +31,10 @@
               "description": "Produce source for map for client code?\n\nDefault to `true`.",
               "type": "boolean"
             },
+            "compileClientNodeModules": {
+              "markdownDescription": "Should compile `node_modules` for client code?\n\nDefault to `true`.",
+              "type": "boolean"
+            },
             "crawlConcurrency": {
               "markdownDescription": "Concurrency while staticize.\n\nDefault to `4`.",
               "type": "number"
@@ -47,10 +51,6 @@
               "const": "standalone",
               "markdownDescription": "Use `'standalone'` to export a standalone version of Pluffa Node\nutil for ship it in a container environment.",
               "type": "string"
-            },
-            "experimentalUseSwc": {
-              "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
-              "type": "boolean"
             },
             "nodeModule": {
               "enum": [
@@ -124,8 +124,16 @@
               "markdownDescription": "Urls to start the staticize process.\n\nDefault to: `['/']`.",
               "type": "array"
             },
+            "useHelpersForClientCode": {
+              "markdownDescription": "Use external helpers package when compiling client code?\n\n- Install `@babel/runtime` for Babel.\n- Install `@swc/helpers` for SWC.\n\nDefault to `false`.",
+              "type": "boolean"
+            },
             "useProxyInProd": {
               "description": "Use proxy in the production server? Default to `false`.",
+              "type": "boolean"
+            },
+            "useSwc": {
+              "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
               "type": "boolean"
             }
           },
@@ -164,8 +172,8 @@
               "markdownDescription": "Produce source for map for client code?\n\nDefault to `true`.",
               "type": "boolean"
             },
-            "experimentalUseSwc": {
-              "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
+            "compileClientNodeModules": {
+              "markdownDescription": "Should compile `node_modules` for client code?\n\nDefault to `true`.",
               "type": "boolean"
             },
             "miniflareConfig": {
@@ -196,6 +204,14 @@
               "const": "cloudflare-workers",
               "description": "Pluffa runtime.",
               "type": "string"
+            },
+            "useHelpersForClientCode": {
+              "markdownDescription": "Use external helpers package when compiling client code?\n\n- Install `@babel/runtime` for Babel.\n- Install `@swc/helpers` for SWC.\n\nDefault to `false`.",
+              "type": "boolean"
+            },
+            "useSwc": {
+              "markdownDescription": "Use the [SWC](https://swc.rs) Rust compiler instead of [Babel](https://babeljs.io) to speed\nup code compilation.\n\nDefault to `false`.",
+              "type": "boolean"
             },
             "workerEntry": {
               "description": "Path to to your worker file.",

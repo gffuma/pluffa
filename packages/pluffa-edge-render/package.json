@@ -2,7 +2,7 @@
   "name": "@pluffa/edge-render",
   "type": "module",
   "description": "Pluffa render runtime for edge platforms",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -29,9 +29,6 @@
   ],
   "engines": {
     "node": ">=16.7"
-  },
-  "dependencies": {
-    "@pluffa/ssr": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",

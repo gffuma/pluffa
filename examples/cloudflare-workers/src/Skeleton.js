@@ -13,7 +13,7 @@ export default function Skeleton() {
         <div id="root">
           <Root />
         </div>
-        <Scripts async />
+        {/* <Scripts async /> */}
       </body>
     </html>
   )

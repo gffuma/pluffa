@@ -17,6 +17,8 @@ export interface StartWorkerDevServerOptions {
   useTypescript: boolean
   miniflareConfig?: MiniflareOptions
   useSwc?: boolean
+  useHelpersForClientCode: boolean
+  compileClientNodeModules: boolean
   configureWebpackClient?: WebPackConfigMapper
   configureWebpackWorker?: WebPackConfigMapper
 }
@@ -32,6 +34,8 @@ export default function startWorkerDevServer({
   miniflareConfig = {},
   clientSourceMapEnabled = true,
   useSwc = false,
+  useHelpersForClientCode,
+  compileClientNodeModules,
   configureWebpackClient,
   configureWebpackWorker,
 }: StartWorkerDevServerOptions) {
@@ -43,6 +47,8 @@ export default function startWorkerDevServer({
     workerEntry,
     publicDir,
     useSwc,
+    useHelpersForClientCode,
+    compileClientNodeModules,
     miniflareUrl: `http://localhost:${MINIFLARE_PORT}`,
     startMiniFlare: async () => {
       const mf = new Miniflare({

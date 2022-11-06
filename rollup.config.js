@@ -65,7 +65,7 @@ function pluffaNodeRender() {
       externals({
         packagePath: `${baseDir}/package.json`,
       }),
-      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.build.json` }),
     ],
   }))
 }
@@ -176,9 +176,10 @@ function pluffaNode() {
     },
     plugins: [
       externals({
+        include: ['type-is', 'accepts', 'range-parser'],
         packagePath: `${baseDir}/package.json`,
       }),
-      typescript({ tsconfig: `${baseDir}/tsconfig.json` }),
+      typescript({ tsconfig: `${baseDir}/tsconfig.build.json` }),
     ],
   }))
 }
@@ -210,6 +211,7 @@ function pluffaCloudflareWorkers() {
   return ['esm', 'cjs'].map((format) => ({
     input: {
       index: `${baseDir}/src/index.ts`,
+      runtime: `${baseDir}/src/runtime.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,

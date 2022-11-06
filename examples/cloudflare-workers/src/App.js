@@ -17,7 +17,7 @@ function Babu() {
 
 export default function App() {
   return (
-    <Suspense fallback={<span>Loading...</span>}>
+    <Suspense fallback={<h1>Loading...</h1>}>
       <Babu />
     </Suspense>
   )

@@ -24,6 +24,8 @@ export interface BuildOptions {
   useTypescript: boolean
   statikDataDir: string | false
   useSwc?: boolean
+  useHelpersForClientCode: boolean
+  compileClientNodeModules: boolean
   configureWebpackClient?: WebPackConfigMapper
   configureWebpackServer?: WebPackConfigMapper
 }
@@ -38,6 +40,8 @@ export default function build({
   statikDataDir,
   useSwc = false,
   clientSourceMapEnabled = true,
+  useHelpersForClientCode,
+  compileClientNodeModules,
   configureWebpackClient = identity,
   configureWebpackServer = identity,
 }: BuildOptions) {
@@ -63,6 +67,8 @@ export default function build({
         statikDataUrl,
         sourceMapEnabled: clientSourceMapEnabled,
         useSwc,
+        useHelpersForClientCode,
+        compileClientNodeModules,
       })
     ),
     configureWebpackServer(

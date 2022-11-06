@@ -1,10 +1,10 @@
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { StaticRouter } from 'react-router-dom/server'
-import { useSSRData, useSSRUrl } from '@pluffa/ssr'
+import { useSSRData, useSSRRequest } from '@pluffa/ssr'
 import App from './App'
 
 export default function Server() {
-  const url = useSSRUrl()
+  const { url } = useSSRRequest()
   const { queryClient } = useSSRData()
   return (
     <QueryClientProvider client={queryClient}>

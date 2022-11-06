@@ -1,14 +1,15 @@
 import { Transform } from 'stream'
 
-export function createHtmlInjectTransformer(
+export function createTagHtmlInjectTransformer(
   token: string,
+  oneTime: boolean,
   inject: () => string
 ) {
   let injected = false
 
   return new Transform({
     transform(chunk: Buffer, encoding, callback) {
-      if (!injected) {
+      if (!oneTime || !injected) {
         const content = chunk.toString()
         let index
         if ((index = content.indexOf(token)) !== -1) {
@@ -21,6 +22,17 @@ export function createHtmlInjectTransformer(
           return
         }
       }
+      callback(null, chunk)
+    },
+  })
+}
+
+export function createEndHtmlInjectTransformer(inject: () => string) {
+  return new Transform({
+    flush(callback) {
+      callback(null, Buffer.from(inject(), 'utf-8'))
+    },
+    transform(chunk: Buffer, encoding, callback) {
       callback(null, chunk)
     },
   })

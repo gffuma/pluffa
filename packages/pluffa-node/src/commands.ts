@@ -64,7 +64,9 @@ export async function runDevCommand(
     useTypescript,
     clientSourceMapEnabled: config.clientSourceMap,
     compileNodeCommonJS: config.nodeModule === 'commonjs',
-    useSwc: config.experimentalUseSwc,
+    useSwc: config.useSwc,
+    compileClientNodeModules: config.compileClientNodeModules,
+    useHelpersForClientCode: config.useHelpersForClientCode,
     configureWebpackClient: config.experimentalConfigureWebpackClient,
     configureWebpackServer: config.experimentalConfigureWebpackServer,
   })
@@ -103,7 +105,9 @@ export async function runBuildCommand(
     // BUNDLING
     useTypescript,
     clientSourceMapEnabled: config.clientSourceMap,
-    useSwc: config.experimentalUseSwc,
+    useSwc: config.useSwc,
+    compileClientNodeModules: config.compileClientNodeModules,
+    useHelpersForClientCode: config.useHelpersForClientCode,
     configureWebpackClient: config.experimentalConfigureWebpackClient,
     configureWebpackServer: config.experimentalConfigureWebpackServer,
   })

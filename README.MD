@@ -25,7 +25,7 @@ An example Pokedex App with **SEO** and **SSR**/**SSG** using Pluffa with:
 ## `Server.tsx`
 
 ```tsx
-import { useSSRUrl, useSSRData, getScripts } from '@pluffa/ssr'
+import { useSSRRequest, useSSRData, getScriptsTags } from '@pluffa/ssr'
 import { GetServerData } from '@pluffa/node-render'
 import {
   dehydrate,
@@ -38,7 +38,7 @@ import App from './App'
 
 export default function Server() {
   // Get SSR Url of request
-  const url = useSSRUrl()
+  const { url } = useSSRRequest()
   // Get data from getServerData
   const { queryClient, helmetContext } = useSSRData()
   // Init providers with data and use the url for SSR Rouring
@@ -54,8 +54,8 @@ export default function Server() {
 }
 
 export const getServerData: GetServerData = async ({
-  // Current SSR Request URL
-  url,
+  // Current SSR Request
+  request,
   // Map of bundler entrypoints such scripts and styles
   entrypoints,
 }) => {
@@ -90,7 +90,7 @@ export const getServerData: GetServerData = async ({
         dehydrate(queryClient)
       )};</script>` +
       // Inject client JS of your React App
-      getScripts(entrypoints),
+      getScriptsTags(entrypoints),
   }
 }
 ```
@@ -442,7 +442,7 @@ export interface ServerData<Data> {
 }
 
 export interface GetServerDataConfig {
-  url: string
+  request: RequestWrapper
   entrypoints: Record<string, string[]>
 }
 

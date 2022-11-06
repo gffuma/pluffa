@@ -1,6 +1,7 @@
 import sourceMap from 'source-map-support'
 import chalk from 'chalk'
-import { Express, Response } from 'express'
+import cookieParser from 'cookie-parser'
+import express, { Express, Response } from 'express'
 import { createProxyMiddleware, Filter } from 'http-proxy-middleware'
 import { createRequire } from 'module'
 import path from 'path'
@@ -10,11 +11,12 @@ import {
   getFlatEntrypointsFromWebPackStats,
 } from '@pluffa/build-tools'
 import type { ServerComponent, SkeletonComponent } from '@pluffa/ssr'
-import { renderExpressResponse, GetServerData } from '@pluffa/node-render'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
-import ErrorPage from './components/ErrorPage.js'
+import ErrorPage from './components/ErrorPage'
 import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
-import { createHotModule, HotModule } from './hotModule.js'
+import { createHotModule, HotModule } from './hotModule'
+import type { GetServerData } from './types'
+import { handleSSR } from './handleSSR'
 
 const require = createRequire(import.meta.url)
 
@@ -39,6 +41,13 @@ export interface CreateDevServerOptions {
   proxyUrl?: string
 }
 
+function createBaseExpressApp() {
+  const app = express()
+  app.use(express.json())
+  app.use(cookieParser())
+  return app
+}
+
 export default function createDevServer({
   compiler,
   publicDir,
@@ -49,6 +58,7 @@ export default function createDevServer({
   sourceMap.install({ emptyCacheBetweenOperations: true })
 
   const app = createBaseDevServer({
+    app: createBaseExpressApp(),
     compiler,
     publicDir,
   })
@@ -160,6 +170,7 @@ export default function createDevServer({
     const { devMiddleware } = res.locals.webpack
     const multiStats = devMiddleware.stats as MultiStats
     const entrypoints = getFlatEntrypointsFromWebPackStats(multiStats, 'client')
+    const bundle = { entrypoints }
     try {
       if (statikEnabled) {
         const { configureRegisterStatik } = await getStatikRunTime()
@@ -168,22 +179,23 @@ export default function createDevServer({
       }
       const { default: Server, getServerData } = await serverHotModule.get()
       const { default: Skeleton } = await skeletonHotModule.get()
-      await renderExpressResponse(req, res, {
-        Server,
-        Skeleton,
-        getServerData,
-        entrypoints,
-        onError: (error) => {
-          console.log(chalk.red('Error during server rendering'))
-          console.log(error)
+      await handleSSR(
+        req,
+        res,
+        {
+          Server,
+          Skeleton,
+          getServerData,
+          bundle,
         },
-        onFatalError: (error) => {
-          // Unrecoverable fatal error during rendering
-          handleFatalSSRError(error, res)
-        },
-      })
+        {
+          handleFatalSSRError,
+        }
+      )
     } catch (error) {
       // Compilation error or run time error before rendering
+      console.error(chalk.red('Uncaught Exception when handle ssr request'))
+      console.error(error)
       handleFatalSSRError(error, res)
     }
   })

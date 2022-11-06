@@ -4,26 +4,21 @@ import {
   RenderToReadableStreamOptions,
   renderToString,
 } from 'react-dom/server'
-import { createHtmlInjectTransformer, stringToStream } from './streamsUtils'
+import {
+  createTagHtmlInjectTransformer,
+  createEndHtmlInjectTransformer,
+  stringToStream,
+} from './streamsUtils'
+
+export type RenderingMode = 'seo' | 'streaming'
 
 export interface RenderOptions extends RenderToReadableStreamOptions {
   injectBeforeBodyClose?: () => string
   injectBeforeHeadClose?: () => string
+  injectOnEnd?: () => string
+  injectBeforeEveryScript?: () => string
+  mode?: RenderingMode
   getClientRenderFallback?: () => ReactElement
-}
-
-function wrapInjectorWithErrorHandler(
-  injector: () => string,
-  erorrHandler: (err: unknown) => void
-) {
-  return () => {
-    try {
-      return injector()
-    } catch (err) {
-      erorrHandler(err)
-      return ''
-    }
-  }
 }
 
 export async function render(
@@ -31,7 +26,10 @@ export async function render(
   {
     injectBeforeBodyClose,
     injectBeforeHeadClose,
+    injectBeforeEveryScript,
+    injectOnEnd,
     getClientRenderFallback,
+    mode = 'seo',
     ...reactRenderOptions
   }: RenderOptions = {}
 ) {
@@ -39,24 +37,26 @@ export async function render(
     let out = stream
     if (injectBeforeBodyClose) {
       out = out.pipeThrough(
-        createHtmlInjectTransformer(
-          '</body>',
-          wrapInjectorWithErrorHandler(injectBeforeBodyClose, (err) => {
-            console.error('Error when calling injectBeforeBodyClose()')
-            console.error(err)
-          })
-        )
+        createTagHtmlInjectTransformer('</body>', true, injectBeforeBodyClose)
       )
     }
     if (injectBeforeHeadClose) {
       out = out.pipeThrough(
-        createHtmlInjectTransformer(
-          '</head>',
-          wrapInjectorWithErrorHandler(injectBeforeHeadClose, (err) => {
-            console.error('Error when calling injectBeforeHeadClose()')
-            console.error(err)
-          })
+        createTagHtmlInjectTransformer('</head>', true, injectBeforeHeadClose)
+      )
+    }
+    if (injectBeforeEveryScript) {
+      out = out.pipeThrough(
+        createTagHtmlInjectTransformer(
+          '<script>',
+          false,
+          injectBeforeEveryScript
         )
+      )
+    }
+    if (injectOnEnd) {
+      out = out.pipeThrough(
+        createEndHtmlInjectTransformer(injectOnEnd)
       )
     }
     return out
@@ -67,7 +67,9 @@ export async function render(
       children,
       reactRenderOptions
     )
-    await reactStream.allReady
+    if (mode === 'seo') {
+      await reactStream.allReady
+    }
     return transfromStream(reactStream)
   } catch (error) {
     // ... Try 2 Switch 2 Client Render ...

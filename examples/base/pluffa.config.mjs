@@ -8,6 +8,6 @@ export default async (cmd) => {
     clientEntry: './src/index.js',
     skeletonComponent: './src/Skeleton.js',
     serverComponent: './src/App.js',
-    experimentalUseSwc: true,
+    useSwc: true,
   }
 }

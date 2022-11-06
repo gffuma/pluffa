@@ -138,7 +138,26 @@ export interface NodeConfig {
    *
    * Default to `false`.
    */
-  experimentalUseSwc?: boolean
+  useSwc?: boolean
+  /**
+   * @markdownDescription
+   *
+   * Should compile `node_modules` for client code?
+   *
+   * Default to `true`.
+   */
+  compileClientNodeModules?: boolean
+  /**
+   * @markdownDescription
+   *
+   * Use external helpers package when compiling client code?
+   *
+   * - Install `@babel/runtime` for Babel.
+   * - Install `@swc/helpers` for SWC.
+   *
+   * Default to `false`.
+   */
+  useHelpersForClientCode?: boolean
   /**
    * @markdownDescription
    *
@@ -164,7 +183,7 @@ export type NodeConfigDefaults = Required<
     | 'outputDir'
     | 'publicDir'
     | 'clientSourceMap'
-    | 'experimentalUseSwc'
+    | 'useSwc'
     | 'nodeModule'
     | 'urls'
     | 'crawlConcurrency'
@@ -172,6 +191,8 @@ export type NodeConfigDefaults = Required<
     | 'exitStaticizeOnError'
     | 'crawlEnabled'
     | 'serveStaticAssets'
+    | 'useHelpersForClientCode'
+    | 'compileClientNodeModules'
   >
 >
 
@@ -188,7 +209,9 @@ export const NodeConfigDefaultsValues: NodeConfigDefaults = {
   crawlEnabled: true,
   serveStaticAssets: true,
   clientSourceMap: true,
-  experimentalUseSwc: false,
+  useSwc: false,
+  useHelpersForClientCode: false,
+  compileClientNodeModules: true,
 }
 
 export type NodeConfigWithDefaults = NodeConfig & NodeConfigDefaults

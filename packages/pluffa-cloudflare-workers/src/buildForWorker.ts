@@ -26,6 +26,8 @@ export interface BuildForWorkerOptions {
   outputDir: string
   publicDir: string | false
   useSwc?: boolean
+  useHelpersForClientCode: boolean
+  compileClientNodeModules: boolean
   configureWebpackClient?: WebPackConfigMapper
   configureWebpackWorker?: WebPackConfigMapper
 }
@@ -38,6 +40,8 @@ export default async function buildForWorker({
   publicDir,
   clientSourceMapEnabled = true,
   useSwc = false,
+  useHelpersForClientCode,
+  compileClientNodeModules,
   configureWebpackClient = identity,
   configureWebpackWorker = identity,
 }: BuildForWorkerOptions) {
@@ -60,6 +64,8 @@ export default async function buildForWorker({
         statikDataUrl: false,
         sourceMapEnabled: clientSourceMapEnabled,
         useSwc,
+        useHelpersForClientCode,
+        compileClientNodeModules,
       })
     ),
     configureWebpackWorker(
