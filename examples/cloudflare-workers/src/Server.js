@@ -1,5 +1,5 @@
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useSSRData, getScripts } from '@pluffa/ssr'
+import { useSSRData, getScriptsTags } from '@pluffa/ssr'
 import App from './App'
 
 export default function Server() {
@@ -38,7 +38,7 @@ export const getServerData = ({ bundle, response, request }) => {
     },
     mode: 'streaming',
     bootstrapScripts: bundle.entrypoints['main'].filter((s) => s.endsWith('.js')),
-    // injectOnEnd: () => getScripts(bundle.entrypoints),
+    // injectOnEnd: () => getScriptsTags(bundle.entrypoints),
     injectBeforeEveryScript: () =>
       `<script>window.__INITIAL_DATA__ = ${JSON.stringify(
         dehydrate(queryClient)

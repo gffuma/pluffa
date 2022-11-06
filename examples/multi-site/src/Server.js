@@ -10,8 +10,8 @@ export default function Server() {
   return <App />
 }
 
-export function getServerData({ url }) {
-  const appType = url.startsWith('/admin') ? 'admin' : 'main'
+export function getServerData({ request }) {
+  const appType = request.url.startsWith('/admin') ? 'admin' : 'main'
   return {
     data: {
       appType,

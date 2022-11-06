@@ -1,7 +1,12 @@
 import { StrictMode } from 'react'
 import type { GetServerData } from '@pluffa/node'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useSSRRequest, useSSRData, getScripts } from '@pluffa/ssr'
+import {
+  useSSRRequest,
+  useSSRData,
+  getScriptsTags,
+  getScriptsFiles,
+} from '@pluffa/ssr'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App'
 
@@ -36,7 +41,8 @@ export const getServerData: GetServerData = ({ bundle, request }) => {
     },
   })
 
-  const mode = request.getOriginal().query['ssr'] === 'seo' ? 'seo' : 'streaming'
+  const mode =
+    request.getOriginal().query['ssr'] === 'seo' ? 'seo' : 'streaming'
   const data = {
     queryClient,
   }
@@ -46,9 +52,7 @@ export const getServerData: GetServerData = ({ bundle, request }) => {
     return {
       mode,
       data,
-      bootstrapScripts: bundle.entrypoints.main.filter((e) =>
-        e.endsWith('.js')
-      ),
+      bootstrapScripts: getScriptsFiles(bundle.entrypoints),
       injectBeforeEveryScript: () =>
         `<script>${getInitialDataJS()}window.__HYDRATE__ && window.__HYDRATE__();</script>`,
     }
@@ -57,7 +61,7 @@ export const getServerData: GetServerData = ({ bundle, request }) => {
       mode,
       data,
       injectBeforeBodyClose: () =>
-        `<script>${getInitialDataJS()}</script>${getScripts(
+        `<script>${getInitialDataJS()}</script>${getScriptsTags(
           bundle.entrypoints
         )}`,
     }

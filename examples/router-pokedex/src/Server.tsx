@@ -1,12 +1,12 @@
-import { GetServerData } from '@pluffa/node-render'
+import type { GetServerData } from '@pluffa/node'
 import { dehydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useSSRData, useSSRUrl } from '@pluffa/ssr'
+import { useSSRData, useSSRRequest } from '@pluffa/ssr'
 import { ServerRouter, RouterManager } from '@pluffa/router/server'
 import App from './App'
 import { routes } from './routes'
 
 export default function Server() {
-  const url = useSSRUrl()
+  const { url } = useSSRRequest()
   const { queryClient, routerManager } = useSSRData<{
     queryClient: QueryClient
     routerManager: RouterManager
@@ -20,7 +20,7 @@ export default function Server() {
   )
 }
 
-export const getServerData: GetServerData = async ({ url }) => {
+export const getServerData: GetServerData = async ({ request }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -36,7 +36,7 @@ export const getServerData: GetServerData = async ({ url }) => {
     },
   })
   const routerManager = new RouterManager(routes, { queryClient })
-  await routerManager.prefetchUrl(url)
+  await routerManager.prefetchUrl(request.url)
   return {
     data: {
       routerManager,

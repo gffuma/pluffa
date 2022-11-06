@@ -1,11 +1,11 @@
 import { SWRConfig } from 'swr'
 import { StaticRouter } from 'react-router-dom/server'
-import { useSSRUrl, useSSRData } from '@pluffa/ssr'
+import { useSSRData, useSSRRequest } from '@pluffa/ssr'
 import App from './App'
 import fetcher from './fetcher'
 
 export default function Server() {
-  const url = useSSRUrl()
+  const { url } = useSSRRequest()
   const { cache } = useSSRData()
   return (
     <SWRConfig
