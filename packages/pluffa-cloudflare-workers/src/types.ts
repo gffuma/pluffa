@@ -25,6 +25,7 @@ export interface GetServerDataConfig {
   bundle: BundleInformation
   response: InstructResponse
   request: RequestWrapper<Request>
+  mode: 'server'
 }
 
 export type GetServerData<Data = any> = (

@@ -118,6 +118,7 @@ export function createSSRHandler<Data = any>({
         bundle,
         response,
         request,
+        mode: 'server',
       })
       providedRenderOptions = passDownRenderOptions
       ctx.data = data

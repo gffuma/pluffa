@@ -331,6 +331,7 @@ export default async function staticize({
             bundle,
             request,
             response,
+            mode: 'staticizer',
           })
           ssrCtx.data = data
           providedRenderOptions = passDownRenderOptions

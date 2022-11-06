@@ -20,22 +20,34 @@ export function useSSRData<Data = any>(): Data {
 export function useSSRBundleInfo() {
   return useSSRContext().bundle
 }
-export function getScripts(
+export function getScriptsFiles(
   entrypoints: Record<string, string[]>,
   entry = 'main'
 ) {
-  return entrypoints[entry]
-    .filter((e) => e.endsWith('.js'))
+  return entrypoints[entry].filter((e) => e.endsWith('.js'))
+}
+
+export function getScriptsTags(
+  entrypoints: Record<string, string[]>,
+  entry = 'main'
+) {
+  return getScriptsFiles(entrypoints, entry)
     .map((e) => `<script src="/${e}"></script>`)
     .join('')
 }
 
-export function getStyles(
+export function getStylesFiles(
   entrypoints: Record<string, string[]>,
   entry = 'main'
 ) {
-  return entrypoints[entry]
-    .filter((e) => e.endsWith('.css'))
+  return entrypoints[entry].filter((e) => e.endsWith('.css'))
+}
+
+export function getStylesTags(
+  entrypoints: Record<string, string[]>,
+  entry = 'main'
+) {
+  return getStylesFiles(entrypoints, entry)
     .map((e) => `<link href="/${e} rel="stylesheet" />`)
     .join('')
 }

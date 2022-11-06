@@ -27,6 +27,7 @@ export interface GetServerDataConfig {
   bundle: BundleInformation
   request: RequestWrapper<Request>
   response: InstructResponse
+  mode: 'server' | 'staticizer'
 }
 
 export type GetServerData<Data = any> = (

@@ -42,6 +42,7 @@ export async function handleSSR<Data = any>(
       bundle,
       request,
       response,
+      mode: 'server',
     })
     ssrCtx.data = data
     providedRenderOptions = passDownRenderOptions
