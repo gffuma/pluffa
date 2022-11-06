@@ -69,7 +69,26 @@ export interface CloudFlareWorkersConfig {
    *
    * Default to `false`.
    */
-  experimentalUseSwc?: boolean
+  useSwc?: boolean
+  /**
+   * @markdownDescription
+   *
+   * Should compile `node_modules` for client code?
+   *
+   * Default to `true`.
+   */
+  compileClientNodeModules?: boolean
+  /**
+   * @markdownDescription
+   *
+   * Use external helpers package when compiling client code?
+   *
+   * - Install `@babel/runtime` for Babel.
+   * - Install `@swc/helpers` for SWC.
+   *
+   * Default to `false`.
+   */
+  useHelpersForClientCode?: boolean
   /**
    * Map Webpack client configuration to desired configuration.
    */
@@ -88,7 +107,9 @@ export type CloudFlareWorkersConfigDefaults = Required<
     | 'outputDir'
     | 'publicDir'
     | 'clientSourceMap'
-    | 'experimentalUseSwc'
+    | 'useSwc'
+    | 'compileClientNodeModules'
+    | 'useHelpersForClientCode'
   >
 >
 
@@ -99,7 +120,9 @@ export const CloudFlareWorkersConfigDefaultsValues: CloudFlareWorkersConfigDefau
     outputDir: 'build',
     publicDir: 'public',
     clientSourceMap: true,
-    experimentalUseSwc: false,
+    useSwc: false,
+    compileClientNodeModules: true,
+    useHelpersForClientCode: false,
   }
 
 export type CloudFlareWorkersConfigWithDefaults = CloudFlareWorkersConfig &

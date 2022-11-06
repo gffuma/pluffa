@@ -49,7 +49,11 @@ export async function runDevCommand(
     // BUNDLER
     clientSourceMapEnabled: config.clientSourceMap,
     useTypescript,
-    useSwc: config.experimentalUseSwc,
+    useSwc: config.useSwc,
+    compileClientNodeModules: config.compileClientNodeModules,
+    useHelpersForClientCode: config.useHelpersForClientCode,
+    configureWebpackClient: config.experimentalConfigureWebpackClient,
+    configureWebpackWorker: config.experimentalConfigureWebpackWorker,
     // CF
     miniflareConfig: config.miniflareConfig,
   })
@@ -69,6 +73,10 @@ export async function runBuildCommand(
     publicDir: config.publicDir,
     clientSourceMapEnabled: config.clientSourceMap,
     useTypescript,
-    useSwc: config.experimentalUseSwc,
+    useSwc: config.useSwc,
+    compileClientNodeModules: config.compileClientNodeModules,
+    useHelpersForClientCode: config.useHelpersForClientCode,
+    configureWebpackClient: config.experimentalConfigureWebpackClient,
+    configureWebpackWorker: config.experimentalConfigureWebpackWorker,
   })
 }

@@ -20,6 +20,8 @@ export interface createWorkerDevServerOptions {
   useTypescript?: boolean
   miniflareUrl: string
   useSwc?: boolean
+  useHelpersForClientCode: boolean
+  compileClientNodeModules: boolean
   startMiniFlare(): void
   configureWebpackClient?: WebPackConfigMapper
   configureWebpackWorker?: WebPackConfigMapper
@@ -34,6 +36,8 @@ export default function createWokerDevServer({
   startMiniFlare,
   clientSourceMapEnabled = true,
   useSwc = false,
+  useHelpersForClientCode,
+  compileClientNodeModules,
   configureWebpackClient = identity,
   configureWebpackWorker = identity,
 }: createWorkerDevServerOptions) {
@@ -48,6 +52,8 @@ export default function createWokerDevServer({
         useTypescript,
         sourceMapEnabled: clientSourceMapEnabled,
         useSwc,
+        useHelpersForClientCode,
+        compileClientNodeModules,
       })
     ),
     configureWebpackWorker(

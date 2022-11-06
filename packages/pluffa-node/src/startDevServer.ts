@@ -23,7 +23,9 @@ export interface StartDevServerOptions {
   publicDir: string | false
   port: number
   useTypescript: boolean
-  useSwc?: boolean
+  useSwc: boolean
+  useHelpersForClientCode: boolean
+  compileClientNodeModules: boolean
   configureWebpackClient?: WebPackConfigMapper
   configureWebpackServer?: WebPackConfigMapper
 }
@@ -39,7 +41,9 @@ export default function startDevServer({
   port,
   publicDir,
   useTypescript,
-  useSwc = false,
+  useSwc,
+  useHelpersForClientCode,
+  compileClientNodeModules,
   configureWebpackClient = identity,
   configureWebpackServer = identity,
 }: StartDevServerOptions) {
@@ -55,6 +59,8 @@ export default function startDevServer({
         statikDataUrl: false,
         sourceMapEnabled: clientSourceMapEnabled,
         useSwc,
+        useHelpersForClientCode,
+        compileClientNodeModules,
       })
     ),
     configureWebpackServer(

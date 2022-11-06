@@ -87,6 +87,8 @@ export interface GetWebPackCodeRulesOptions {
   isProd: boolean
   isClient: boolean
   useSwc: boolean
+  isVendor: boolean
+  useHelpersForClientCode: boolean
 }
 
 export function getWebPackCodeRules({
@@ -94,56 +96,99 @@ export function getWebPackCodeRules({
   useSwc,
   isClient,
   isProd,
+  isVendor,
+  useHelpersForClientCode,
 }: GetWebPackCodeRulesOptions): RuleSetRule {
   if (isClient) {
     // JavaScript running in the broswer
     if (useSwc) {
       // Experiment using swc for speed up compilation step
-      return {
-        loader: 'swc-loader',
-        options: {
-          jsc: {
-            parser: {
-              syntax: useTypescript ? 'typescript' : 'ecmascript',
-              tsx: true,
-              jsx: true,
-            },
-            transform: {
-              react: {
-                runtime: 'automatic',
-                refresh: !isProd,
+      // FIXME: Temp workaround for:
+      // https://github.com/swc-project/swc/issues/3365
+      const targets = require('browserslist').loadConfig({
+        path: process.cwd(),
+        env: isProd ? 'production' : 'development',
+      })
+      if (isVendor) {
+        return {
+          loader: 'swc-loader',
+          options: {
+            jsc: {
+              parser: {
+                syntax: 'ecmascript',
+                tsx: false,
+                jsx: false,
+                externalHelpers: useHelpersForClientCode,
               },
             },
+            env: {
+              targets,
+            },
           },
-          // FIXME: Temp workaround for:
-          // https://github.com/swc-project/swc/issues/3365
-          env: {
-            targets: require('browserslist').loadConfig({
-              path: process.cwd(),
-              env: isProd ? 'production' : 'development',
-            }),
+        }
+      } else {
+        return {
+          loader: 'swc-loader',
+          options: {
+            jsc: {
+              parser: {
+                syntax: useTypescript ? 'typescript' : 'ecmascript',
+                tsx: true,
+                jsx: true,
+                externalHelpers: useHelpersForClientCode,
+              },
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                  refresh: !isProd,
+                },
+              },
+            },
+            env: {
+              targets,
+            },
           },
-        },
+        }
       }
     } else {
       // Old good babel
-      return {
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            [
-              'react-app',
-              {
-                runtime: 'automatic',
-                flow: false,
-                typescript: useTypescript,
-              },
+      if (isVendor) {
+        return {
+          loader: 'babel-loader',
+          options: {
+            babelrc: false,
+            configFile: false,
+            compact: false,
+            presets: [
+              [
+                require.resolve('babel-preset-react-app/dependencies'),
+                { helpers: useHelpersForClientCode },
+              ],
             ],
-          ],
-          plugins: [!isProd && require.resolve('react-refresh/babel')].filter(
-            Boolean
-          ),
-        },
+          },
+        }
+      } else {
+        return {
+          loader: 'babel-loader',
+          options: {
+            babelrc: false,
+            configFile: false,
+            presets: [
+              [
+                'react-app',
+                {
+                  runtime: 'automatic',
+                  flow: false,
+                  typescript: useTypescript,
+                  helpers: useHelpersForClientCode,
+                },
+              ],
+            ],
+            plugins: [!isProd && require.resolve('react-refresh/babel')].filter(
+              Boolean
+            ),
+          },
+        }
       }
     }
   } else {
@@ -194,6 +239,8 @@ export interface GetWebPackRulesOptions {
   isProd: boolean
   isClient: boolean
   useSwc: boolean
+  compileClientNodeModules?: boolean
+  useHelpersForClientCode?: boolean
 }
 
 export function getWebPackRules({
@@ -201,6 +248,8 @@ export function getWebPackRules({
   isProd,
   isClient,
   useSwc,
+  useHelpersForClientCode = false,
+  compileClientNodeModules = true,
 }: GetWebPackRulesOptions): RuleSetRule[] {
   return [
     {
@@ -214,8 +263,26 @@ export function getWebPackRules({
             isProd,
             useTypescript,
             useSwc,
+            isVendor: false,
+            useHelpersForClientCode,
           }),
         },
+        // Compile node_modules O.o
+        (isClient && compileClientNodeModules
+          ? {
+              test: /\.(js|mjs)$/,
+              exclude:
+                /(@babel(?:\/|\\{1,2})runtime)|(@swc(?:\/|\\{1,2})helpers)/,
+              use: getWebPackCodeRules({
+                isClient,
+                isProd,
+                useTypescript,
+                useSwc,
+                isVendor: true,
+                useHelpersForClientCode,
+              }),
+            }
+          : false) as RuleSetRule | false,
         // ... STYLES ...
         getWebPackStyleRule({
           isProd,
@@ -300,7 +367,7 @@ export function getWebPackRules({
           resourceQuery: /raw/,
           type: 'asset/source',
         },
-      ],
+      ].filter(B),
     },
   ]
 }
