@@ -3,6 +3,6 @@
   "clientEntry": "./src/index.js",
   "serverComponent": "./src/Server.js",
   "skeletonComponent": "./src/Skeleton.js",
-  "registerStatik": "./src/registerStatik.js",
+  "statikHandler": "./src/statikHandler.js",
   "urls": ["/", "/secret"]
 }

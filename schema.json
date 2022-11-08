@@ -84,10 +84,6 @@
               ],
               "markdownDescription": "Public direcotry used to serve public files.\nSet `false` to disable serving public files.\n\nDefault to `'public'`."
             },
-            "registerStatik": {
-              "description": "Path register statik file.",
-              "type": "string"
-            },
             "runtime": {
               "const": "node",
               "description": "Pluffa runtime.",
@@ -116,6 +112,10 @@
                 }
               ],
               "markdownDescription": "Directory where exports the statik files when staticize.\n\nDefault to `'data'`."
+            },
+            "statikHandler": {
+              "description": "Path of statik handler file.",
+              "type": "string"
             },
             "urls": {
               "items": {

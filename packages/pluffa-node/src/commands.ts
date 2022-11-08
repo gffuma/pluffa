@@ -59,7 +59,7 @@ export async function runDevCommand(
     proxy: config.proxy,
     publicDir: config.publicDir,
     // STATIK?
-    registerStatik: config.registerStatik,
+    statikHandler: config.statikHandler,
     // BUNDLING
     useTypescript,
     clientSourceMapEnabled: config.clientSourceMap,
@@ -81,7 +81,7 @@ export async function runStartCommand(rawConfig: Partial<NodeConfig>) {
     publicDir: config.publicDir,
     serveStaticAssets: config.serveStaticAssets,
     // STATIK?
-    statikEnabled: Boolean(config.registerStatik),
+    statikEnabled: Boolean(config.statikHandler),
     statikDataDir: config.statikDataDir,
     // BUNDLING
     compileNodeCommonJS: config.nodeModule === 'commonjs',
@@ -99,7 +99,7 @@ export async function runBuildCommand(
     skeletonComponent: config.skeletonComponent,
     clientEntry: config.clientEntry,
     // STATIK?
-    registerStatik: config.registerStatik,
+    statikHandler: config.statikHandler,
     statikDataDir: config.statikDataDir,
     compileNodeCommonJS: config.nodeModule === 'commonjs',
     // BUNDLING
@@ -124,7 +124,7 @@ export async function runStaticizeCommand(rawConfig: Partial<NodeConfig>) {
     publicDir: config.publicDir,
     statikDataDir: config.statikDataDir,
     crawlEnabled: config.crawlEnabled,
-    statikEnabled: Boolean(config.registerStatik),
+    statikEnabled: Boolean(config.statikHandler),
     urls: config.urls,
     exitOnError: config.exitStaticizeOnError,
     compileNodeCommonJS: config.nodeModule === 'commonjs',

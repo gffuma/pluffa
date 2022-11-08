@@ -6,6 +6,10 @@
   "sideEffects": false,
   "exports": {
     ".": {
+      "worker": {
+        "require": "./dist/statik.edge.cjs",
+        "import": "./dist/statik.edge.js"
+      },
       "browser": {
         "require": "./dist/statik.browser.cjs",
         "import": "./dist/statik.browser.js"
@@ -19,6 +23,14 @@
     "./runtime": {
       "require": "./dist/runtime.cjs",
       "import": "./dist/runtime.js"
+    },
+    "./client": {
+      "require": "./dist/client.cjs",
+      "import": "./dist/client.js"
+    },
+    "./edge": {
+      "require": "./dist/edge.cjs",
+      "import": "./dist/edge.js"
     }
   },
   "typesVersions": {
@@ -28,6 +40,12 @@
       ],
       "runtime": [
         "./dist/runtime.d.ts"
+      ],
+      "client": [
+        "./dist/client.d.ts"
+      ],
+      "edge": [
+        "./dist/edge.d.ts"
       ]
     }
   },
@@ -46,7 +64,6 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "itty-router": "^2.6.1",
     "mkdirp": "^1.0.4"
   },
   "devDependencies": {

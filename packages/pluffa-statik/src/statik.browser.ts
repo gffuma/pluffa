@@ -1,3 +1,4 @@
+import { getStatikClientBaseUrl } from './client'
 import { StatikReqConfig } from './statik'
 
 export default async function statik(url: string, config?: StatikReqConfig) {
@@ -17,7 +18,7 @@ export default async function statik(url: string, config?: StatikReqConfig) {
   if (process.env.PLUFFA_STATIK_BASE_URL) {
     fetchUrl = process.env.PLUFFA_STATIK_BASE_URL + url + '.json'
   } else {
-    fetchUrl = '/__pluffastatik' + url
+    fetchUrl = getStatikClientBaseUrl() + url
   }
   return fetch(fetchUrl, init).then((r) =>
     r.ok ? r.json() : Promise.reject({ status: r.status })

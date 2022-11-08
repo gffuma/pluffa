@@ -1,6 +1,7 @@
 export interface StatikReqConfig {
   method?: string
   body?: Record<string, any>
+  $context?: Record<string, any>
 }
 
 export default function statik<T = any>(

@@ -9,6 +9,7 @@
   "dependencies": {
     "@pluffa/node": "latest",
     "gray-matter": "^4.0.3",
+    "itty-router": "^2.6.6",
     "pluffa": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

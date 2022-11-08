@@ -11,6 +11,7 @@
     "@pluffa/cloudflare-workers": "latest",
     "itty-router": "^2.5.1",
     "pluffa": "latest",
+    "@pluffa/statik": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.1"

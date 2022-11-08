@@ -17,7 +17,7 @@ export interface StartDevServerOptions {
   clientSourceMapEnabled?: boolean
   serverComponent: string
   skeletonComponent: string
-  registerStatik?: string
+  statikHandler?: string
   compileNodeCommonJS: boolean
   proxy?: string
   publicDir: string | false
@@ -35,7 +35,7 @@ export default function startDevServer({
   clientSourceMapEnabled = true,
   serverComponent,
   skeletonComponent,
-  registerStatik,
+  statikHandler,
   compileNodeCommonJS,
   proxy: proxyUrl,
   port,
@@ -70,7 +70,7 @@ export default function startDevServer({
         compileNodeCommonJS,
         serverComponent,
         skeletonComponent,
-        registerStatik,
+        statikHandler,
         useSwc,
       })
     ),
@@ -80,7 +80,7 @@ export default function startDevServer({
     compileNodeCommonJS,
     compiler,
     proxyUrl,
-    statikEnabled: Boolean(registerStatik),
+    statikEnabled: Boolean(statikHandler),
     publicDir,
   })
 

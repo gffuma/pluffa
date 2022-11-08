@@ -3,6 +3,12 @@ import { Router } from 'itty-router'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 import Skeleton from './Skeleton'
 import Server, { getServerData } from './Server'
+import {
+  handleStatik,
+  configureStatikHandler,
+  configureStatikServerBaseUrl,
+} from '@pluffa/statik/edge'
+import statikHandler from './fns'
 
 const router = Router()
 
@@ -24,16 +30,11 @@ router.get('/static/*', async (_, event) => {
   }
 })
 
-// router.all('*', async (request) => {
-//   const serverData = getServerData()
-//   return renderToEdgeResponse(request, {
-//     Skeleton,
-//     Server,
-//     ...serverData,
-//   })
-// })
-// router.get('/x/fns/*', () => createStatikHandler(router.handle))
-// statik('/recipes')
+// ___ STATIK ___
+configureStatikHandler(statikHandler)
+configureStatikServerBaseUrl('/x/fns')
+
+router.all('/x/fns/*', handleStatik)
 
 router.all(
   '*',

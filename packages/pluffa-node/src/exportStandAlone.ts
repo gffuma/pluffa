@@ -134,7 +134,7 @@ async function createServerRutimeBootstrapFile(
     publicDir: config.publicDir,
     serveStaticAssets: config.serveStaticAssets,
     // STATIK?
-    statikEnabled: Boolean(config.registerStatik),
+    statikEnabled: Boolean(config.statikHandler),
     statikDataDir: config.statikDataDir,
     // BUNDLING
     compileNodeCommonJS: config.nodeModule === 'commonjs',

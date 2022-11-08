@@ -1,6 +1,9 @@
 import { hydrateRoot } from 'react-dom/client'
 import { QueryClient, hydrate, QueryClientProvider } from 'react-query'
+import { configureStatikClientBaseUrl } from '@pluffa/statik/client'
 import App from './App'
+
+configureStatikClientBaseUrl('/x/fns')
 
 const queryClient = new QueryClient({
   defaultOptions: {

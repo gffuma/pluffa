@@ -13,7 +13,7 @@ import {
 import type { ServerComponent, SkeletonComponent } from '@pluffa/ssr'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
 import ErrorPage from './components/ErrorPage'
-import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
+import { StatikHandler, StatikRequest } from '@pluffa/statik/runtime'
 import { createHotModule, HotModule } from './hotModule'
 import type { GetServerData } from './types'
 import { handleSSR } from './handleSSR'
@@ -71,14 +71,14 @@ export default function createDevServer({
   // we also import the correct version of statik runtime
   const getStatikRunTime: () => Promise<{
     runStatik<T = any>(req: StatikRequest): Promise<T>
-    configureRegisterStatik(register: RegisterStatik): void
+    configureStatikHandler(handler: StatikHandler): void
   }> = compileNodeCommonJS
     ? async () => require('@pluffa/statik/runtime')
     : async () => await import('@pluffa/statik/runtime')
 
   // User's modules thath should hot reloaded during dev
   const statikHotModule = createHotModule<{
-    default: RegisterStatik
+    default: StatikHandler
   }>(buildedNodeDir, 'statik', compileNodeCommonJS)
 
   const serverHotModule = createHotModule<{
@@ -102,13 +102,24 @@ export default function createDevServer({
     if (statikEnabled) {
       hotModules.push(statikHotModule)
     }
-    serverCompiler.hooks.afterDone.tap('realodServerCode', (stats) => {
+    serverCompiler.hooks.afterDone.tap('realodServerCode', async (stats) => {
       const emittedAssets = stats.compilation.emittedAssets
-      hotModules.forEach((m) => {
+      for (const m of hotModules) {
         if (emittedAssets.has(m.name)) {
           m.refresh()
         }
-      })
+        // When statik handler is compiled inject them into the statik runtime
+        if (m.name === statikHotModule.name) {
+          const { configureStatikHandler } = await getStatikRunTime()
+          try {
+            const { default: statikHandler } = await statikHotModule.get()
+            configureStatikHandler(statikHandler)
+          } catch (err: any) {
+            console.log(chalk.red('Error in statik handler.'))
+            console.error(err)
+          }
+        }
+      }
     })
   }
 
@@ -116,15 +127,17 @@ export default function createDevServer({
   if (statikEnabled) {
     app.use('/__pluffastatik', async (req, res) => {
       try {
-        const { runStatik, configureRegisterStatik } = await getStatikRunTime()
-        const { default: registerStatik } = await statikHotModule.get()
-        // Configure global statik hook
-        configureRegisterStatik(registerStatik)
-        // Run them!
+        if (statikHotModule.lastError) {
+          throw statikHotModule.lastError
+        }
+        const { runStatik } = await getStatikRunTime()
+        // Run statik!
         const data = await runStatik({
           method: req.method,
           body: req.body,
           url: req.url,
+          // TODO: Inject from request?
+          $context: {},
         })
         res.send(data)
       } catch (error: any) {
@@ -172,10 +185,8 @@ export default function createDevServer({
     const entrypoints = getFlatEntrypointsFromWebPackStats(multiStats, 'client')
     const bundle = { entrypoints }
     try {
-      if (statikEnabled) {
-        const { configureRegisterStatik } = await getStatikRunTime()
-        const { default: registerStatik } = await statikHotModule.get()
-        configureRegisterStatik(registerStatik)
+      if (statikEnabled && statikHotModule.lastError) {
+        throw statikHotModule.lastError
       }
       const { default: Server, getServerData } = await serverHotModule.get()
       const { default: Skeleton } = await skeletonHotModule.get()

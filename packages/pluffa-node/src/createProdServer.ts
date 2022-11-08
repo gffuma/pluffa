@@ -5,8 +5,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import express, { Express, Response } from 'express'
 import cookieParser from 'cookie-parser'
-import { RegisterStatik, StatikRequest } from '@pluffa/statik/runtime'
-import type { GetServerData } from './types'
+import { StatikHandler, StatikRequest } from '@pluffa/statik/runtime'
 import { handleSSR } from './handleSSR'
 import type { BundleInformation } from '@pluffa/ssr'
 
@@ -131,20 +130,20 @@ export default async function createProdServer({
   // we also import the correct version of statik runtime
   const getStatikRunTime: () => Promise<{
     runStatik<T = any>(req: StatikRequest): Promise<T>
-    configureRegisterStatik(register: RegisterStatik): void
+    configureStatikHandler(register: StatikHandler): void
   }> = compileNodeCommonJS
     ? async () => require('@pluffa/statik/runtime')
     : async () => await import('@pluffa/statik/runtime')
 
   if (statikEnabled && statikDataDir) {
     // Register stuff for run time in server rendering
-    const { configureRegisterStatik, runStatik } = await getStatikRunTime()
-    const { default: registerStatik } = await import(
+    const { configureStatikHandler, runStatik } = await getStatikRunTime()
+    const { default: statikHandler } = await import(
       path.join(buildNodePath, `statik.${buildImportExt}`)
     )
       .catch(handleImportError)
       .then(uniformExport)
-    configureRegisterStatik(registerStatik)
+    configureStatikHandler(statikHandler)
 
     const statikDaraUrl = statikDataDir.startsWith('/')
       ? statikDataDir
@@ -158,6 +157,7 @@ export default async function createProdServer({
           body: req.body,
           // NOTE: Note not perfect solution lol
           url: req.url.replace('.json', ''),
+          $context: {},
         })
         res.send(data)
       } catch (error: any) {

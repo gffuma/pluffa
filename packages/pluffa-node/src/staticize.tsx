@@ -14,7 +14,7 @@ import {
   RenderOptions,
 } from '@pluffa/node-render'
 import { CrawlSession, createCrawlSession, CrawlContext } from '@pluffa/crawl'
-import type { RegisterStatik } from '@pluffa/statik/runtime'
+import type { StatikHandler } from '@pluffa/statik/runtime'
 import {
   SkeletonComponent,
   ServerComponent,
@@ -23,7 +23,7 @@ import {
   SSRProvider,
   SSRContextType,
 } from '@pluffa/ssr'
-import type { GetServerData, ServerData } from './types'
+import type { GetServerData } from './types'
 import createRequest from './createRequest'
 import { NodeRequestWrapper } from './httpWrappers'
 import { Request } from 'express'
@@ -267,21 +267,21 @@ export default async function staticize({
     // we also import the correct version of statik runtime
     const getStatikRunTime: () => Promise<{
       configureStatikDataDir(dataDir: string): void
-      configureRegisterStatik(register: RegisterStatik): void
+      configureStatikHandler(register: StatikHandler): void
     }> = compileNodeCommonJS
       ? async () => require('@pluffa/statik/runtime')
       : async () => await import('@pluffa/statik/runtime')
 
-    const { configureRegisterStatik, configureStatikDataDir } =
+    const { configureStatikHandler, configureStatikDataDir } =
       await getStatikRunTime()
 
-    const { default: registerStatik } = await import(
+    const { default: statikHandler } = await import(
       path.join(buildNodePath, `statik.${buildImportExt}`)
     )
       .catch(handleImportError)
       .then(uniformExport)
 
-    configureRegisterStatik(registerStatik)
+    configureStatikHandler(statikHandler)
     if (statikDataDir !== false) {
       configureStatikDataDir(path.resolve(outPath, statikDataDir))
     }

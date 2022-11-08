@@ -44,27 +44,20 @@ class InstructResponseCFResponse implements InstructResponse {
 class EdgeRequestWrapper implements RequestWrapper<Request> {
   _request: Request
   _headers: Record<string, string>
-  _body: any
   _url: string
-  _cookies: Record<string, string>
+  _cookies: Record<string, string> | null
 
   constructor(request: Request) {
     this._request = request
     this._headers = Object.fromEntries(request.headers)
     const url = new URL(request.url)
     this._url = url.pathname + url.search
-    this._cookies = cookie.parse(this._headers['cookie'] || '')
-    // TODO: This sucks...
-    this._body = null
+    // Parse lazy...
+    this._cookies = null
   }
 
-  // TODO: Decice the format of body or maybe ad more methods ...
-  // like json() ecc
   get body() {
-    if (!this._body) {
-      this._body = this._request.clone().body
-    }
-    return this._body
+    throw new Error('Not implemented.')
   }
 
   get headers() {
@@ -72,6 +65,9 @@ class EdgeRequestWrapper implements RequestWrapper<Request> {
   }
 
   get cookies() {
+    if (!this._cookies) {
+      this._cookies = cookie.parse(this._headers['cookie'] || '')
+    }
     return this._cookies
   }
 

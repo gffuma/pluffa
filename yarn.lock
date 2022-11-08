@@ -1605,6 +1605,18 @@
     undici "5.9.1"
     ws "^8.2.2"
 
+"@pluffa/edge-render@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@pluffa/edge-render/-/edge-render-0.3.0.tgz#52b0fb8b468f5d912d047caf12eeb9ffee55cb6c"
+  integrity sha512-Eo/CS/zfPxPr3Jx2zer6GKKChxpH2UzGGZoIvL1g4UqCP3jUgvwzn1cosH447euwKThhTY0dDW1VStifk/vHAA==
+  dependencies:
+    "@pluffa/ssr" "^0.1.0"
+
+"@pluffa/ssr@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@pluffa/ssr/-/ssr-0.1.0.tgz#b90d75648b4dda0af7daa37c8c26e0e76ca8cf63"
+  integrity sha512-UIGGFGyg9zQt4lSkYceGkeGPI42dj3uMyme9/DiXq5qmS5hD0xgySVAEZsC8t/CYmZBjn01ZuChJKu5xiH50WA==
+
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.8":
   version "0.5.8"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.5.8.tgz#da3383761e2c0c440610819f3204769022a38d12"
@@ -4040,11 +4052,6 @@ istanbul-reports@^3.1.3:
   dependencies:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
-
-itty-router@^2.6.1:
-  version "2.6.6"
-  resolved "https://registry.yarnpkg.com/itty-router/-/itty-router-2.6.6.tgz#78a08c3b7dc1bd90ce832cae8eff7e4cbfbf67ef"
-  integrity sha512-hIPHtXGymCX7Lzb2I4G6JgZFE4QEEQwst9GORK7sMYUpJvLfy4yZJr95r04e8DzoAnj6HcxM2m4TbK+juu+18g==
 
 jest-changed-files@^29.2.0:
   version "29.2.0"

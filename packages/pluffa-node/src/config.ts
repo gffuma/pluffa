@@ -101,9 +101,9 @@ export interface NodeConfig {
    */
   crawlEnabled?: boolean
   /**
-   * Path register statik file.
+   * Path of statik handler file.
    */
-  registerStatik?: string
+  statikHandler?: string
   /**
    * @markdownDescription
    *

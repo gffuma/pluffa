@@ -86,7 +86,7 @@ export function getNodeConfiguration(
 export interface GetWebPackNodeConfigOptions {
   serverComponent: string
   skeletonComponent: string
-  registerStatik?: string
+  statikHandler?: string
   compileNodeCommonJS: boolean
   useTypescript: boolean
   isProd: boolean
@@ -97,7 +97,7 @@ export function getWebPackNodeConfig({
   useTypescript,
   serverComponent,
   skeletonComponent,
-  registerStatik,
+  statikHandler,
   compileNodeCommonJS,
   isProd,
   useSwc,
@@ -106,8 +106,8 @@ export function getWebPackNodeConfig({
     Server: serverComponent,
     Skeleton: skeletonComponent,
   }
-  if (registerStatik) {
-    entry.statik = registerStatik
+  if (statikHandler) {
+    entry.statik = statikHandler
   }
   return {
     name: 'server',

@@ -1,32 +1,45 @@
-import itty from 'itty-router'
-
+// FIXME: We should unify the Pluffa http stack ....
+// But for now we keep a the StatikRequest here.
+// Re-use the other layer has some cross platform issues
 export interface StatikRequest<T = any> {
   method: string
   url: string
   body?: T
+  // NOTE: I am not dub or a PHP Fan lol
+  // but in CF 'context' is required so... yes i can use another
+  // name but the $ means such special or internal...
+  // maybe in the future should find a better way for dependency injection
+  // but for now stick on this lol
+  $context: Record<string, any>
 }
 
-export type RegisterStatik<T = any> = (
-  router: itty.Router<StatikRequest<T>>
-) => void
+export type StatikHandler<T = any> = (req: StatikRequest<T>) => any
 
-export class StatikNotFound extends Error {
-  status: 404
-  constructor(message: any) {
+export class StatikError extends Error {
+  status: number
+  constructor(message: any, status: number = 500) {
     super(message)
-    this.status = 404
+    this.status = status
+  }
+}
+export class StatikNotFound extends StatikError {
+  constructor(message: any = 'Not Found') {
+    super(message, 404)
   }
 }
 
 export interface StatikConfig {
+  baseUrl: string
   dataDir?: string
-  register?: RegisterStatik
+  handler?: StatikHandler
 }
 
-const StatikGlobalConfig: StatikConfig = {}
+const StatikGlobalConfig: StatikConfig = {
+  baseUrl: '',
+}
 
-export function configureRegisterStatik(register: RegisterStatik) {
-  StatikGlobalConfig.register = register
+export function configureStatikHandler(handler: StatikHandler) {
+  StatikGlobalConfig.handler = handler
 }
 
 export function configureStatikDataDir(dataDir: string) {
@@ -37,22 +50,26 @@ export function getStatikDataDir() {
   return StatikGlobalConfig.dataDir
 }
 
-export async function runStatik<T = any>(
-  req: StatikRequest
-): Promise<T> {
-  const router = itty.Router<StatikRequest>()
-  if (!StatikGlobalConfig.register) {
+export function configureStatikServerBaseUrl(url: string) {
+  StatikGlobalConfig.baseUrl = url
+}
+
+export function getStatikServerBaseUrl() {
+  return StatikGlobalConfig.baseUrl
+}
+
+export async function runStatik<T = any>(req: StatikRequest): Promise<T> {
+  if (!StatikGlobalConfig.handler) {
     throw new Error(
-      'You should call configureRegisterStatik() before calling runStatik().'
+      'You should call configureStatikHandler() before calling runStatik().'
     )
   }
-  StatikGlobalConfig.register(router)
-  router.all('*', () => {
-    throw new StatikNotFound(`No register statik handler for URL ${req.url}`)
-  })
-  const data = await router.handle({
+  const data = await StatikGlobalConfig.handler({
     ...req,
     url: `http://pluffa${req.url}`,
   })
+  if (data === undefined) {
+    throw new StatikNotFound()
+  }
   return data
 }

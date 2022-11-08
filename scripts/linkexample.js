@@ -26,8 +26,8 @@ async function main() {
     const pkg = await fs.readJson(
       path.join('./packages', deName, 'package.json')
     )
-    Object.keys(pkg.dependencies)
-      .concat(Object.keys(pkg.peerDependencies))
+    Object.keys(pkg.dependencies ?? {})
+      .concat(Object.keys(pkg.peerDependencies ?? {}))
       .filter((d) => d.includes('react'))
       .forEach((d) => crossLinks.add(d))
   }

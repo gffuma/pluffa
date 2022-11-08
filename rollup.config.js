@@ -141,8 +141,11 @@ function pluffaStatik() {
   return ['esm', 'cjs'].map((format) => ({
     input: {
       runtime: `${baseDir}/src/runtime.ts`,
+      client: `${baseDir}/src/client.ts`,
+      edge: `${baseDir}/src/edge.ts`,
       'statik.browser': `${baseDir}/src/statik.browser.ts`,
       'statik.node': `${baseDir}/src/statik.node.ts`,
+      'statik.edge': `${baseDir}/src/statik.edge.ts`,
     },
     output: {
       dir: `${baseDir}/dist`,

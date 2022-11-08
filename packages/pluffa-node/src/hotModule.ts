@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url)
 
 export interface HotModule<T = any> {
   readonly name: string
+  lastError: any
   get(): Promise<T>
   refresh(): void
 }
@@ -28,6 +29,7 @@ export function createHotModule(
 
   const name = nameNoExt + (compileNodeCommonJS ? '.js' : '.mjs')
   const correctPathForNodeMode = path.join(buildDir, name)
+  let lastErrorValue: any = null
 
   const getFreshModule = compileNodeCommonJS
     ? async () => {
@@ -37,15 +39,19 @@ export function createHotModule(
     : async () => importVm(correctPathForNodeMode)
 
   function refresh() {
+    lastErrorValue = null
     promiseRunTime = getFreshModule().then(
       (value) => ({
         value,
         isError: false,
       }),
-      (value) => ({
-        value,
-        isError: true,
-      })
+      (value) => {
+        lastErrorValue = value
+        return {
+          value,
+          isError: true,
+        }
+      }
     )
   }
 
@@ -64,5 +70,8 @@ export function createHotModule(
     name,
     get,
     refresh,
+    get lastError() {
+      return lastErrorValue
+    },
   }
 }

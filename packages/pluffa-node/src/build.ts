@@ -19,7 +19,7 @@ export interface BuildOptions {
   clientSourceMapEnabled?: boolean
   serverComponent: string
   skeletonComponent: string
-  registerStatik?: string
+  statikHandler?: string
   compileNodeCommonJS: boolean
   useTypescript: boolean
   statikDataDir: string | false
@@ -34,7 +34,7 @@ export default function build({
   clientEntry,
   serverComponent,
   skeletonComponent,
-  registerStatik,
+  statikHandler,
   useTypescript,
   compileNodeCommonJS,
   statikDataDir,
@@ -78,7 +78,7 @@ export default function build({
         serverComponent,
         skeletonComponent,
         useTypescript,
-        registerStatik,
+        statikHandler,
         useSwc,
       })
     ),
