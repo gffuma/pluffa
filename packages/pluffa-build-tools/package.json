@@ -2,7 +2,7 @@
   "name": "@pluffa/build-tools",
   "type": "module",
   "description": "Pluffa meta package to share build tools stuff",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",

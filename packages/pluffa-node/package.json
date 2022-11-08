@@ -2,7 +2,7 @@
   "name": "@pluffa/node",
   "type": "module",
   "description": "Pluffa on Node.js",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "sideEffects": false,
   "exports": {
     ".": {
@@ -40,12 +40,12 @@
     "static site"
   ],
   "dependencies": {
-    "@pluffa/build-tools": "^0.6.0",
+    "@pluffa/build-tools": "^0.7.0",
     "@pluffa/crawl": "^0.2.0",
     "@pluffa/env": "^0.2.0",
     "@pluffa/node-render": "^0.4.0",
     "@pluffa/ssr": "^0.2.0",
-    "@pluffa/statik": "^0.2.0",
+    "@pluffa/statik": "^0.3.0",
     "@vercel/nft": "^0.22.1",
     "ansi-to-html": "^0.7.2",
     "chalk": "^5.1.0",

@@ -2,7 +2,7 @@
   "name": "@pluffa/cloudflare-workers",
   "type": "module",
   "description": "Pluffa on cloudflare workers",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -41,7 +41,7 @@
     "node": ">=16.7"
   },
   "dependencies": {
-    "@pluffa/build-tools": "^0.6.0",
+    "@pluffa/build-tools": "^0.7.0",
     "@pluffa/edge-render": "^0.3.0",
     "@pluffa/env": "^0.2.0",
     "@pluffa/ssr": "^0.2.0",
