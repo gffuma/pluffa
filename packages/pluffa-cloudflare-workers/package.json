@@ -2,7 +2,7 @@
   "name": "@pluffa/cloudflare-workers",
   "type": "module",
   "description": "Pluffa on cloudflare workers",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
