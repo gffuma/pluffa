@@ -27,7 +27,7 @@ export interface createWorkerDevServerOptions {
   configureWebpackWorker?: WebPackConfigMapper
 }
 
-export default function createWokerDevServer({
+export default function createWorkerDevServer({
   clientEntry,
   workerEntry,
   useTypescript = false,

@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import webpack, { Configuration, MultiStats } from 'webpack'
 import rimraf from 'rimraf'
 import {
-  getFlatEntrypointsFromWebPackStats,
+  getFlatEntrypointsFromWebPackMultiStats,
   getWebPackClientConfig,
   getWebPackNodeConfig,
 } from '@pluffa/build-tools'
@@ -100,7 +100,10 @@ export default function build({
         }
         process.exit(1)
       } else {
-        const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
+        const entrypoints = getFlatEntrypointsFromWebPackMultiStats(
+          stats!,
+          'client'
+        )
         await fs.writeFile(
           path.join(process.cwd(), '.pluffa/client', 'manifest.json'),
           JSON.stringify({ entrypoints }, null, 2)

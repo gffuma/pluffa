@@ -1,15 +1,8 @@
-import { MultiStats } from 'webpack'
+import { MultiStats, Stats } from 'webpack'
 
-export function getFlatEntrypointsFromWebPackStats(
-  stats: MultiStats,
-  name: string
-) {
-  const deStats = stats.stats.find((c) => c.compilation.name === name)
-  if (!deStats) {
-    throw new Error(`Invalid webpack config name ${name}`)
-  }
+export function getFlatEntrypointsFromWebPackStats(stats: Stats) {
   const flatty: Record<string, string[]> = {}
-  for (const chunk of deStats.compilation.chunks) {
+  for (const chunk of stats.compilation.chunks) {
     if (!chunk.name) continue
     for (const file of chunk.files) {
       if (flatty[chunk.name] === undefined) {
@@ -28,4 +21,15 @@ export function getFlatEntrypointsFromWebPackStats(
     }
   }
   return flatty
+}
+
+export function getFlatEntrypointsFromWebPackMultiStats(
+  multiStats: MultiStats,
+  name: string
+) {
+  const deStats = multiStats.stats.find((c) => c.compilation.name === name)
+  if (!deStats) {
+    throw new Error(`Invalid webpack config name ${name}`)
+  }
+  return getFlatEntrypointsFromWebPackStats(deStats)
 }

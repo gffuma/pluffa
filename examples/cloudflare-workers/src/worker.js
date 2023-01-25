@@ -10,6 +10,8 @@ import {
 } from '@pluffa/statik/edge'
 import statikHandler from './fns'
 
+console.log('O', PLUFFA_BUNDLE)
+
 const router = Router()
 
 router.get('/static/*', async (_, event) => {
@@ -42,6 +44,7 @@ router.all(
     Server,
     Skeleton,
     getServerData,
+    bundle: PLUFFA_BUNDLE,
   })
 )
 

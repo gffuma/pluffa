@@ -5,7 +5,7 @@ import util from 'util'
 import webpack, { Configuration } from 'webpack'
 import rimraf from 'rimraf'
 import {
-  getFlatEntrypointsFromWebPackStats,
+  getFlatEntrypointsFromWebPackMultiStats,
   getWebPackClientConfig,
 } from '@pluffa/build-tools'
 import { getWebPackWorkerConfig } from './webpack'
@@ -99,7 +99,7 @@ export default async function buildForWorker({
       await fs.rename(libOutPath, buildOutPath)
 
       // Inject entry points in worker bundle
-      const entrypoints = getFlatEntrypointsFromWebPackStats(stats!, 'client')
+      const entrypoints = getFlatEntrypointsFromWebPackMultiStats(stats!, 'client')
       await fs.appendFile(
         path.resolve(buildOutPath, 'runtime/worker.js'),
         `\nvar PLUFFA_BUNDLE_ENTRYPOINTS = ${JSON.stringify(entrypoints)};`,

@@ -8,7 +8,7 @@ import path from 'path'
 import { renderToString } from 'react-dom/server'
 import {
   createBaseDevServer,
-  getFlatEntrypointsFromWebPackStats,
+  getFlatEntrypointsFromWebPackMultiStats,
 } from '@pluffa/build-tools'
 import type { ServerComponent, SkeletonComponent } from '@pluffa/ssr'
 import { Compiler, MultiCompiler, MultiStats } from 'webpack'
@@ -182,7 +182,10 @@ export default function createDevServer({
   app.use(async (req, res) => {
     const { devMiddleware } = res.locals.webpack
     const multiStats = devMiddleware.stats as MultiStats
-    const entrypoints = getFlatEntrypointsFromWebPackStats(multiStats, 'client')
+    const entrypoints = getFlatEntrypointsFromWebPackMultiStats(
+      multiStats,
+      'client'
+    )
     const bundle = { entrypoints }
     try {
       if (statikEnabled && statikHotModule.lastError) {
